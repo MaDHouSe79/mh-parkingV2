@@ -28,6 +28,7 @@
 
 # MH Parking V2 by MaDHouSe79
 - I rewrote the parking script and now your vehicles are automatically parked, this happens when you get out or get in the vehicle.
+- I remove the F5 park/unpark and everything else that was no longer needed.
 - The Impound should also work automatically and the vehicle should disappear when the police impound a vehicle.
 
 # Videos
