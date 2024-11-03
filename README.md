@@ -52,7 +52,7 @@
 ALTER TABLE `player_vehicles` ADD COLUMN `location` TEXT NULL DEFAULT NULL
 ```
 
-
+# 🐞 Any bugs issues or suggestions, let my know, just join my discord. 👊😎
 
 # LICENSE
 [GPL LICENSE](./LICENSE)<br />
