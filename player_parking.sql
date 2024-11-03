@@ -1,0 +1,1 @@
+ALTER TABLE `player_vehicles` ADD COLUMN `location` TEXT NULL DEFAULT NULL
