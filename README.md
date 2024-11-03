@@ -40,8 +40,9 @@
 # Installation
 - Step 1: First stop your server.
 - Step 2: Copy the directory `mh-parkinV2` to `resources/[mh]/`.
-- Step 3: Add the database table to your player_vehicles table in your database.
-- Step 4: Start your server.  
+- Stap 3: Add `ensure [mh]` in `server.cfg` below `ensure [defaultmaps]`.
+- Step 4: Add the database table to your player_vehicles table in your database.
+- Step 5: Start your server.  
 
 # Installation QB-Garagae
 [README](https://github.com/MaDHouSe79/mh-parkingV2/tree/main/readme)
