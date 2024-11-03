@@ -27,8 +27,8 @@
 - [Discord](https://discord.gg/vJ9EukCmJQ)
 
 # MH Parking V2 by MaDHouSe
-I rewrite the parking script and now it can automatic park your vehicles when you exit or get in the vehicle.
-The impound should work also automatic and the vehicle should despawn when a police impound a vehicle.
+- I rewrite the parking script and now it can automatic park your vehicles when you exit or get in the vehicle.
+- The impound should work also automatic and the vehicle should despawn when a police impound a vehicle.
 
 # Videos
 [Watch](https://youtu.be/cLCthqPRLQQ)
