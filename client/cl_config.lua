@@ -18,3 +18,4 @@ Config.ForceVehicleOnGound = true -- If true this will force parked vehicles on 
 -- For performance
 Config.ViewDistance = true        -- If true vehicles are only visable in 100 meters around the players.
 Config.ParkedViewDistance = 100   -- Default 100 if your distance is over 100 meters the vehicles in that area will not render on screen.
+Config.UseParkedBlips = true      -- if true players can see a blip of the parked vehicle on the map
