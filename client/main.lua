@@ -37,16 +37,20 @@ local function BlinkVehiclelights(vehicle, state)
 end
 
 local function CreateParkedBlip(label, location)
-    local blip = AddBlipForCoord(location.x, location.y, location.z)
-    SetBlipSprite(blip, 545)
-    SetBlipDisplay(blip, 4)
-    SetBlipScale(blip, 0.6)
-    SetBlipAsShortRange(blip, true)
-    SetBlipColour(blip, 25)
-    BeginTextCommandSetBlipName("STRING")
-    AddTextComponentSubstringPlayerName(label)
-    EndTextCommandSetBlipName(blip)
-    return blip
+    if Config.UseParkedBlips then
+        local blip = AddBlipForCoord(location.x, location.y, location.z)
+        SetBlipSprite(blip, 545)
+        SetBlipDisplay(blip, 4)
+        SetBlipScale(blip, 0.6)
+        SetBlipAsShortRange(blip, true)
+        SetBlipColour(blip, 25)
+        BeginTextCommandSetBlipName("STRING")
+        AddTextComponentSubstringPlayerName(label)
+        EndTextCommandSetBlipName(blip)
+        return blip
+    else
+        return nil
+    end
 end
 
 local function SetVehicleDamage(vehicle, engine, body)
