@@ -7,7 +7,10 @@ elseif v.state == 1 then
     v.state = Lang:t("status.garaged")
 elseif v.state == 2 then
     v.state = Lang:t("status.impound")
+end
+```
+- Add this below `v.state = Lang:t("status.impound")`
+```lua
 elseif v.state == 3 then
     v.state = "Parked outside"
-end
 ```
