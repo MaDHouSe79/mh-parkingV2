@@ -128,16 +128,6 @@ local function DeleteNearByVehicle(location)
     end
 end
 
-local function CreateTargetEntityMenu(vehicle)
-    if DoesEntityExist(vehicle) then
-        if Config.TargetScript == "qb-target" then
-            exports['qb-target']:AddTargetEntity(NetworkGetNetworkIdFromEntity(vehicle), {options = {{type = "client", event = "mh-parkingV2:client:park", icon = "fas fa-car", label = Lang:t('target.park_vehicle')}, {type = "client", event = "mh-parkingV2:client:drive", icon = "fas fa-car", label = Lang:t('target.unpark_vehicle')}}, distance = 2.5})
-        elseif Config.TargetScript == "ox_target" then
-            exports.ox_target:addEntity(NetworkGetNetworkIdFromEntity(vehicle), {{name = 'vehicle_parking', icon = "fas fa-parking", label = Lang:t('target.park_vehicle'), event = "mh-parkingV2:client:park", distance = 2.5},  {name = 'parmeters_parking', icon = "fas fa-parking", label = Lang:t('target.unpark_vehicle'), event = "mh-parkingV2:client:drive", distance = 2.5}})
-        end
-    end
-end
-
 local function Drive(vehicle)
     if DoesEntityExist(vehicle) then
         local plate = QBCore.Functions.GetPlate(vehicle)
@@ -219,7 +209,7 @@ local function SpawnVehicles(vehicles)
                 FreezeEntityPosition(vehicle, true)
                 SetModelAsNoLongerNeeded(vehicles[i].model)
                 local tmpBlip = nil
-                if PlayerData.citizenid == vehicles[i].citizenid then FreezeEntityPosition(vehicle, false) tmpBlip = CreateParkedBlip(Lang:t('info.parked_blip',{model = vehicles[i].model}), vehicles[i].location) CreateTargetEntityMenu(vehicle) end
+                if PlayerData.citizenid == vehicles[i].citizenid then FreezeEntityPosition(vehicle, false) tmpBlip = CreateParkedBlip(Lang:t('info.parked_blip',{model = vehicles[i].model}), vehicles[i].location) end
                 table.insert(LocalVehicles, {entity = vehicle, plate = vehicles[i].plate, blip = tmpBlip, location = vehicles[i].location})
             end
         end
@@ -257,14 +247,12 @@ end
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
     PlayerData, isLoggedIn = QBCore.Functions.GetPlayerData(), true
     TriggerServerEvent("mh-parkingV2:server:refreshVehicles")
-    TriggerServerEvent('mh-parkingV2:server:onjoin')
 end)
 
 AddEventHandler('onResourceStart', function(resource)
     if resource == GetCurrentResourceName() then
         PlayerData, isLoggedIn = QBCore.Functions.GetPlayerData(), true
         TriggerServerEvent("mh-parkingV2:server:refreshVehicles")
-        TriggerServerEvent('mh-parkingV2:server:onjoin')
     end
 end)
 
