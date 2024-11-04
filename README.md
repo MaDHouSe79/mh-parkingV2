@@ -36,6 +36,11 @@
 - [qb-core](https://github.com/qbcore-framework/qb-core)
 - [qb-policejob](https://github.com/qbcore-framework/qb-policejob)
 - [qb-vehiclekeys](https://github.com/qbcore-framework/qb-vehiclekeys)
+- 
+# Database
+```sql
+ALTER TABLE `player_vehicles` ADD COLUMN `location` TEXT NULL DEFAULT NULL
+```
 
 # Installation
 - Step 1: First stop your server.
@@ -45,14 +50,25 @@
 - Step 5: Start your server.  
 
 # Installation QB-Garagae
-[README](https://github.com/MaDHouSe79/mh-parkingV2/tree/main/readme)
+[README FILES](https://github.com/MaDHouSe79/mh-parkingV2/tree/main/readme)
 
-# Database
-```sql
-ALTER TABLE `player_vehicles` ADD COLUMN `location` TEXT NULL DEFAULT NULL
+# Impound 
+- The Impound should also work automatically and the vehicle should disappear when the police impound the vehicle.
+
+# Towing vehicle example
+- this for mechanics (client side call)
+```lua
+local vehicle, distance = QBCore.Functions.GetClosestVehicle(GetEntityCoords(PlayerPedId()))
+if vehicle ~= 0 and distance <= 3.0 then
+    PlayerData = QBCore.Functions.GetPlayerData()
+    if PlayerData.job.name == 'mechanic' and PlayerData.job.onduty then
+        local plate = QBCore.Functions.GetPlate(vehicle)
+        TriggerServerEvent('mh-parkingV2:server:towVehicle', plate)
+    end
+end
 ```
 
-# 🐞 Any bugs issues or suggestions, let my know, just join my discord. 👊😎
+# 🐞 Any bugs issues or suggestions, let my know. 👊😎
 
 # LICENSE
 [GPL LICENSE](./LICENSE)<br />
