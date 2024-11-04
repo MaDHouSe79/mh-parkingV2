@@ -148,18 +148,10 @@ local function Drive(vehicle)
                 DeteteParkedBlip(vehicle)
                 QBCore.Functions.TriggerCallback("mh-parkingV2:server:getVehicleData", function(vehicleData)
                     if type(vehicleData) == 'table' then
+                        TriggerServerEvent('qb-vehiclekeys:server:setVehLockState', netid, 1)
                         DeleteLocalVehicle(plate)
-                        local mods = json.decode(vehicleData.mods)
-                        QBCore.Functions.SetVehicleProperties(vehicle, mods)
-                        exports[Config.FuelScript]:SetFuel(vehicle, vehicleData.fuel)
                         SetEntityInvincible(vehicle, false)
                         FreezeEntityPosition(vehicle, false)
-                        SetVehicleLivery(vehicle, mods.livery)
-                        SetVehicleEngineHealth(vehicle, mods.engineHealth)
-                        SetVehicleBodyHealth(vehicle, mods.bodyHealth)
-                        SetVehiclePetrolTankHealth(vehicle, mods.tankHealth)
-                        SetVehRadioStation(vehicle, 'OFF')
-                        SetVehicleDirtLevel(vehicle, 0)
                         if not Config.DisableParkNotify then Notify(callback.message, "primary", 5000) end
                     elseif type(vehicleData) == 'boolean' then
                         Notify(callback.message, "error", 5000)
@@ -216,8 +208,6 @@ local function SpawnVehicles(vehicles)
                 SetEntityAsMissionEntity(vehicle, true, true)
                 SetEntityInvincible(vehicle, true)
                 SetEntityHeading(vehicle, vehicles[i].location.w)
-                SetVehicleDirtLevel(vehicle, 0)
-                SetModelAsNoLongerNeeded(vehicles[i].model)
                 SetVehicleLivery(vehicle, vehicles[i].mods.livery)
                 SetVehicleEngineHealth(vehicle, vehicles[i].mods.engineHealth)
                 SetVehicleBodyHealth(vehicle, vehicles[i].mods.bodyHealth)
@@ -227,6 +217,7 @@ local function SpawnVehicles(vehicles)
                 SetVehicleDamage(vehicle, vehicles[i].engine, vehicles[i].body)
                 TriggerServerEvent('qb-vehiclekeys:server:setVehLockState', netid, 2)
                 FreezeEntityPosition(vehicle, true)
+                SetModelAsNoLongerNeeded(vehicles[i].model)
                 local tmpBlip = nil
                 if PlayerData.citizenid == vehicles[i].citizenid then FreezeEntityPosition(vehicle, false) tmpBlip = CreateParkedBlip(Lang:t('info.parked_blip',{model = vehicles[i].model}), vehicles[i].location) CreateTargetEntityMenu(vehicle) end
                 table.insert(LocalVehicles, {entity = vehicle, plate = vehicles[i].plate, blip = tmpBlip, location = vehicles[i].location})
@@ -332,11 +323,7 @@ RegisterNetEvent("mh-parkingV2:client:autoPark", function(driver, netid)
         local player = PlayerData.source
         local vehicle = NetworkGetEntityFromNetworkId(netid)
         if DoesEntityExist(vehicle) then
-            if driver == player then
-                Save(vehicle)
-            elseif driver ~= player then
-                TaskLeaveVehicle(player, vehicle)
-            end
+            if driver == player then Save(vehicle) else TaskLeaveVehicle(player, vehicle, 1) end
         end
     end
 end)
@@ -345,9 +332,7 @@ RegisterNetEvent("mh-parkingV2:client:autoDrive", function(driver, netid)
     if isLoggedIn then
         local player = PlayerData.source
         local vehicle = NetworkGetEntityFromNetworkId(netid)
-        if DoesEntityExist(vehicle) and driver == player then 
-            Drive(vehicle)
-        end
+        if DoesEntityExist(vehicle) and driver == player then Drive(vehicle) end
     end
 end)
 
