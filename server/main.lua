@@ -26,8 +26,8 @@ local function AutoSave()
     SetTimeout(SV_Config.AutoSaveTimer * 1000, AutoSave)
 end
 
-QBCore.Functions.CreateCallback('mh-parkingV2:server:isVehicleParked', function(source, cb, plate, state)
-    local result = MySQL.Sync.fetchAll('SELECT * FROM player_vehicles WHERE state = ?', {state})[1]
+QBCore.Functions.CreateCallback('mh-parkingV2:server:isVehicleParked', function(source, cb, plate)
+    local result = MySQL.Sync.fetchAll('SELECT * FROM player_vehicles WHERE state = ? AND plate = ?', {plate})[1]
     if result then cb(true) end
     cb(false)
 end)
