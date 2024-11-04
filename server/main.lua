@@ -89,8 +89,28 @@ AddEventHandler('onResourceStart', function(resource)
 end)
 
 RegisterNetEvent('police:server:Impound', function(plate, fullImpound, price, body, engine, fuel)
-    local parked = MySQL.Sync.fetchAll('SELECT * FROM player_vehicles WHERE plate = ? AND state = ?', {plate, 3})[1]
-    if parked then TriggerClientEvent('mh-parkingV2:client:deletePlate', -1, plate) end
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+    if Player then
+        if Player.PlayerData.job.type == 'leo' and Player.PlayerData.job.onduty then
+            local parked = MySQL.Sync.fetchAll('SELECT * FROM player_vehicles WHERE plate = ? AND state = 3', {plate})[1]
+            if parked then TriggerClientEvent('mh-parkingV2:client:deletePlate', -1, plate) end
+        end 
+    end
+end)
+
+RegisterNetEvent('mh-parkingV2:server:towVehicle', function(plate)
+    local src = source
+    local Player = QBCore.Functions.GetPlayer(src)
+    if Player then
+        if Player.PlayerData.job.name == 'mechanic' and Player.PlayerData.job.onduty then
+            local parked = MySQL.Sync.fetchAll('SELECT * FROM player_vehicles WHERE plate = ? AND state = ?', {plate})[1]
+            if parked then 
+                MySQL.Async.execute('UPDATE player_vehicles SET state = 0 WHERE plate = ?', {plate})
+                TriggerClientEvent('mh-parkingV2:client:deletePlate', -1, plate)
+            end
+        end
+    end
 end)
 
 RegisterNetEvent("baseevents:enteredVehicle", function(currentVehicle, currentSeat, vehicleName, netId)
