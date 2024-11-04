@@ -329,12 +329,13 @@ end)
 
 RegisterNetEvent("mh-parkingV2:client:autoPark", function(driver, netid)
     if isLoggedIn then
-        local player, vehicle = PlayerData.source, NetworkGetEntityFromNetworkId(netid)
+        local player = PlayerData.source
+        local vehicle = NetworkGetEntityFromNetworkId(netid)
         if DoesEntityExist(vehicle) then
-            if driver == player and GetPedInVehicleSeat(vehicle, -1) == player then
+            if driver == player then
                 Save(vehicle)
-            elseif driver ~= player and GetPedInVehicleSeat(vehicle, -1) ~= player then
-                if GetVehiclePedIsIn(player, false) == vehicle then TaskLeaveVehicle(player, vehicle) end
+            elseif driver ~= player then
+                TaskLeaveVehicle(player, vehicle)
             end
         end
     end
@@ -342,8 +343,9 @@ end)
 
 RegisterNetEvent("mh-parkingV2:client:autoDrive", function(driver, netid)
     if isLoggedIn then
-        local player, vehicle = PlayerData.source, NetworkGetEntityFromNetworkId(netid)
-        if DoesEntityExist(vehicle) and driver == player and GetPedInVehicleSeat(vehicle, -1) == player then 
+        local player = PlayerData.source
+        local vehicle = NetworkGetEntityFromNetworkId(netid)
+        if DoesEntityExist(vehicle) and driver == player then 
             Drive(vehicle)
         end
     end
