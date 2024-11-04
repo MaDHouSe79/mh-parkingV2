@@ -21,6 +21,8 @@ local function AutoSave()
                     if isDriving and isDriving.plate == plate then MySQL.Async.execute('UPDATE player_vehicles SET location = ? WHERE plate = ? AND citizenid = ? AND state = ?', {json.encode(location), plate, citizenid, 0}) end
                     local inGarage = MySQL.Sync.fetchAll('SELECT * FROM player_vehicles WHERE plate = ? AND citizenid = ? AND state = ?', {plate, citizenid, 1})[1]
                     if inGarage and inGarage.plate == plate then DeleteEntity(vehicle) end
+                    local isImpound = MySQL.Sync.fetchAll('SELECT * FROM player_vehicles WHERE plate = ? AND citizenid = ? AND state = ?', {plate, citizenid, 2})[1]
+                    if isImpound and isImpound.plate == plate then DeleteEntity(vehicle) end
                     local isParked = MySQL.Sync.fetchAll('SELECT * FROM player_vehicles WHERE plate = ? AND citizenid = ? AND state = ?', {plate, citizenid, 3})[1]
                     if isParked and isParked.plate == plate then DeleteEntity(vehicle) end
                 end
