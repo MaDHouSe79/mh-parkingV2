@@ -4,8 +4,8 @@
 local QBCore = exports['qb-core']:GetCoreObject()
 
 local function AutoSave()
-    if SV_Config.AutoSave then
-        local players = QBCore.Functions.GetPlayers()
+    local players = QBCore.Functions.GetPlayers()
+    if SV_Config.AutoSave and #players >= 1 then
         for id in pairs(players) do
             local Player = QBCore.Functions.GetPlayer(id)
             if Player then
@@ -56,7 +56,7 @@ QBCore.Functions.CreateCallback("mh-parkingV2:server:save", function(source, cb,
                 if type(result2) == 'table' and #result2 > 0 then
                     cb({status = false, message = Lang:t('info.already_parked')})
                 else
-                    MySQL.Async.execute('UPDATE player_vehicles SET state = 3, location = ? WHERE plate = ? AND citizenid = ?', {json.encode(location), plate, citizenid})
+                    MySQL.Async.execute('UPDATE player_vehicles SET state = 3, location = ?, street = ? WHERE plate = ? AND citizenid = ?', {json.encode(location), street, plate, citizenid})
                     cb({status = true, message = Lang:t('info.vehicle_parked')})
                 end
             else
@@ -85,7 +85,15 @@ QBCore.Functions.CreateCallback("mh-parkingV2:server:drive", function(source, cb
 end)
 
 AddEventHandler('onResourceStart', function(resource)
-    if resource == GetCurrentResourceName() then AutoSave() end
+    if resource == GetCurrentResourceName() then
+        AutoSave()
+        local result = MySQL.Sync.fetchAll('SELECT * FROM player_vehicles')
+        for k, v in pairs(result) do
+            if v.state == 0 and (v.location ~= nil) then
+                MySQL.update('UPDATE player_vehicles SET state = 3 WHERE plate = ?', {v.plate})
+            end
+        end
+    end
 end)
 
 RegisterNetEvent('police:server:Impound', function(plate, fullImpound, price, body, engine, fuel)
@@ -149,4 +157,10 @@ RegisterServerEvent('mh-parkingV2:server:refreshVehicles', function()
             TriggerClientEvent("mh-parkingV2:client:refreshVehicles", src, vehicles)
         end
     end
+end)
+
+CreateThread(function()
+    Wait(3000)
+    MySQL.Async.execute('ALTER TABLE player_vehicles ADD COLUMN IF NOT EXISTS location TEXT NULL DEFAULT NULL')
+    MySQL.Async.execute('ALTER TABLE player_vehicles ADD COLUMN IF NOT EXISTS street TEXT NULL DEFAULT NULL')
 end)
