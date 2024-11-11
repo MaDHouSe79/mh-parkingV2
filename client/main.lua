@@ -196,9 +196,7 @@ end
 
 local function AddParkedVehicle(entity, data)
     local blip = nil
-    if PlayerData.citizenid == data.citizenid then  
-        blip = CreateParkedBlip(Lang:t('info.parked_blip',{model = GetDisplayNameFromVehicleModel(GetEntityModel(data.entity))}), data.location)
-    end
+    if PlayerData.citizenid == data.citizenid then blip = CreateParkedBlip(Lang:t('info.parked_blip',{model = GetDisplayNameFromVehicleModel(GetEntityModel(data.entity))}), data.location) end
     table.insert(LocalVehicles, {citizenid = data.citizenid, fullname = data.fullname, plate = data.plate, model = data.model, blip = blip, location = data.location, entity = entity or nil})
 end
 
