@@ -32,37 +32,6 @@ local function IsCloseByStationPump(coords)
     return false
 end
 
-local function IsCloseByCoords(coords)
-    for k, v in pairs(Config.NoParkingLocations) do
-        if GetDistance(coords, v.coords) < v.radius then
-            if v.job == nil then
-                return true
-            elseif v.job ~= nil and v.job ~= PlayerData.job.name then
-                return true
-            end
-        end         
-        
-    end
-    return false
-end
-
-local function IsCloseByParkingLot(coords)
-    for k, v in pairs(Config.AllowedParkingLots) do
-        if GetDistance(coords, v.coords) < v.radius then return true end
-    end
-    return false
-end
-
-local function AllowToPark(coords)
-    local isAllowd = false
-    if Config.UseParkingLotsOnly then 
-        if IsCloseByParkingLot(coords) and not IsCloseByStationPump(coords) then isAllowd = true end
-    elseif not Config.UseParkingLotsOnly then 
-        if not IsCloseByCoords(coords) and not IsCloseByStationPump(coords) then isAllowd = true end
-    end
-    return isAllowd
-end
-
 local function DeteteParkedBlip(vehicle)
     for k, v in pairs(LocalVehicles) do
         if v.entity == vehicle then RemoveBlip(v.blip) v.blip = nil end
@@ -193,8 +162,8 @@ end
 
 local function Save(vehicle)
     if isLoggedIn and DoesEntityExist(vehicle) then
-        local allowToPark = AllowToPark(GetEntityCoords(PlayerPedId()))
-        if allowToPark then
+        local isCloseByStationPump = IsCloseByStationPump(GetEntityCoords(PlayerPedId()))
+        if not isCloseByStationPump then
             local netid = NetworkGetNetworkIdFromEntity(vehicle)
             local vehicleCoords = GetEntityCoords(vehicle)
             local vehicleHeading = GetEntityHeading(vehicle)
