@@ -192,24 +192,34 @@ local function Drive(vehicle)
 end
 
 local function Save(vehicle)
-    if DoesEntityExist(vehicle) then
-        local netid = NetworkGetNetworkIdFromEntity(vehicle)
-        local vehicleCoords = GetEntityCoords(vehicle)
-        local vehicleHeading = GetEntityHeading(vehicle)
-        local plate = QBCore.Functions.GetPlate(vehicle)
-        local location = vector4(vehicleCoords.x, vehicleCoords.y, vehicleCoords.z, vehicleHeading)
-        QBCore.Functions.TriggerCallback("mh-parkingV2:server:save", function(callback)
-            if callback.status then
-                SetEntityAsMissionEntity(vehicle, true, true)
-                local parked_blip = CreateParkedBlip(Lang:t('info.parked_blip',{model = GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))}), vehicleCoords)
-                table.insert(LocalVehicles, {entity = vehicle, plate = plate, blip = parked_blip, location = vehicleCoords})
-                if not Config.DisableParkNotify then Notify(callback.message, "primary", 5000) end
-            elseif callback.limit then
-                Notify(callback.message, "error", 5000)
-            elseif not callback.owner then
-                Notify(callback.message, "error", 5000)
-            end
-        end, plate, location, netid)
+    if isLoggedIn and DoesEntityExist(vehicle) then
+        local allowToPark = AllowToPark(GetEntityCoords(PlayerPedId()))
+        if allowToPark then
+            local netid = NetworkGetNetworkIdFromEntity(vehicle)
+            local vehicleCoords = GetEntityCoords(vehicle)
+            local vehicleHeading = GetEntityHeading(vehicle)
+            local plate = QBCore.Functions.GetPlate(vehicle)
+            local street = GetCurrentStreetName(GetEntityCoords(PlayerPedId()))
+            local model = GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))
+            local location = vector4(vehicleCoords.x, vehicleCoords.y, vehicleCoords.z, vehicleHeading)
+            QBCore.Functions.TriggerCallback("mh-parkingV2:server:save", function(callback)
+                if callback.status then
+                    SetEntityAsMissionEntity(vehicle, true, true)
+                    if not Config.DisableParkNotify then Notify(callback.message, "primary", 5000) end
+                    local seats = GetVehicleModelNumberOfSeats(GetHashKey(model))
+                    for i = 1, seats, 1 do
+                        SetVehicleDoorShut(vehicle, i, false) -- will close all doors from 0-5
+                    end
+                    Wait(5000)
+                    FreezeEntityPosition(vehicle, true)
+                elseif callback.limit then
+                    Notify(callback.message, "error", 5000)
+                elseif not callback.owner then
+                    Notify(callback.message, "error", 5000)
+                end
+
+            end, plate, location, netid, model, street)
+        end
     end
 end
 
