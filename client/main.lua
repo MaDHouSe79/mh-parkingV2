@@ -176,9 +176,7 @@ local function Save(vehicle)
                     SetEntityAsMissionEntity(vehicle, true, true)
                     if not Config.DisableParkNotify then Notify(callback.message, "primary", 5000) end
                     local seats = GetVehicleModelNumberOfSeats(GetHashKey(model))
-                    for i = 1, seats, 1 do
-                        SetVehicleDoorShut(vehicle, i, false) -- will close all doors from 0-5
-                    end
+                    for i = 1, seats, 1 do SetVehicleDoorShut(vehicle, i, false)  end -- will close all doors from 0-5
                     Wait(5000)
                     FreezeEntityPosition(vehicle, true)
                 elseif callback.limit then
@@ -186,7 +184,6 @@ local function Save(vehicle)
                 elseif not callback.owner then
                     Notify(callback.message, "error", 5000)
                 end
-
             end, plate, location, netid, model, street)
         end
     end
