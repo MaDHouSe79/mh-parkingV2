@@ -32,6 +32,37 @@ local function IsCloseByStationPump(coords)
     return false
 end
 
+local function IsCloseByCoords(coords)
+    for k, v in pairs(Config.NoParkingLocations) do
+        if GetDistance(coords, v.coords) < v.radius then
+            if v.job == nil then
+                return true
+            elseif v.job ~= nil and v.job ~= PlayerData.job.name then
+                return true
+            end
+        end         
+        
+    end
+    return false
+end
+
+local function IsCloseByParkingLot(coords)
+    for k, v in pairs(Config.AllowedParkingLots) do
+        if GetDistance(coords, v.coords) < v.radius then return true end
+    end
+    return false
+end
+
+local function AllowToPark(coords)
+    local isAllowd = false
+    if Config.UseParkingLotsOnly then 
+        if IsCloseByParkingLot(coords) and not IsCloseByStationPump(coords) then isAllowd = true end
+    elseif not Config.UseParkingLotsOnly then 
+        if not IsCloseByCoords(coords) and not IsCloseByStationPump(coords) then isAllowd = true end
+    end
+    return isAllowd
+end
+
 local function DeteteParkedBlip(vehicle)
     for k, v in pairs(LocalVehicles) do
         if v.entity == vehicle then RemoveBlip(v.blip) v.blip = nil end
@@ -59,6 +90,36 @@ local function CreateParkedBlip(label, location)
     else
         return nil
     end
+end
+
+local function DeleteAllDisableParkedBlips()
+    for k, blip in pairs(diableParkedBlips) do
+        if DoesBlipExist(blip) then
+            RemoveBlip(blip)
+        end
+    end
+    diableParkedBlips = {}
+end
+
+local function CreateBlipCircle(coords, text, radius, color, sprite)
+    local blip = nil
+    if Config.DebugBlipForRadius then
+        blip = AddBlipForRadius(coords, radius)
+	    SetBlipHighDetail(blip, true)
+	    SetBlipColour(blip, color)
+	    SetBlipAlpha(blip, 128)
+    end
+	-- create a blip in the middle
+	blip = AddBlipForCoord(coords)
+	SetBlipHighDetail(blip, true)
+	SetBlipSprite(blip, sprite)
+	SetBlipScale(blip, 0.6)
+	SetBlipColour(blip, color)
+	SetBlipAsShortRange(blip, true)
+	BeginTextCommandSetBlipName("STRING")
+	AddTextComponentSubstringPlayerName(text)
+	EndTextCommandSetBlipName(blip)
+    diableParkedBlips[#diableParkedBlips + 1] = blip
 end
 
 local function SetVehicleDamage(vehicle, engine, body)
@@ -161,9 +222,9 @@ local function Drive(vehicle)
 end
 
 local function Save(vehicle)
-    if isLoggedIn and DoesEntityExist(vehicle) then
-        local isCloseByStationPump = IsCloseByStationPump(GetEntityCoords(PlayerPedId()))
-        if not isCloseByStationPump then
+    if isLoggedIn and DoesEntityExist(vehicle) then 
+        local allowToPark = AllowToPark(GetEntityCoords(PlayerPedId()))
+        if nallowToPark then
             local netid = NetworkGetNetworkIdFromEntity(vehicle)
             local vehicleCoords = GetEntityCoords(vehicle)
             local vehicleHeading = GetEntityHeading(vehicle)
@@ -272,11 +333,15 @@ AddEventHandler('onResourceStart', function(resource)
 end)
 
 AddEventHandler('onResourceStop', function(resource)
-    if resource == GetCurrentResourceName() then PlayerData, isLoggedIn = {}, false end
+    if resource == GetCurrentResourceName() then 
+        PlayerData, isLoggedIn = {}, false
+        DeleteAllDisableParkedBlips()
+    end
 end)
 
 RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
     PlayerData, isLoggedIn = {}, false
+    DeleteAllDisableParkedBlips()
 end)
 
 RegisterNetEvent('QBCore:Client:OnJobUpdate', function(job)
@@ -343,4 +408,19 @@ end)
 
 CreateThread(function()
     while true do Wait(3000) CheckDistanceToForceGrounded() end
+end)
+
+CreateThread(function()
+    if Config.UseParkingLotsOnly then
+        for k, zone in pairs(Config.AllowedParkingLots) do
+            if Config.UseParkingLotsBlips then
+                CreateBlipCircle(zone.coords, "Parking Lot", zone.radius, zone.color, zone.sprite)
+            end
+        end
+    end
+    if Config.UseUnableParkingBlips then
+        for k, zone in pairs(Config.NoParkingLocations) do
+		    CreateBlipCircle(zone.coords, "Unable to park", zone.radius, zone.color, zone.sprite)
+        end
+    end
 end)
