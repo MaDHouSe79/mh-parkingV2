@@ -286,7 +286,7 @@ local function Save(vehicle)
                     Notify(callback.message, "error", 5000)
                 end
 
-            end, plate, location, netid, model, street)
+            end, plate, location, netid, model:lower(), street)
         end
     end
 end
