@@ -39,7 +39,8 @@
 - 
 # Database
 ```sql
-ALTER TABLE `player_vehicles` ADD COLUMN `location` TEXT NULL DEFAULT NULL
+ALTER TABLE player_vehicles ADD COLUMN IF NOT EXISTS location TEXT NULL DEFAULT NULL
+ALTER TABLE player_vehicles ADD COLUMN IF NOT EXISTS street TEXT NULL DEFAULT NULL
 ```
 
 # Installation
