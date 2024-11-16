@@ -147,8 +147,10 @@ QBCore.Functions.CreateCallback("mh-parkingV2:server:drive", function(source, cb
             MySQL.Async.execute('UPDATE player_vehicles SET state = 0 WHERE plate = ? AND citizenid = ?', {plate, citizenid})
             TriggerClientEvent("mh-parkingV2:client:deletePlate", -1, plate)
             cb({status = true, message = Lang:t('info.remove_vehicle_zone'), data = json.decode(result.mods)})
+            return
         else
             cb({status = false, message = Lang:t('info.not_the_owner')})
+            return
         end
     end
 end)
