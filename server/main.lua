@@ -2,7 +2,6 @@
 --[[       MH Realistic Parking V2 Script by MaDHouSe      ]] --
 --[[ ===================================================== ]] --
 local QBCore = exports['qb-core']:GetCoreObject()
-local parkedVehicles = {}
 
 local function AutoSave()
     local players = QBCore.Functions.GetPlayers()
@@ -29,12 +28,20 @@ local function AutoSave()
     SetTimeout(Config.AutoSaveTimer * 1000, AutoSave)
 end
 
-local function RemoveParkedVehicle(plate)
-    for k, v in pairs(parkedVehicles) do
-        if v.plate == plate then
-            parkedVehicles[k] = nil
-        end
+local function IsPlayerAVip(src)
+    if QBCore.Functions.GetPlayer(src) then
+        local Player = QBCore.Functions.GetPlayer(src)
+        local citizenid = Player.PlayerData.citizenid
+        local result = MySQL.Sync.fetchAll('SELECT * FROM players WHERE citizenid = ?', {citizenid})[1]
+        if result ~= nil and result.parkvip == 1 then return true end
     end
+    return false
+end
+
+local function GetPlayerParkAmount(citizenid)
+    local result = MySQL.Sync.fetchAll('SELECT * FROM players WHERE citizenid = ?', {citizenid})[1]
+    if result ~= nil then return result.parkmax end
+    return 0
 end
 
 QBCore.Functions.CreateCallback('mh-parkingV2:server:isVehicleParked', function(source, cb, plate)
@@ -45,8 +52,8 @@ end)
 
 QBCore.Functions.CreateCallback('mh-parkingV2:server:getVehicleData', function(source, cb, plate)
     local src = source
-    local Player = QBCore.Functions.GetPlayer(src)
-    if Player then
+    if QBCore.Functions.GetPlayer(src) then
+        local Player = QBCore.Functions.GetPlayer(src)
         local citizenid = Player.PlayerData.citizenid
         local result = MySQL.Sync.fetchAll('SELECT * FROM player_vehicles WHERE citizenid = ? AND plate = ?', {citizenid, plate})[1]
         if result ~= nil and result.plate == plate then cb(result) else cb({owner = false, message = Lang:t('info.not_the_owner')}) end
@@ -69,30 +76,62 @@ QBCore.Functions.CreateCallback("mh-parkingV2:server:save", function(source, cb,
         local vehicle = NetworkGetEntityFromNetworkId(netid)
         if DoesEntityExist(vehicle) then
             local citizenid = Player.PlayerData.citizenid
-            local isFound = false
             local totalParked = MySQL.Sync.fetchAll('SELECT * FROM player_vehicles WHERE citizenid = ? AND state = ?', {citizenid, 3})
-            if type(totalParked) == 'table' and #totalParked < Config.Maxparking then
-                local result = MySQL.Sync.fetchAll('SELECT * FROM player_vehicles WHERE plate = ? AND citizenid = ? AND state = ?', {plate, citizenid, 0})[1]
-                if result ~= nil and result.plate == plate then
-                    local result2 = MySQL.Sync.fetchAll('SELECT * FROM player_vehicles WHERE plate = ? AND citizenid = ? AND state = ?', {plate, citizenid, 3})
-                    local status
-                    local message
-                    if type(result2) == 'table' and #result2 > 0 then
-                        status = false
-                        message = Lang:t('info.already_parked')
+            if Config.UseAsVip then
+                if IsPlayerAVip(src) then
+                    local maxParking = MySQL.Sync.fetchAll('SELECT * FROM players WHERE citizenid = ?', {citizenid})[1]
+                    if type(totalParked) == 'table' and #totalParked < maxParking.parkmax then
+                        local result = MySQL.Sync.fetchAll('SELECT * FROM player_vehicles WHERE plate = ? AND citizenid = ? AND state = ?', {plate, citizenid, 0})[1]
+                        if result ~= nil and result.plate == plate then
+                            local result2 = MySQL.Sync.fetchAll('SELECT * FROM player_vehicles WHERE plate = ? AND citizenid = ? AND state = ?', {plate, citizenid, 3})
+                            local status = false
+                            local message = nil
+                            if type(result2) == 'table' and #result2 > 0 then
+                                message = Lang:t('info.already_parked')
+                            else
+                                MySQL.Async.execute('UPDATE player_vehicles SET state = 3, location = ?, street = ? WHERE plate = ? AND citizenid = ?', {json.encode(location), street, plate, citizenid})
+                                status = true
+                                message = Lang:t('info.vehicle_parked')
+                            end
+                            local fullname = Player.PlayerData.charinfo.firstname .. ' ' .. Player.PlayerData.charinfo.lastname
+                            TriggerClientEvent('mh-parkingV2:client:addVehicle', -1, {citizenid = citizenid, fullname = fullname, plate = plate, model = model, steet = street, location = location, entity = vehicle})
+                            cb({status = status, message = message})
+                            return
+                        else
+                            cb({owner = false, message = Lang:t('info.not_the_owner')})
+                            return
+                        end
                     else
-                        MySQL.Async.execute('UPDATE player_vehicles SET state = 3, location = ?, street = ? WHERE plate = ? AND citizenid = ?', {json.encode(location), street, plate, citizenid})
-                        status = true
-                        message = Lang:t('info.vehicle_parked')
+                        cb({limit = true, message = Lang:t('info.limit_parking', {limit = maxParking.parkmax})})
+                        return
                     end
-                    local fullname = Player.PlayerData.charinfo.firstname .. ' ' .. Player.PlayerData.charinfo.lastname
-                    TriggerClientEvent('mh-parkingV2:client:addVehicle', -1, {citizenid = citizenid, fullname = fullname, plate = plate, model = model, steet = street, location = location, entity = vehicle})
-                    cb({status = status, message = message})
-                else
-                    cb({owner = false, message = Lang:t('info.not_the_owner')})
                 end
-            else
-                cb({limit = true, message = Lang:t('info.limit_parking', {limit = Config.Maxparking})})
+            elseif not Config.UseAsVip then
+                if type(totalParked) == 'table' and #totalParked < Config.Maxparking then
+                    local result = MySQL.Sync.fetchAll('SELECT * FROM player_vehicles WHERE plate = ? AND citizenid = ? AND state = ?', {plate, citizenid, 0})[1]
+                    if result ~= nil and result.plate == plate then
+                        local result2 = MySQL.Sync.fetchAll('SELECT * FROM player_vehicles WHERE plate = ? AND citizenid = ? AND state = ?', {plate, citizenid, 3})
+                        local status = false
+                        local message = nil
+                        if type(result2) == 'table' and #result2 > 0 then
+                            message = Lang:t('info.already_parked')
+                        else
+                            MySQL.Async.execute('UPDATE player_vehicles SET state = 3, location = ?, street = ? WHERE plate = ? AND citizenid = ?', {json.encode(location), street, plate, citizenid})
+                            status = true
+                            message = Lang:t('info.vehicle_parked')
+                        end
+                        local fullname = Player.PlayerData.charinfo.firstname .. ' ' .. Player.PlayerData.charinfo.lastname
+                        TriggerClientEvent('mh-parkingV2:client:addVehicle', -1, {citizenid = citizenid, fullname = fullname, plate = plate, model = model, steet = street, location = location, entity = vehicle})
+                        cb({status = status, message = message})
+                        return
+                    else
+                        cb({owner = false, message = Lang:t('info.not_the_owner')})
+                        return
+                    end
+                else
+                    cb({limit = true, message = Lang:t('info.limit_parking', {limit = maxParking})})
+                    return
+                end
             end
         end
     end
@@ -113,6 +152,63 @@ QBCore.Functions.CreateCallback("mh-parkingV2:server:drive", function(source, cb
         end
     end
 end)
+
+QBCore.Commands.Add('park-vip-add', "Add a player as vip", {{name = 'ID', help = 'De id van de speler die je wilt toevoegen.'}, {name = 'Amount', help = 'Het maximale aantal voertuigen dat een speler mag parkeren'}}, true, function(source, args)
+    local src = source
+    if (args[1] ~= nil) then
+        if tonumber(args[1]) > 0 then
+            local amount = 1
+            if (args[2] ~= nil) then
+                if tonumber(args[2]) > 0 then 
+                    amount = tonumber(args[2])
+                    local target = QBCore.Functions.GetPlayer(tonumber(args[1]))
+                    if target then
+                        MySQL.Async.execute('UPDATE players SET parkvip = ?, parkmax = ? WHERE citizenid = ?', {1, amount, target.PlayerData.citizenid})
+                    else
+                        TriggerClientEvent('mh-parkingV2:client:notify', src, "Player does not exist...", "error", 5000)
+                    end
+                end
+            elseif (args[2] == nil) then
+                TriggerClientEvent('mh-parkingV2:client:notify', src, "You need to add a max amount...", "error", 5000)
+            end
+        end
+    else
+        TriggerClientEvent('mh-parkingV2:client:notify', src, "You need to add the player id...", "error", 5000)
+    end
+end, 'admin')
+
+QBCore.Commands.Add('park-vip-remove', "Remove a player from vip", {{name = 'ID', help = 'The id of the player you want to remove.'}}, true, function(source, args)
+    local src = source
+    if args[1] and tonumber(args[1]) > 0 then
+        if args[2] and tonumber(args[2]) > 0 then amount = tonumber(args[2]) end
+        local target = QBCore.Functions.GetPlayer(tonumber(args[1]))
+        if target then
+            MySQL.Async.execute('UPDATE players SET parkvip = ?, parkmax = ? WHERE citizenid = ?', {0, 0, target.PlayerData.citizenid})
+            -- remove all parked vehicles.
+            local totalParked = MySQL.Sync.fetchAll('SELECT * FROM player_vehicles WHERE citizenid = ? AND state = ?', {target.PlayerData.citizenid, 3})
+            for k, vehicle in pairs(totalParked) do
+                MySQL.Async.execute('UPDATE player_vehicles SET state = ?, location = ?, street = ? WHERE citizenid = ? and plate = ?', {0, '', '', target.PlayerData.citizenid, vehicle.plate})
+                TriggerClientEvent('mh-parkingV2:client:deletePlate', -1, vehicle.plate)
+            end
+        else
+            TriggerClientEvent('mh-parkingV2:client:notify', src, "Player does not exist...", "error", 5000)
+        end
+    end
+end, 'admin')
+
+QBCore.Commands.Add('park-vip-update', "Update a vip player", {{name = 'ID', help = 'De id van de speler die je wilt update.'}, {name = 'Amount', help = 'Het maximale aantal voertuigen dat een speler mag parkeren'}}, true, function(source, args)
+    local src = source
+    if args[1] and tonumber(args[1]) > 0 then
+        local amount = 1
+        if args[2] and tonumber(args[2]) > 0 then amount = tonumber(args[2]) end
+        local target = QBCore.Functions.GetPlayer(tonumber(args[1]))
+        if target then
+            MySQL.Async.execute('UPDATE players SET parkmax = ? WHERE citizenid = ?', {amount, target.PlayerData.citizenid})
+        else
+            TriggerClientEvent('mh-parkingV2:client:notify', src, "Player does not exist...", "error", 5000)
+        end
+    end
+end, 'admin')
 
 AddEventHandler('onResourceStart', function(resource)
     if resource == GetCurrentResourceName() then
@@ -192,7 +288,6 @@ RegisterServerEvent('mh-parkingV2:server:refreshVehicles', function()
                 vehicles[#vehicles + 1] = {citizenid = v.citizenid, fullname = fullname, plate = v.plate, model = v.vehicle, fuel = v.fuel, engine = v.engine, body = v.body, mods = json.decode(v.mods), location = json.decode(v.location), steet = v.street}                
                 if Player.PlayerData.citizenid == v.citizenid then TriggerClientEvent('qb-vehiclekeys:client:AddKeys', Player.PlayerData.source, v.plate) end
             end
-            parkedVehicles = vehicles
             TriggerClientEvent("mh-parkingV2:client:refreshVehicles", src, vehicles)
         end
     end
@@ -200,15 +295,13 @@ end)
 
 RegisterNetEvent('mh-parkingV2:server:setVehLockState', function(vehNetId, state)
     local vehicle = NetworkGetEntityFromNetworkId(vehNetId)
-    if DoesEntityExist(vehicle) then
-        SetVehicleDoorsLocked(NetworkGetEntityFromNetworkId(vehNetId), state)
-    end
+    if DoesEntityExist(vehicle) then SetVehicleDoorsLocked(NetworkGetEntityFromNetworkId(vehNetId), state) end
 end)
 
 CreateThread(function()
     Wait(3000)
-    if Config.Framework == 'esx' then
-        MySQL.Async.execute('ALTER TABLE player_vehicles ADD COLUMN IF NOT EXISTS location TEXT NULL DEFAULT NULL')
-        MySQL.Async.execute('ALTER TABLE player_vehicles ADD COLUMN IF NOT EXISTS street TEXT NULL DEFAULT NULL')
-    end
+    MySQL.Async.execute('ALTER TABLE players ADD COLUMN IF NOT EXISTS parkvip INT NULL DEFAULT 0')
+    MySQL.Async.execute('ALTER TABLE players ADD COLUMN IF NOT EXISTS parkmax INT NULL DEFAULT 0')
+    MySQL.Async.execute('ALTER TABLE player_vehicles ADD COLUMN IF NOT EXISTS location TEXT NULL DEFAULT NULL')
+    MySQL.Async.execute('ALTER TABLE player_vehicles ADD COLUMN IF NOT EXISTS street TEXT NULL DEFAULT NULL')
 end)
