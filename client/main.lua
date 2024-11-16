@@ -196,13 +196,15 @@ end
 
 local function AddParkedVehicle(entity, data)
     local blip = nil
-    if PlayerData.citizenid == data.citizenid then blip = CreateParkedBlip(Lang:t('info.parked_blip',{model = GetDisplayNameFromVehicleModel(GetEntityModel(data.entity))}), data.location) end
+    if PlayerData.citizenid == data.citizenid then  
+        blip = CreateParkedBlip(Lang:t('info.parked_blip',{model = GetDisplayNameFromVehicleModel(GetEntityModel(data.entity))}), data.location)
+    end
     table.insert(LocalVehicles, {citizenid = data.citizenid, fullname = data.fullname, plate = data.plate, model = data.model, blip = blip, location = data.location, entity = entity or nil})
 end
 
 local function RemoveVehicles(vehicles)
     isDeleting = true
-    if isLoggedIn and type(vehicles) == 'table' and #vehicles > 0 and vehicles[1] ~= nil then
+    if type(vehicles) == 'table' and #vehicles > 0 and vehicles[1] ~= nil then
         for i = 1, #vehicles, 1 do
             local vehicle, distance = QBCore.Functions.GetClosestVehicle(vehicles[i].location)
             if NetworkGetEntityIsLocal(vehicle) and distance < 1 then
@@ -222,11 +224,12 @@ local function RemoveVehicles(vehicles)
 end
 
 local function DeleteLocalVehicle(plate)
-    if isLoggedIn and #LocalVehicles > 0 then
+    if #LocalVehicles > 0 then
         for i = 1, #LocalVehicles do
             if LocalVehicles[i] ~= nil and LocalVehicles[i].plate ~= nil then
                 if SamePlates(plate, LocalVehicles[i].plate) then
                     if LocalVehicles[i].blip ~= nil then RemoveBlip(LocalVehicles[i].blip) end
+                    if DoesEntityExist(LocalVehicles[i].entity) then FreezeEntityPosition(LocalVehicles[i].entity, false) end
                     table.remove(LocalVehicles, i)
                 end
             end
@@ -260,7 +263,7 @@ local function Drive(vehicle)
 end
 
 local function Save(vehicle)
-    if isLoggedIn and DoesEntityExist(vehicle) then
+    if DoesEntityExist(vehicle) then
         local allowToPark = AllowToPark(GetEntityCoords(PlayerPedId()))
         if allowToPark then
             local netid = NetworkGetNetworkIdFromEntity(vehicle)
@@ -275,17 +278,15 @@ local function Save(vehicle)
                     SetEntityAsMissionEntity(vehicle, true, true)
                     if not Config.DisableParkNotify then Notify(callback.message, "primary", 5000) end
                     local seats = GetVehicleModelNumberOfSeats(GetHashKey(model))
-                    for i = 1, seats, 1 do
-                        SetVehicleDoorShut(vehicle, i, false) -- will close all doors from 0-5
-                    end
-                    Wait(5000)
+                    Wait(1500)
+                    for i = 1, seats, 1 do SetVehicleDoorShut(vehicle, i, false) end -- will close all doors from 0-5
+                    Wait(1500)
                     FreezeEntityPosition(vehicle, true)
                 elseif callback.limit then
                     Notify(callback.message, "error", 5000)
                 elseif not callback.owner then
                     Notify(callback.message, "error", 5000)
                 end
-
             end, plate, location, netid, model:lower(), street)
         end
     end
@@ -332,7 +333,7 @@ local function SpawnVehicles(vehicles)
 end
 
 local function MakeVehiclesVisable()
-    if isLoggedIn and Config.ViewDistance and #LocalVehicles > 0 then
+    if Config.ViewDistance and #LocalVehicles > 0 then
         local playerCoords = GetEntityCoords(PlayerPedId())
         for k, vehicle in pairs(LocalVehicles) do
             if GetDistance(playerCoords, vehicle.location) < 150 and not IsEntityVisible(vehicle.entity) then
@@ -345,7 +346,7 @@ local function MakeVehiclesVisable()
 end
 
 local function CheckDistanceToForceGrounded()
-    if isLoggedIn and Config.ForceVehicleOnGound and #LocalVehicles > 0 then
+    if Config.ForceVehicleOnGound and #LocalVehicles > 0 then
         for i = 1, #LocalVehicles do
             local playerCoords = GetEntityCoords(PlayerPedId())
             if LocalVehicles[i].entity ~= nil and DoesEntityExist(LocalVehicles[i].entity) and not LocalVehicles[i].isGrounded then
@@ -366,14 +367,12 @@ local function GetPedVehicleSeat(ped)
 end
 
 local function SetVehicleWaypoit(coords)
-    if isLoggedIn then
-        local playerCoords = GetEntityCoords(PlayerPedId())
-        local distance = GetDistance(playerCoords, coords)
-        if distance < 200 then
-            Notify(Lang:t('info.no_waipoint', {distance = Round(distance, 2)}), "error", 5000)
-        elseif distance > 200 then
-            SetNewWaypoint(coords.x, coords.y)
-        end
+    local playerCoords = GetEntityCoords(PlayerPedId())
+    local distance = GetDistance(playerCoords, coords)
+    if distance < 200 then
+        Notify(Lang:t('info.no_waipoint', {distance = Round(distance, 2)}), "error", 5000)
+    elseif distance > 200 then
+        SetNewWaypoint(coords.x, coords.y)
     end
 end
 
@@ -406,19 +405,21 @@ RegisterNetEvent('QBCore:Client:OnGangUpdate', function(gang)
 end)
 
 RegisterNetEvent("mh-parkingV2:client:refreshVehicles", function(vehicles)
-    if isLoggedIn then RemoveVehicles(vehicles) Wait(2000) SpawnVehicles(vehicles) end
+    RemoveVehicles(vehicles) 
+    Wait(2000) 
+    SpawnVehicles(vehicles)
 end)
 
 RegisterNetEvent("mh-parkingV2:client:notify", function(message, type, length)
-    if isLoggedIn then Notify(message, type, length) end
+    Notify(message, type, length)
 end)
 
 RegisterNetEvent("mh-parkingV2:client:deletePlate", function(plate)
-    if isLoggedIn then DeleteLocalVehicle(plate) end
+    DeleteLocalVehicle(plate)
 end)
 
 RegisterNetEvent("mh-parkingV2:client:addVehicle", function(data)
-    if isLoggedIn then AddParkedVehicle(data.entity, data) end
+    AddParkedVehicle(data.entity, data)
 end)
 
 RegisterNetEvent("mh-parkingV2:client:park", function()
@@ -470,7 +471,6 @@ end)
 CreateThread(function()
     while true do Wait(3000) if isLoggedIn then CheckDistanceToForceGrounded() end end
 end)
------------------------------------------------------------------------------------------------------------
 
 CreateThread(function()
     if Config.UseParkingLotsOnly then
@@ -486,8 +486,6 @@ CreateThread(function()
         end
     end
 end)
------------------------------------------------------------------------------------------------------------
-
 
 CreateThread(function()
 	while true do
@@ -532,8 +530,6 @@ CreateThread(function()
 	end
 end)
 
------------------------------------------------------------------------------------------------------------
--- Park Menu
 RegisterNetEvent('mh-parkingV2:client:GetVehicleMenu', function()
     if isLoggedIn then
         QBCore.Functions.TriggerCallback("mh-parkingV2:server:GetVehicles", function(vehicles)
@@ -561,15 +557,13 @@ RegisterNetEvent('qb-radialmenu:client:onRadialmenuOpen', function()
     parkMenu = exports['qb-radialmenu']:AddOption({id = 'park_vehicle', title = 'Parked Menu', icon = "square-parking", type = 'client', event = "mh-parkingV2:client:GetVehicleMenu", shouldClose = true}, parkMenu)
 end)
 
------------------------------------------------------------------------------------------------------------
--- Text Above Vehicles
 RegisterCommand('toggleparktext', function()
     displayOwnerText = not displayOwnerText
 end, false)
 
 CreateThread(function()
     while true do
-        if isLoggedIn and displayOwnerText then
+        if displayOwnerText then
             local playerCoords = GetEntityCoords(PlayerPedId())
             for k, v in pairs(LocalVehicles) do
                 if GetDistance(playerCoords, v.location) < Config.VehicleOwnerTextDisplayDistance then
