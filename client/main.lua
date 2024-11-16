@@ -65,20 +65,20 @@ local function CreateBlipCircle(coords, text, radius, color, sprite)
     local blip = nil
     if Config.DebugBlipForRadius then
         blip = AddBlipForRadius(coords, radius)
-	    SetBlipHighDetail(blip, true)
-	    SetBlipColour(blip, color)
-	    SetBlipAlpha(blip, 128)
-    end
-	-- create a blip in the middle
-	blip = AddBlipForCoord(coords)
 	SetBlipHighDetail(blip, true)
-	SetBlipSprite(blip, sprite)
-	SetBlipScale(blip, 0.6)
 	SetBlipColour(blip, color)
-	SetBlipAsShortRange(blip, true)
-	BeginTextCommandSetBlipName("STRING")
-	AddTextComponentSubstringPlayerName(text)
-	EndTextCommandSetBlipName(blip)
+	SetBlipAlpha(blip, 128)
+    end
+    -- create a blip in the middle
+    blip = AddBlipForCoord(coords)
+    SetBlipHighDetail(blip, true)
+    SetBlipSprite(blip, sprite)
+    SetBlipScale(blip, 0.6)
+    SetBlipColour(blip, color)
+    SetBlipAsShortRange(blip, true)
+    BeginTextCommandSetBlipName("STRING")
+    AddTextComponentSubstringPlayerName(text)
+    EndTextCommandSetBlipName(blip)
     diableParkedBlips[#diableParkedBlips + 1] = blip
 end
 
