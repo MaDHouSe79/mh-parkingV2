@@ -98,8 +98,7 @@ local function IsCloseByCoords(coords)
             elseif v.job ~= nil and v.job ~= PlayerData.job.name then
                 return true
             end
-        end         
-        
+        end
     end
     return false
 end
@@ -482,7 +481,7 @@ CreateThread(function()
     end
     if Config.UseUnableParkingBlips then
         for k, zone in pairs(Config.NoParkingLocations) do
-		    CreateBlipCircle(zone.coords, "Unable to park", zone.radius, zone.color, zone.sprite)
+	    CreateBlipCircle(zone.coords, "Unable to park", zone.radius, zone.color, zone.sprite)
         end
     end
 end)
