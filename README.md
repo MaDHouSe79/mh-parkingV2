@@ -37,10 +37,6 @@
 - [qb-policejob](https://github.com/qbcore-framework/qb-policejob)
 - [qb-vehiclekeys](https://github.com/qbcore-framework/qb-vehiclekeys)
 - 
-# Database
-```sql
-ALTER TABLE `player_vehicles` ADD COLUMN `location` TEXT NULL DEFAULT NULL
-```
 
 # Installation
 - Step 1: First stop your server.
@@ -51,6 +47,11 @@ ALTER TABLE `player_vehicles` ADD COLUMN `location` TEXT NULL DEFAULT NULL
 
 # Installation QB-Garagae
 [README FILES](https://github.com/MaDHouSe79/mh-parkingV2/tree/main/readme)
+
+# Admin Commands
+- /park-vip-add [player id] [max park amount]
+- /park-vip-remove [player id]
+- /park-vip-update [player id] [max park amount]
 
 # Impound 
 - The Impound should also work automatically and the vehicle should disappear when the police impound the vehicle.
