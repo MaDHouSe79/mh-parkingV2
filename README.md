@@ -49,9 +49,9 @@
 [README FILES](https://github.com/MaDHouSe79/mh-parkingV2/tree/main/readme)
 
 # Admin Commands
-- /park-vip-add [player id] [max park amount]
-- /park-vip-remove [player id]
-- /park-vip-update [player id] [max park amount]
+- `/park-vip-add` `[player id]` `[max park amount]`
+- `/park-vip-remove` `[player id]`
+- `/park-vip-update` `[player id]` `[max park amount]`
 
 # Impound 
 - The Impound should also work automatically and the vehicle should disappear when the police impound the vehicle.
