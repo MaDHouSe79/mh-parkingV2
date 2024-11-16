@@ -65,20 +65,20 @@ local function CreateBlipCircle(coords, text, radius, color, sprite)
     local blip = nil
     if Config.DebugBlipForRadius then
         blip = AddBlipForRadius(coords, radius)
-	SetBlipHighDetail(blip, true)
-	SetBlipColour(blip, color)
-	SetBlipAlpha(blip, 128)
+	    SetBlipHighDetail(blip, true)
+	    SetBlipColour(blip, color)
+	    SetBlipAlpha(blip, 128)
     end
-    -- create a blip in the middle
-    blip = AddBlipForCoord(coords)
-    SetBlipHighDetail(blip, true)
-    SetBlipSprite(blip, sprite)
-    SetBlipScale(blip, 0.6)
-    SetBlipColour(blip, color)
-    SetBlipAsShortRange(blip, true)
-    BeginTextCommandSetBlipName("STRING")
-    AddTextComponentSubstringPlayerName(text)
-    EndTextCommandSetBlipName(blip)
+	-- create a blip in the middle
+	blip = AddBlipForCoord(coords)
+	SetBlipHighDetail(blip, true)
+	SetBlipSprite(blip, sprite)
+	SetBlipScale(blip, 0.6)
+	SetBlipColour(blip, color)
+	SetBlipAsShortRange(blip, true)
+	BeginTextCommandSetBlipName("STRING")
+	AddTextComponentSubstringPlayerName(text)
+	EndTextCommandSetBlipName(blip)
     diableParkedBlips[#diableParkedBlips + 1] = blip
 end
 
@@ -98,7 +98,8 @@ local function IsCloseByCoords(coords)
             elseif v.job ~= nil and v.job ~= PlayerData.job.name then
                 return true
             end
-        end
+        end         
+        
     end
     return false
 end
@@ -228,7 +229,6 @@ local function DeleteLocalVehicle(plate)
             if LocalVehicles[i] ~= nil and LocalVehicles[i].plate ~= nil then
                 if SamePlates(plate, LocalVehicles[i].plate) then
                     if LocalVehicles[i].blip ~= nil then RemoveBlip(LocalVehicles[i].blip) end
-                    if DoesEntityExist(LocalVehicles[i].entity) then FreezeEntityPosition(LocalVehicles[i].entity, false) end
                     table.remove(LocalVehicles, i)
                 end
             end
@@ -249,8 +249,6 @@ local function Drive(vehicle)
                         TriggerServerEvent('qb-vehiclekeys:server:setVehLockState', netid, 1)
                         DeleteLocalVehicle(plate)
                         SetEntityInvincible(vehicle, false)
-                        local isFrozen = IsEntityPositionFrozen(vehicle)
-                        if isFrozen then FreezeEntityPosition(vehicle, false) end
                         if not Config.DisableParkNotify then Notify(callback.message, "primary", 5000) end
                     elseif type(vehicleData) == 'boolean' then
                         Notify(callback.message, "error", 5000)
@@ -276,11 +274,9 @@ local function Save(vehicle)
                 if callback.status then
                     SetEntityAsMissionEntity(vehicle, true, true)
                     if not Config.DisableParkNotify then Notify(callback.message, "primary", 5000) end
+                    Wait(1500)
                     local seats = GetVehicleModelNumberOfSeats(GetHashKey(model))
-                    Wait(1500)
                     for i = 1, seats, 1 do SetVehicleDoorShut(vehicle, i, false) end -- will close all doors from 0-5
-                    Wait(1500)
-                    FreezeEntityPosition(vehicle, true)
                 elseif callback.limit then
                     Notify(callback.message, "error", 5000)
                 elseif not callback.owner then
@@ -322,10 +318,6 @@ local function SpawnVehicles(vehicles)
                 TriggerServerEvent('mh-parkingV2:server:setVehLockState', VehToNet(vehicle), 2)
                 SetVehicleDoorsLocked(vehicle, 2)
                 AddParkedVehicle(vehicle, vehicles[i])
-                Wait(500)
-                if PlayerData.citizenid ~= vehicles[i].citizenid then  
-                    FreezeEntityPosition(vehicle, true)
-                end
             end
         end
     end
@@ -481,7 +473,7 @@ CreateThread(function()
     end
     if Config.UseUnableParkingBlips then
         for k, zone in pairs(Config.NoParkingLocations) do
-	    CreateBlipCircle(zone.coords, "Unable to park", zone.radius, zone.color, zone.sprite)
+		    CreateBlipCircle(zone.coords, "Unable to park", zone.radius, zone.color, zone.sprite)
         end
     end
 end)
