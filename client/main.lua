@@ -235,7 +235,7 @@ local function DeleteLocalVehicle(plate)
 end
 
 local function Drive(vehicle)
-    if isLoggedIn and DoesEntityExist(vehicle) then
+    if DoesEntityExist(vehicle) then
         local plate = QBCore.Functions.GetPlate(vehicle)
         local netid = NetworkGetNetworkIdFromEntity(vehicle)
         QBCore.Functions.TriggerCallback("mh-parkingV2:server:drive", function(callback)
@@ -247,8 +247,8 @@ local function Drive(vehicle)
                         TriggerServerEvent('qb-vehiclekeys:server:setVehLockState', netid, 1)
                         DeleteLocalVehicle(plate)
                         SetEntityInvincible(vehicle, false)
-                        while GetVehicleDoorAngleRatio(vehicle, 0) > 0.0 do Wait(500) end
-                        FreezeEntityPosition(vehicle, false)
+                        local isFrozen = IsEntityPositionFrozen(vehicle)
+                        if isFrozen then FreezeEntityPosition(vehicle, false) end
                         if not Config.DisableParkNotify then Notify(callback.message, "primary", 5000) end
                     elseif type(vehicleData) == 'boolean' then
                         Notify(callback.message, "error", 5000)
