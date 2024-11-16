@@ -9,7 +9,7 @@ Config.UseTarget = GetConvar('UseTarget', 'false') == 'true'
 Config.TargetScript = "qb-target"       -- Default qb-target but you can also use ox_target.
 ----------------------------------------------------------------------------
 -- Fuel Script
-Config.FuelScript = 'mh-fuel'        -- Default is LegacyFuel, if you use a other fuel script, for example cc-fuel
+Config.FuelScript = 'LegacyFuel'        -- Default is LegacyFuel, if you use a other fuel script, for example cc-fuel
 ----------------------------------------------------------------------------
 -- Notify Script
 Config.DisableParkNotify = false        -- Default true, if false you get many notifications when you enter or leave the vehicle, all other notify massages are stil enable.
@@ -21,7 +21,8 @@ Config.ForceVehicleOnGound = true       -- If true this will force parked vehicl
 Config.ViewDistance = true              -- If true vehicles are only visable in 100 meters around the players.
 Config.ParkedViewDistance = 100         -- Default 100 if your distance is over 100 meters the vehicles in that area will not render on screen.
 Config.UseParkedBlips = true            -- if true players can see a blip of the parked vehicle on the map
-Config.Maxparking = 15                  -- Default 5, this is max parked vehicles allowed per player, don't go to high with this...
+Config.Maxparking = 1                   -- Default 1, this is max parked vehicles allowed per player, don't go to high with this...
+Config.UseAsVip = true                  -- if true `Config.Maxparking` does not work and you need to add a amount per player.
 ----------------------------------------------------------------------------
 Config.AutoSave = false                 -- Default false, auto save player owned vehicle locations, this is dependend on the `Config.AutoSaveTimer`, if a player disconnect the vehicle wil be parked in that area.
 Config.AutoSaveTimer = 20               -- Default 20 secs, you can go higher if you want, don't go to low.
