@@ -323,7 +323,9 @@ local function SpawnVehicles(vehicles)
                 SetVehicleDoorsLocked(vehicle, 2)
                 AddParkedVehicle(vehicle, vehicles[i])
                 Wait(500)
-                FreezeEntityPosition(vehicle, true)
+                if PlayerData.citizenid ~= vehicles[i].citizenid then  
+                    FreezeEntityPosition(vehicle, true)
+                end
             end
         end
     end
