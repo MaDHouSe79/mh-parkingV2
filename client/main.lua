@@ -473,14 +473,14 @@ CreateThread(function()
     end
     if Config.UseUnableParkingBlips then
         for k, zone in pairs(Config.NoParkingLocations) do
-		    CreateBlipCircle(zone.coords, "Unable to park", zone.radius, zone.color, zone.sprite)
+	    CreateBlipCircle(zone.coords, "Unable to park", zone.radius, zone.color, zone.sprite)
         end
     end
 end)
 
 CreateThread(function()
 	while true do
-		Wait(0)
+	Wait(0)
         if isLoggedIn then
             local ped = PlayerPedId()
             if not isInVehicle and not IsPlayerDead(PlayerId()) then
@@ -517,8 +517,8 @@ CreateThread(function()
                 end
             end
         end
-		Wait(50)
-	end
+	Wait(50)
+    end
 end)
 
 RegisterNetEvent('mh-parkingV2:client:GetVehicleMenu', function()
