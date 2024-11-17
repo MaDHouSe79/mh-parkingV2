@@ -297,7 +297,7 @@ local function SpawnVehicles(vehicles)
                 DeleteLocalVehicle(vehicles[i].plate)
                 local closestVehicle, closestDistance = QBCore.Functions.GetClosestVehicle(vehicles[i].location)
                 if closestDistance <= 1 then DeleteEntity(closestVehicle) while DoesEntityExist(closestVehicle) do Citizen.Wait(10) end end
-                local vehicle = CreateVehicle(vehicles[i].model, vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z + 0.2, vehicles[i].location.w, true)
+                local vehicle = CreateVehicle(vehicles[i].model, vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z + 0.2, vehicles[i].location.w, false)
                 while not DoesEntityExist(vehicle) do Citizen.Wait(500) end               
                 if vehicles[i].mods.livery ~= nil then livery = vehicles[i].mods.livery end
                 QBCore.Functions.SetVehicleProperties(vehicle, vehicles[i].mods)
