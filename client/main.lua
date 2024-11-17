@@ -249,6 +249,7 @@ local function Drive(vehicle)
                         TriggerServerEvent('qb-vehiclekeys:server:setVehLockState', netid, 1)
                         DeleteLocalVehicle(plate)
                         SetEntityInvincible(vehicle, false)
+			FreezeEntityPosition(vehicle, false)
                         if not Config.DisableParkNotify then Notify(callback.message, "primary", 5000) end
                     elseif type(vehicleData) == 'boolean' then
                         Notify(callback.message, "error", 5000)
@@ -277,6 +278,8 @@ local function Save(vehicle)
                     Wait(1500)
                     local seats = GetVehicleModelNumberOfSeats(GetHashKey(model))
                     for i = 1, seats, 1 do SetVehicleDoorShut(vehicle, i, false) end -- will close all doors from 0-5
+		    Wait(5000)
+                    FreezeEntityPosition(vehicle, true)
                 elseif callback.limit then
                     Notify(callback.message, "error", 5000)
                 elseif not callback.owner then
@@ -318,6 +321,8 @@ local function SpawnVehicles(vehicles)
                 TriggerServerEvent('mh-parkingV2:server:setVehLockState', VehToNet(vehicle), 2)
                 SetVehicleDoorsLocked(vehicle, 2)
                 AddParkedVehicle(vehicle, vehicles[i])
+		Wait(5000)
+                FreezeEntityPosition(vehicle, true)
             end
         end
     end
