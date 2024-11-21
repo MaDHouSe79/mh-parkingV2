@@ -24,12 +24,6 @@ local function Trim(value)
     return (string.gsub(value, '^%s*(.-)%s*$', '%1'))
 end
 
-local function SamePlates(plate1, plate2)
-    plate1 = Trim(plate1)
-    plate2 = Trim(plate2)
-    return (plate1 == plate2)
-end
-
 local function LoadModel(model)
     while not HasModelLoaded(model) do
         RequestModel(model)
@@ -40,7 +34,7 @@ end
 local function IsVehicleAlreadyListed(plate)
     if #LocalVehicles > 0 then
         for i = 1, #LocalVehicles do
-            if SamePlates(LocalVehicles[i].plate, plate) then return true end
+            if Trim(LocalVehicles[i].plate) == Trim(plate) then return true end
         end
     end 
     return false
@@ -82,9 +76,17 @@ local function CreateBlipCircle(coords, text, radius, color, sprite)
     diableParkedBlips[#diableParkedBlips + 1] = blip
 end
 
+local function IsCloseByAtm(coords)
+    for hash in pairs(Config.ATMModels) do
+        local atm = GetClosestObjectOfType(coords.x, coords.y, coords.z, 10.0, hash, false, true, true)
+        if atm ~= 0 then return true end
+    end
+    return false
+end
+
 local function IsCloseByStationPump(coords)
     for hash in pairs(Config.DisableNeedByPumpModels) do
-        local pump = GetClosestObjectOfType(coords.x, coords.y, coords.z, 10.0, hash, false, true, true)
+        local pump = GetClosestObjectOfType(coords.x, coords.y, coords.z, 10.0, GetHashKey(hash), false, true, true)
         if pump ~= 0 then return true end
     end
     return false
@@ -114,9 +116,9 @@ end
 local function AllowToPark(coords)
     local isAllowd = false
     if Config.UseParkingLotsOnly then 
-        if IsCloseByParkingLot(coords) and not IsCloseByStationPump(coords) then isAllowd = true end
+        if IsCloseByParkingLot(coords) and not IsCloseByStationPump(coords) and not IsCloseByAtm(coords) then isAllowd = true end
     elseif not Config.UseParkingLotsOnly then 
-        if not IsCloseByCoords(coords) and not IsCloseByStationPump(coords) then isAllowd = true end
+        if not IsCloseByCoords(coords) and not IsCloseByStationPump(coords)  and not IsCloseByAtm(coords) then isAllowd = true end
     end
     return isAllowd
 end
@@ -196,9 +198,7 @@ end
 
 local function AddParkedVehicle(entity, data)
     local blip = nil
-    if PlayerData.citizenid == data.citizenid then  
-        blip = CreateParkedBlip(Lang:t('info.parked_blip',{model = GetDisplayNameFromVehicleModel(GetEntityModel(data.entity))}), data.location)
-    end
+    if PlayerData.citizenid == data.citizenid then blip = CreateParkedBlip(Lang:t('info.parked_blip',{model = GetDisplayNameFromVehicleModel(GetEntityModel(data.entity))}), data.location) end
     table.insert(LocalVehicles, {citizenid = data.citizenid, fullname = data.fullname, plate = data.plate, model = data.model, blip = blip, location = data.location, entity = entity or nil})
 end
 
@@ -227,7 +227,7 @@ local function DeleteLocalVehicle(plate)
     if #LocalVehicles > 0 then
         for i = 1, #LocalVehicles do
             if LocalVehicles[i] ~= nil and LocalVehicles[i].plate ~= nil then
-                if SamePlates(plate, LocalVehicles[i].plate) then
+                if Trim(plate) == Trim(LocalVehicles[i].plate) then
                     if LocalVehicles[i].blip ~= nil then RemoveBlip(LocalVehicles[i].blip) end
                     table.remove(LocalVehicles, i)
                 end
@@ -246,10 +246,9 @@ local function Drive(vehicle)
                 DeteteParkedBlip(vehicle)
                 QBCore.Functions.TriggerCallback("mh-parkingV2:server:getVehicleData", function(vehicleData)
                     if type(vehicleData) == 'table' then
-                        TriggerServerEvent('qb-vehiclekeys:server:setVehLockState', netid, 1)
                         DeleteLocalVehicle(plate)
                         SetEntityInvincible(vehicle, false)
-			FreezeEntityPosition(vehicle, false)
+                        FreezeEntityPosition(vehicle, false)
                         if not Config.DisableParkNotify then Notify(callback.message, "primary", 5000) end
                     elseif type(vehicleData) == 'boolean' then
                         Notify(callback.message, "error", 5000)
@@ -278,7 +277,7 @@ local function Save(vehicle)
                     Wait(1500)
                     local seats = GetVehicleModelNumberOfSeats(GetHashKey(model))
                     for i = 1, seats, 1 do SetVehicleDoorShut(vehicle, i, false) end -- will close all doors from 0-5
-		    Wait(5000)
+                    Wait(2000)
                     FreezeEntityPosition(vehicle, true)
                 elseif callback.limit then
                     Notify(callback.message, "error", 5000)
@@ -300,7 +299,7 @@ local function SpawnVehicles(vehicles)
                 DeleteLocalVehicle(vehicles[i].plate)
                 local closestVehicle, closestDistance = QBCore.Functions.GetClosestVehicle(vehicles[i].location)
                 if closestDistance <= 1 then DeleteEntity(closestVehicle) while DoesEntityExist(closestVehicle) do Citizen.Wait(10) end end
-                local vehicle = CreateVehicle(vehicles[i].model, vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z + 0.2, vehicles[i].location.w, false)
+                local vehicle = CreateVehicle(vehicles[i].model, vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z + 0.2, vehicles[i].location.w, true)
                 while not DoesEntityExist(vehicle) do Citizen.Wait(500) end               
                 if vehicles[i].mods.livery ~= nil then livery = vehicles[i].mods.livery end
                 QBCore.Functions.SetVehicleProperties(vehicle, vehicles[i].mods)
@@ -321,7 +320,6 @@ local function SpawnVehicles(vehicles)
                 TriggerServerEvent('mh-parkingV2:server:setVehLockState', VehToNet(vehicle), 2)
                 SetVehicleDoorsLocked(vehicle, 2)
                 AddParkedVehicle(vehicle, vehicles[i])
-		Wait(5000)
                 FreezeEntityPosition(vehicle, true)
             end
         end
@@ -374,22 +372,24 @@ end
 
 AddEventHandler('onResourceStart', function(resource)
     if resource == GetCurrentResourceName() then
-        PlayerData, isLoggedIn = QBCore.Functions.GetPlayerData(), true
+        PlayerData, isLoggedIn, LocalVehicles = QBCore.Functions.GetPlayerData(), true, {}
         TriggerServerEvent("mh-parkingV2:server:refreshVehicles")
     end
 end)
 
 AddEventHandler('onResourceStop', function(resource)
-    if resource == GetCurrentResourceName() then PlayerData, isLoggedIn = {}, false end
+    if resource == GetCurrentResourceName() then 
+        PlayerData, isLoggedIn, LocalVehicles = {}, false, {}
+    end
 end)
 
 RegisterNetEvent('QBCore:Client:OnPlayerLoaded', function()
-    PlayerData, isLoggedIn = QBCore.Functions.GetPlayerData(), true
+    PlayerData, isLoggedIn, LocalVehicles = QBCore.Functions.GetPlayerData(), true, {}
     TriggerServerEvent("mh-parkingV2:server:refreshVehicles")
 end)
 
 RegisterNetEvent('QBCore:Client:OnPlayerUnload', function()
-    PlayerData, isLoggedIn = {}, false
+    PlayerData, isLoggedIn, LocalVehicles = {}, false, {}
 end)
 
 RegisterNetEvent('QBCore:Client:OnJobUpdate', function(job)
@@ -448,7 +448,7 @@ RegisterNetEvent("mh-parkingV2:client:autoPark", function(driver, netid)
     if isLoggedIn then
         local player = PlayerData.source
         local vehicle = NetworkGetEntityFromNetworkId(netid)
-        if DoesEntityExist(vehicle) then if player == driver then Save(vehicle) elseif player ~= driver then TaskLeaveVehicle(player, vehicle, 1) end end
+        if Config.AutoSaveWhenLeaveVehicle and DoesEntityExist(vehicle) then if player == driver then Save(vehicle) elseif player ~= driver then TaskLeaveVehicle(player, vehicle, 1) end end
     end
 end)
 
@@ -478,14 +478,14 @@ CreateThread(function()
     end
     if Config.UseUnableParkingBlips then
         for k, zone in pairs(Config.NoParkingLocations) do
-	    CreateBlipCircle(zone.coords, "Unable to park", zone.radius, zone.color, zone.sprite)
+		    CreateBlipCircle(zone.coords, "Unable to park", zone.radius, zone.color, zone.sprite)
         end
     end
 end)
 
 CreateThread(function()
 	while true do
-	Wait(0)
+		Wait(0)
         if isLoggedIn then
             local ped = PlayerPedId()
             if not isInVehicle and not IsPlayerDead(PlayerId()) then
@@ -522,8 +522,8 @@ CreateThread(function()
                 end
             end
         end
-	Wait(50)
-    end
+		Wait(50)
+	end
 end)
 
 RegisterNetEvent('mh-parkingV2:client:GetVehicleMenu', function()
