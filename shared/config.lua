@@ -21,11 +21,11 @@ Config.ForceVehicleOnGound = true       -- If true this will force parked vehicl
 Config.ViewDistance = true              -- If true vehicles are only visable in 100 meters around the players.
 Config.ParkedViewDistance = 100         -- Default 100 if your distance is over 100 meters the vehicles in that area will not render on screen.
 Config.UseParkedBlips = true            -- if true players can see a blip of the parked vehicle on the map
-Config.Maxparking = 1                   -- Default 1, this is max parked vehicles allowed per player, don't go to high with this...
+Config.Maxparking = 2                   -- Default 1, this is max parked vehicles allowed per player, don't go to high with this...
 Config.UseAsVip = false                 -- if true `Config.Maxparking` does not work and you need to add a amount per player.
 ----------------------------------------------------------------------------
 Config.AutoSave = false                 -- Default false, auto save player owned vehicle locations, this is dependend on the `Config.AutoSaveTimer`, if a player disconnect the vehicle wil be parked in that area.
-Config.AutoSaveTimer = 20               -- Default 20 secs, you can go higher if you want, don't go to low.
+Config.AutoSaveTimer = 5                -- Default 5 secs, you can go higher if you want, don't go to low.
 Config.AutoSaveWhenLeaveVehicle = true  -- If true the vehicle will be automaticly saved, if false then set `Config.AutoSave` to `true`.
 ----------------------------------------------------------------------------
 Config.UseVehicleOwnerText = true
@@ -35,6 +35,15 @@ Config.VehicleOwnerTextDisplayDistance = 15
 Config.DebugBlipForRadius = true   -- If true you see a circle aera on the map, use this for debug only.
 Config.UseUnableParkingBlips = true -- If this you see blip for radius in the map.
 Config.UseParkingLotsBlips = true  --If true players see parking lot blips on the map
+
+
+-- This is when you need to fuel and you can't use the auto park system.
+-- This goes automatic so leave it as it is.
+Config.ATMModels = {
+    ['prop_atm_02'] = true,
+    ['prop_atm_03'] = true,
+    ['prop_fleeca_atm'] = true,
+}
 
 -- This is when you need to fuel and you can't use the auto park system.
 -- This goes automatic so leave it as it is.
