@@ -60,7 +60,7 @@ Config.DisableNeedByPumpModels = {
 -- This are locations where you can't use the auto park system.
 -- the reason for this is it can be that you need to use the vehicle on that point.
 -- So if you want that you can't use the park system cause you can't use the vehicle when parked.
--- If you want to see the radius in the map you need to set Config.DebugBlipForRadius to true
+-- If you want to see the radius on the map you need to set Config.DebugBlipForRadius to true
 Config.NoParkingLocations = {
     -- Default locations
     {coords = vector3(-333.0179, -135.5331, 38.3735), radius = 15.0, color = 1, sprite = 163, job = 'mechanic'},   -- ls costum 1
