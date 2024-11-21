@@ -78,7 +78,7 @@ end
 
 local function IsCloseByAtm(coords)
     for hash in pairs(Config.ATMModels) do
-        local atm = GetClosestObjectOfType(coords.x, coords.y, coords.z, 10.0, hash, false, true, true)
+        local atm = GetClosestObjectOfType(coords.x, coords.y, coords.z, 10.0, GetHashKey(hash), false, true, true)
         if atm ~= 0 then return true end
     end
     return false
