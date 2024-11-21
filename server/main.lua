@@ -3,6 +3,12 @@
 --[[ ===================================================== ]] --
 local QBCore = exports['qb-core']:GetCoreObject()
 
+
+local function Trim(value)
+    if not value then return nil end
+    return (string.gsub(value, '^%s*(.-)%s*$', '%1'))
+end
+
 local function AutoSave()
     local players = QBCore.Functions.GetPlayers()
     if Config.AutoSave and #players >= 1 then
@@ -18,8 +24,8 @@ local function AutoSave()
                     local location = vector4(vehicleCoords.x, vehicleCoords.y, vehicleCoords.z, vehicleHeading)
                     local citizenid = Player.PlayerData.citizenid
                     local isDriving = MySQL.Sync.fetchAll('SELECT * FROM player_vehicles WHERE plate = ? AND citizenid = ? AND state = ?', {plate, citizenid, 0})[1]
-                    if isDriving and isDriving.plate == plate then
-                        MySQL.Async.execute('UPDATE player_vehicles SET location = ?, street = ? WHERE plate = ? AND citizenid = ? AND state = ?', {json.encode(location), 'unknow', plate, citizenid, 0}) 
+                    if isDriving and Trim(isDriving.plate) == Trim(plate) then
+                        MySQL.Async.execute('UPDATE player_vehicles SET location = ?, street = ? WHERE plate = ? AND citizenid = ?', {json.encode(location), 'unknow', plate, citizenid}) 
                     end
                 end
             end
@@ -56,7 +62,7 @@ QBCore.Functions.CreateCallback('mh-parkingV2:server:getVehicleData', function(s
         local Player = QBCore.Functions.GetPlayer(src)
         local citizenid = Player.PlayerData.citizenid
         local result = MySQL.Sync.fetchAll('SELECT * FROM player_vehicles WHERE citizenid = ? AND plate = ?', {citizenid, plate})[1]
-        if result ~= nil and result.plate == plate then cb(result) else cb({owner = false, message = Lang:t('info.not_the_owner')}) end
+        if result ~= nil and Trim(result.plate) == Trim(plate) then cb(result) else cb({owner = false, message = Lang:t('info.not_the_owner')}) end
     end
 end)
 
@@ -82,7 +88,7 @@ QBCore.Functions.CreateCallback("mh-parkingV2:server:save", function(source, cb,
                     local maxParking = MySQL.Sync.fetchAll('SELECT * FROM players WHERE citizenid = ?', {citizenid})[1]
                     if type(totalParked) == 'table' and #totalParked < maxParking.parkmax then
                         local result = MySQL.Sync.fetchAll('SELECT * FROM player_vehicles WHERE plate = ? AND citizenid = ? AND state = ?', {plate, citizenid, 0})[1]
-                        if result ~= nil and result.plate == plate then
+                        if result ~= nil and Trim(result.plate) == Trim(plate) then
                             local result2 = MySQL.Sync.fetchAll('SELECT * FROM player_vehicles WHERE plate = ? AND citizenid = ? AND state = ?', {plate, citizenid, 3})
                             local status = false
                             local message = nil
@@ -109,7 +115,7 @@ QBCore.Functions.CreateCallback("mh-parkingV2:server:save", function(source, cb,
             elseif not Config.UseAsVip then
                 if type(totalParked) == 'table' and #totalParked < Config.Maxparking then
                     local result = MySQL.Sync.fetchAll('SELECT * FROM player_vehicles WHERE plate = ? AND citizenid = ? AND state = ?', {plate, citizenid, 0})[1]
-                    if result ~= nil and result.plate == plate then
+                    if result ~= nil and Trim(result.plate) == Trim(plate) then
                         local result2 = MySQL.Sync.fetchAll('SELECT * FROM player_vehicles WHERE plate = ? AND citizenid = ? AND state = ?', {plate, citizenid, 3})
                         local status = false
                         local message = nil
@@ -143,8 +149,8 @@ QBCore.Functions.CreateCallback("mh-parkingV2:server:drive", function(source, cb
     if Player then
         local citizenid = Player.PlayerData.citizenid
         local result = MySQL.Sync.fetchAll('SELECT * FROM player_vehicles WHERE plate = ? AND state = ? AND citizenid = ?', {plate, 3, citizenid})[1]
-        if result ~= nil and result.plate == plate then
-            MySQL.Async.execute('UPDATE player_vehicles SET state = 0 WHERE plate = ? AND citizenid = ?', {plate, citizenid})
+        if result ~= nil and Trim(result.plate) == Trim(plate) then
+            MySQL.Async.execute('UPDATE player_vehicles SET state = 0, location = ?, street = ? WHERE plate = ? AND citizenid = ?', {"unknow", "unknow", plate, citizenid})
             TriggerClientEvent("mh-parkingV2:client:deletePlate", -1, plate)
             cb({status = true, message = Lang:t('info.remove_vehicle_zone'), data = json.decode(result.mods)})
         else
@@ -215,7 +221,7 @@ AddEventHandler('onResourceStart', function(resource)
         AutoSave()
         local result = MySQL.Sync.fetchAll('SELECT * FROM player_vehicles')
         for k, v in pairs(result) do
-            if v.state == 0 and (v.location ~= nil) then
+            if v.state == 0 and (v.location ~= 'unknow') then
                 MySQL.update('UPDATE player_vehicles SET state = 3 WHERE plate = ?', {v.plate})
             end
         end
@@ -275,18 +281,20 @@ RegisterServerEvent('mh-parkingV2:server:refreshVehicles', function()
     local src = source
     local Player = QBCore.Functions.GetPlayer(src)
     if Player then
-        local result = MySQL.Sync.fetchAll('SELECT * FROM player_vehicles WHERE state = 3')
+        local result = MySQL.Sync.fetchAll('SELECT * FROM player_vehicles')
         if type(result) == 'table' and #result >= 1 then
             local vehicles = {}
             for k, v in pairs(result) do
-                local fullname = "unknow"
-                local pl = MySQL.Sync.fetchAll('SELECT * FROM players WHERE citizenid = ?', {v.citizenid})[1]
-                if pl then
-                    local user = json.decode(pl.charinfo)
-                    fullname = user.firstname .. ' ' .. user.lastname
+                if v.state == 3 then
+                    local fullname = "unknow"
+                    local pl = MySQL.Sync.fetchAll('SELECT * FROM players WHERE citizenid = ?', {v.citizenid})[1]
+                    if pl then
+                        local user = json.decode(pl.charinfo)
+                        fullname = user.firstname .. ' ' .. user.lastname
+                    end
+                    vehicles[#vehicles + 1] = {citizenid = v.citizenid, fullname = fullname, plate = v.plate, model = v.vehicle, fuel = v.fuel, engine = v.engine, body = v.body, mods = json.decode(v.mods), location = json.decode(v.location), steet = v.street}                
+                    if Player.PlayerData.citizenid == v.citizenid then TriggerClientEvent('qb-vehiclekeys:client:AddKeys', Player.PlayerData.source, v.plate) end
                 end
-                vehicles[#vehicles + 1] = {citizenid = v.citizenid, fullname = fullname, plate = v.plate, model = v.vehicle, fuel = v.fuel, engine = v.engine, body = v.body, mods = json.decode(v.mods), location = json.decode(v.location), steet = v.street}                
-                if Player.PlayerData.citizenid == v.citizenid then TriggerClientEvent('qb-vehiclekeys:client:AddKeys', src, v.plate) end
             end
             TriggerClientEvent("mh-parkingV2:client:refreshVehicles", src, vehicles)
         end
