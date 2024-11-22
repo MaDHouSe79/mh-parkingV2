@@ -213,6 +213,9 @@ local function RemoveVehicles(vehicles)
                     local tmpModel = GetEntityModel(vehicle)
                     SetModelAsNoLongerNeeded(tmpModel)
                     DeteteParkedBlip(vehicle)
+                    NetworkFadeOutEntity(vehicle, false, true)
+                    while NetworkIsEntityFading(vehicle) do Wait(0) end
+                    Wait(100)
                     DeleteEntity(vehicle)
                 end
             end
@@ -298,9 +301,11 @@ local function SpawnVehicles(vehicles)
                 LoadModel(vehicles[i].model)
                 DeleteLocalVehicle(vehicles[i].plate)
                 local closestVehicle, closestDistance = QBCore.Functions.GetClosestVehicle(vehicles[i].location)
-                if closestDistance <= 1 then DeleteEntity(closestVehicle) while DoesEntityExist(closestVehicle) do Citizen.Wait(10) end end
+                if closestDistance <= 0.5 then DeleteEntity(closestVehicle) while DoesEntityExist(closestVehicle) do Citizen.Wait(10) end end
                 local vehicle = CreateVehicle(vehicles[i].model, vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z + 0.2, vehicles[i].location.w, true)
-                while not DoesEntityExist(vehicle) do Citizen.Wait(500) end               
+                while not DoesEntityExist(vehicle) do Citizen.Wait(500) end  
+                NetworkFadeInEntity(vehicle, false, true)
+                while NetworkIsEntityFading(vehicle) do Wait(0) end
                 if vehicles[i].mods.livery ~= nil then livery = vehicles[i].mods.livery end
                 QBCore.Functions.SetVehicleProperties(vehicle, vehicles[i].mods)
                 exports[Config.FuelScript]:SetFuel(vehicle, vehicles[i].fuel)
@@ -321,6 +326,7 @@ local function SpawnVehicles(vehicles)
                 SetVehicleDoorsLocked(vehicle, 2)
                 AddParkedVehicle(vehicle, vehicles[i])
                 FreezeEntityPosition(vehicle, true)
+                Wait(1000)
             end
         end
     end
