@@ -306,12 +306,12 @@ local function SpawnVehicles(vehicles)
                 while not DoesEntityExist(vehicle) do Citizen.Wait(500) end  
                 NetworkFadeInEntity(vehicle, false, true)
                 while NetworkIsEntityFading(vehicle) do Wait(0) end
+                SetEntityAsMissionEntity(vehicle, true, true)
                 if vehicles[i].mods.livery ~= nil then livery = vehicles[i].mods.livery end
                 QBCore.Functions.SetVehicleProperties(vehicle, vehicles[i].mods)
                 exports[Config.FuelScript]:SetFuel(vehicle, vehicles[i].fuel)
                 RequestCollisionAtCoord(vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z)
                 SetVehicleOnGroundProperly(vehicle)
-                SetEntityAsMissionEntity(vehicle, true, true)
                 SetModelAsNoLongerNeeded(vehicles[i].model)
                 SetEntityInvincible(vehicle, true)
                 SetEntityHeading(vehicle, vehicles[i].location.w)
@@ -325,8 +325,8 @@ local function SpawnVehicles(vehicles)
                 TriggerServerEvent('mh-parkingV2:server:setVehLockState', VehToNet(vehicle), 2)
                 SetVehicleDoorsLocked(vehicle, 2)
                 AddParkedVehicle(vehicle, vehicles[i])
-                FreezeEntityPosition(vehicle, true)
                 Wait(1000)
+                FreezeEntityPosition(vehicle, true)
             end
         end
     end
