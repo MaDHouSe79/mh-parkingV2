@@ -222,7 +222,7 @@ local function RemoveVehicles(vehicles)
         end
     end
     LocalVehicles = {}
-    Wait(1000)
+    Wait(1500)
     isDeleting = false
 end
 
