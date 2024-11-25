@@ -8,7 +8,6 @@ else
         local installed = LoadResourceFile(script, "version")
         if err == 200 then
             if github ~= nil then
-
                 if string.find(github, "{") and string.find(github, "}") then
                     github = json.decode(github)
                     cur_git_version = github.version
@@ -18,7 +17,6 @@ else
                     cur_git_version = github
                     gitversion = string.gsub(github, "%s+", "")
                 end
-
                 if string.find(installed, "{") and string.find(installed, "}") then
                     installed = json.decode(installed)
                     cur_inst_version = installed.version
@@ -27,7 +25,6 @@ else
                     cur_inst_version = installed
                     insversion = string.gsub(installed, "%s+", "")
                 end
-
                 cur_inst_version = string.gsub(cur_inst_version, "%s+", "")
                 cur_git_version = string.gsub(cur_git_version, "%s+", "")
                 if insversion == gitversion then
@@ -37,7 +34,6 @@ else
                 elseif insversion > gitversion then
                     print("^0[^2" .. script:upper() .. "^0] - ^0[^4UPDATE CHECK^0] - [^3Installed^0:^2"..cur_inst_version.."^0] [^3Github^0:^2"..cur_git_version.."^0] [Status:^1Failed^0]")
                 end
-
             elseif github == nil then
                 print("^0[^2" .. script:upper() .. "^0] - ^0[^4UPDATE CHECK^0] - [^3Installed^0:^2" .. cur_inst_version .. "^0] - ^0Unable to connect to ^3Github^0 host. ^0[STATUS:^1OFFLINE^0]")
             end
