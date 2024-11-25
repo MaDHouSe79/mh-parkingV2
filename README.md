@@ -36,11 +36,6 @@
 - [qb-core](https://github.com/qbcore-framework/qb-core)
 - [qb-policejob](https://github.com/qbcore-framework/qb-policejob)
 - [qb-vehiclekeys](https://github.com/qbcore-framework/qb-vehiclekeys)
-- 
-# Database
-```sql
-ALTER TABLE `player_vehicles` ADD COLUMN `location` TEXT NULL DEFAULT NULL
-```
 
 # Installation
 - Step 1: First stop your server.
