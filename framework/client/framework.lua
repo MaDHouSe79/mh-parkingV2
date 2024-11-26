@@ -104,32 +104,14 @@ function GetClosestVehicle(coords)
 end
 
 function Notify(message, type, length)
-    local exist = false
     if Config.NotifyScript == "ox_lib" and GetResourceState(Config.NotifyScript) ~= 'missing' then
-        exist = true
         lib.notify({title = "MH Parking V2", description = message, type = type})
     elseif Config.NotifyScript == "k5_notify" and GetResourceState(Config.NotifyScript) ~= 'missing' then
-        exist = true
         exports["k5_notify"]:notify("MH Parking V2", message, "k5style", length)
     elseif Config.NotifyScript == "okokNotify" and GetResourceState(Config.NotifyScript) ~= 'missing' then
-        exist = true
         exports['okokNotify']:Alert("MH Parking V2", message, length, type)
     elseif Config.NotifyScript == "Roda_Notifications" and GetResourceState(Config.NotifyScript) ~= 'missing' then
-        exist = true
         exports['Roda_Notifications']:showNotify("MH Parking V2", message, type, length)
-    elseif Config.NotifyScript == "qb" then
-        exist = true
-        Framework.Functions.Notify({text = "MH Parking V2", caption = message}, type, length)
-    elseif Config.NotifyScript == "esx" then
-        exist = true
-        Framework.ShowNotification(message, type, length)
-    end
-    if not exist then
-        if Config.Framework == 'esx' then
-            Framework.ShowNotification(message, 'info', length)
-        elseif Config.Framework == 'qb' then
-            Framework.Functions.Notify({text = "MH Parking V2", caption = message}, type, length)
-        end
     end
 end
 
