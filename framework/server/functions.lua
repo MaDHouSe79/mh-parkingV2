@@ -1,15 +1,6 @@
 Parking = {}
 Parking.Functions = {}
 
-function Trim(value)
-    if not value then return nil end
-    return (string.gsub(value, '^%s*(.-)%s*$', '%1'))
-end
-
-function SamePlates(plate1, plate2)
-    return (Trim(plate1) == Trim(plate2))
-end
-
 function Parking.Functions.SetVehicleLockState(netid, state)
     SetVehicleDoorsLocked(NetworkGetEntityFromNetworkId(vehNetId), state)
 end
@@ -279,4 +270,13 @@ function Parking.Functions.Init()
         MySQL.Async.execute('ALTER TABLE player_vehicles ADD COLUMN IF NOT EXISTS location TEXT NULL DEFAULT NULL')
         MySQL.Async.execute('ALTER TABLE player_vehicles ADD COLUMN IF NOT EXISTS street TEXT NULL DEFAULT NULL')
     end
+end
+
+function Trim(value)
+    if not value then return nil end
+    return (string.gsub(value, '^%s*(.-)%s*$', '%1'))
+end
+
+function SamePlates(plate1, plate2)
+    return (Trim(plate1) == Trim(plate2))
 end
