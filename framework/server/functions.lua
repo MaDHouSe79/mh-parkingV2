@@ -228,7 +228,7 @@ function Parking.Functions.RefreshVehicles(src)
                 if Config.Framework == 'esx' then
                     local char = MySQL.Sync.fetchAll("SELECT * FROM users WHERE owner = ?", {v.citizenid})[1]
                     if char then fullname = char.firstname.. ' ' ..char.lastname end
-                    local tmpVehicles = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE stored = ? AND owner = ?", {3, v.citizenid})[1]
+                    local tmpVehicles = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE stored = ? and plate = ?", {3, v.plate})[1]
                     local mods = json.decode(tmpVehicles.vehicle)
                     local coords = json.decode(tmpVehicles.location)
                     vehicles[#vehicles + 1] = {citizenid = tmpVehicles.owner, fullname = fullname, plate = tmpVehicles.plate, model = mods.model, fuel = mods.fuelLevel, engine = mods.engineHealth, body = mods.bodyHealth, mods = mods, location = coords}
@@ -238,7 +238,7 @@ function Parking.Functions.RefreshVehicles(src)
                  elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
                     local target = Framework.Functions.GetPlayerByCitizenId(v.citizenid) or Framework.Functions.GetOfflinePlayerByCitizenId(v.citizenid)
                     fullname = target.PlayerData.charinfo.firstname .. ' ' .. target.PlayerData.charinfo.lastname
-                    local tmpVehicles = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE state = 3", {3})[1]
+                    local tmpVehicles = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE state = ? and plate = ?", {3, v.plate})[1]
                     local mods = json.decode(tmpVehicles.mods)
                     local coords = json.decode(tmpVehicles.location)
                     vehicles[#vehicles + 1] = {citizenid = tmpVehicles.citizenid, fullname = fullname, plate = tmpVehicles.plate, model = tmpVehicles.vehicle, fuel = mods.fuelLevel, engine = mods.engineHealth, body = mods.bodyHealth, mods = mods, location = coords}  
