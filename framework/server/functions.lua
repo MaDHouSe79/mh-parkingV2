@@ -99,7 +99,7 @@ function Parking.Functions.Save(src, plate, location, netid, model, street)
                         if Config.Framework == 'esx' then
                             MySQL.Async.execute('UPDATE owned_vehicles SET stored = ?, location = ?, street = ? WHERE plate = ? AND owner = ?', {3, json.encode(location), street, plate, Player.identifier})
                          elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
-                            MySQL.Async.execute('UPDATE player_vehicles SET state = ?, location = ?, street = ?  WHERE plate = ? AND citizenid = ?', {3, json.encode(location), street, plate, Player.PlayerData.citizenid})
+                            MySQL.Async.execute('UPDATE player_vehicles SET state = ?, location = ?, street = ? WHERE plate = ? AND citizenid = ?', {3, json.encode(location), street, plate, Player.PlayerData.citizenid})
                         end
                         local citizenid = nil
                         local fullname = nil
