@@ -13,7 +13,7 @@ RegisterNetEvent("mh-parkingV2:client:addVehicle", function(data) Parking.Functi
 RegisterNetEvent("mh-parkingV2:client:park", function() Parking.Functions.TargetPark()end)
 RegisterNetEvent("mh-parkingV2:client:drive", function() Parking.Functions.TargetDrive() end)
 RegisterNetEvent("mh-parkingV2:client:autoPark", function(driver, netid) Parking.Functions.AutoPark(driver, netid) end)
-RegisterNetEvent("mh-parkingV2:client:autoDrive", function(driver, netid) Parking.Functions.autoDrive(driver, netid) end)
+RegisterNetEvent("mh-parkingV2:client:autoDrive", function(driver, netid) Parking.Functions.AutoDrive(driver, netid) end)
 RegisterNetEvent('mh-parkingV2:client:GetVehicleMenu', function() Parking.Functions.GetVehicleMenu() end)
 RegisterCommand('toggleparktext', function() displayOwnerText = not displayOwnerText end, false)
 RegisterCommand('parkmenu', function() TriggerEvent('mh-parkingV2:client:GetVehicleMenu') end, false)
