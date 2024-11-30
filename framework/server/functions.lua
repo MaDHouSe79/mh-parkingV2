@@ -68,7 +68,7 @@ function Parking.Functions.GetVehicles(src)
     end
 end
 
-function Parking.Functions.Save(src, plate, location, netid, model)
+function Parking.Functions.Save(src, plate, location, netid, model, street)
     local Player = GetPlayer(src)
     if Player then
         local vehicle = NetworkGetEntityFromNetworkId(netid)
@@ -97,9 +97,9 @@ function Parking.Functions.Save(src, plate, location, netid, model)
                         return {status = false, message = Lang:t('info.already_parked')}
                     else
                         if Config.Framework == 'esx' then
-                            MySQL.Async.execute('UPDATE owned_vehicles SET stored = ?, location = ? WHERE plate = ? AND owner = ?', {3, json.encode(location), plate, Player.identifier})
+                            MySQL.Async.execute('UPDATE owned_vehicles SET stored = ?, location = ?, street = ? WHERE plate = ? AND owner = ?', {3, json.encode(location), street, plate, Player.identifier})
                          elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
-                            MySQL.Async.execute('UPDATE player_vehicles SET state = ?, location = ? WHERE plate = ? AND citizenid = ?', {3, json.encode(location), plate, Player.PlayerData.citizenid})
+                            MySQL.Async.execute('UPDATE player_vehicles SET state = ?, location = ?, street = ?  WHERE plate = ? AND citizenid = ?', {3, json.encode(location), street, plate, Player.PlayerData.citizenid})
                         end
                         local citizenid = nil
                         local fullname = nil
