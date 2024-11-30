@@ -484,7 +484,7 @@ function Parking.Functions.AutoPark(driver, netid)
     end
 end
 
-function Parking.Functions.autoDrive(driver, netid)
+function Parking.Functions.AutoDrive(driver, netid)
     if isLoggedIn then
         local player = GetPlayerServerId(PlayerId())
         local vehicle = NetworkGetEntityFromNetworkId(netid)
