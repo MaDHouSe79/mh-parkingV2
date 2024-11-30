@@ -285,6 +285,9 @@ function Parking.Functions.Save(vehicle)
             local plate = GetVehicleNumberPlateText(vehicle)
             local vehicleCoords = GetEntityCoords(vehicle)
             local vehicleHeading = GetEntityHeading(vehicle)
+	    local x, y, z = table.unpack(GetEntityCoords(PlayerPedId()))
+            local street, crossing = GetStreetNameAtCoord(x, y, z)
+            street = GetStreetNameFromHashKey(street)
             local location = vector4(vehicleCoords.x, vehicleCoords.y, vehicleCoords.z, vehicleHeading)
             while IsPedInAnyVehicle(PlayerPedId(), false) do Wait(100) end
             TriggerCallback("mh-parkingV2:server:save", function(callback)
@@ -300,7 +303,7 @@ function Parking.Functions.Save(vehicle)
                 elseif not callback.owner then
                     Notify(callback.message, "error", 5000)
                 end
-            end, plate, location, netid, model)
+            end, plate, location, netid, model, street)
         end        
     end
 end
