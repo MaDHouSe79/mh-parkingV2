@@ -76,21 +76,21 @@ function Parking.Functions.Save(src, plate, location, netid, model, street)
             local totalParked = nil
             if Config.Framework == 'esx' then
                 totalParked = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE owner = ? AND stored = ?", {Player.identifier, 3})
-             elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
+            elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
                 totalParked = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE citizenid = ? AND state = ?", {Player.PlayerData.citizenid, 3})
             end
             if type(totalParked) == 'table' and #totalParked < Config.Maxparking then
                 local result = nil
                 if Config.Framework == 'esx' then
                     result = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE plate = ? AND owner = ? AND stored = ?", {plate, Player.identifier, 0})[1]
-                 elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
+                elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
                     result = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE plate = ? AND citizenid = ? AND state = ?", {plate, Player.PlayerData.citizenid, 0})[1]
                 end
                 if result ~= nil and SamePlates(result.plate, plate) then
                     local result2 = nil
                     if Config.Framework == 'esx' then
                         result2 = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE plate = ? AND owner = ? AND stored = ?", {plate, Player.identifier, 3})
-                     elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
+                    elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
                         result2 = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE plate = ? AND citizenid = ? AND state = ?", {plate, Player.PlayerData.citizenid, 3})
                     end
                     if type(result2) == 'table' and #result2 > 0 then
@@ -98,7 +98,7 @@ function Parking.Functions.Save(src, plate, location, netid, model, street)
                     else
                         if Config.Framework == 'esx' then
                             MySQL.Async.execute('UPDATE owned_vehicles SET stored = ?, location = ?, street = ? WHERE plate = ? AND owner = ?', {3, json.encode(location), street, plate, Player.identifier})
-                         elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
+                        elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
                             MySQL.Async.execute('UPDATE player_vehicles SET state = ?, location = ?, street = ?  WHERE plate = ? AND citizenid = ?', {3, json.encode(location), street, plate, Player.PlayerData.citizenid})
                         end
                         local citizenid = nil
@@ -106,7 +106,7 @@ function Parking.Functions.Save(src, plate, location, netid, model, street)
                         if Config.Framework == 'esx' then
                             citizenid = Player.identifier
                             fullname = Player.name
-                         elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
+                        elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
                             citizenid = Player.PlayerData.citizenid
                             fullname = Player.PlayerData.charinfo.firstname .. ' ' .. Player.PlayerData.charinfo.lastname
                         end
