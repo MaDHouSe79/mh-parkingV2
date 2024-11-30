@@ -19,7 +19,7 @@ Config.UseTarget = GetConvar('UseTarget', 'false') == 'true'
 Config.TargetScript = "qb-target"       -- Default qb-target but you can also use ox_target.
 ----------------------------------------------------------------------------
 -- Fuel Script
-Config.FuelScript = 'mh-fuel'           -- Default is LegacyFuel, if you use a other fuel script, for example ox_fuel
+Config.FuelScript = 'LegacyFuel'        -- Default is LegacyFuel, if you use a other fuel script, for example ox_fuel
 ----------------------------------------------------------------------------
 -- Notify Script
 Config.DisableParkNotify = false        -- Default true, if false you get many notifications when you enter or leave the vehicle, all other notify massages are stil enable.
