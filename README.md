@@ -44,7 +44,7 @@
 - Step 4: Add the database table to your player_vehicles table in your database.
 - Step 5: Start your server.  
 
-# Installation QB-Garagae
+# Installation QB-Garages
 [README FILES](https://github.com/MaDHouSe79/mh-parkingV2/tree/main/readme)
 
 # Impound 
