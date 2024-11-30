@@ -252,8 +252,7 @@ end
 
 function Parking.Functions.Drive(vehicle)
     if DoesEntityExist(vehicle) then
-        local plate = GetVehicleNumberPlateText(vehicle)
-        local netid = NetworkGetNetworkIdFromEntity(vehicle)
+        local data = {netid = NetworkGetNetworkIdFromEntity(vehicle), plate = GetVehicleNumberPlateText(vehicle)}
         while not IsPedInAnyVehicle(PlayerPedId(), false) do Wait(100) end
         TriggerCallback("mh-parkingV2:server:drive", function(callback)
             if callback.status then
@@ -261,7 +260,7 @@ function Parking.Functions.Drive(vehicle)
                 Parking.Functions.DeteteParkedBlip(vehicle)
                 TriggerCallback("mh-parkingV2:server:getVehicleData", function(vehicleData)
                     if type(vehicleData) == 'table' then
-                        Parking.Functions.DeleteLocalVehicle(plate)
+                        Parking.Functions.DeleteLocalVehicle(data.plate)
                         SetEntityInvincible(vehicle, false)
                         FreezeEntityPosition(vehicle, false)
                         SetVehiclePetrolTankHealth(vehicle, 1000.0)
@@ -270,9 +269,9 @@ function Parking.Functions.Drive(vehicle)
                     elseif type(vehicleData) == 'boolean' then
                         Notify(callback.message, "error", 5000)
                     end
-                end, plate)
+                end, data.plate)
             end
-        end, plate, netid)
+        end, data)
     end    
 end
 
@@ -280,17 +279,19 @@ function Parking.Functions.Save(vehicle)
     local allowToPark = Parking.Functions.AllowToPark(GetEntityCoords(PlayerPedId()))
     if allowToPark then
         if DoesEntityExist(vehicle) then
-            local netid = NetworkGetNetworkIdFromEntity(vehicle)
-            local model = GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))
-            local plate = GetVehicleNumberPlateText(vehicle)
             local vehicleCoords = GetEntityCoords(vehicle)
             local vehicleHeading = GetEntityHeading(vehicle)
-            local x, y, z = table.unpack(GetEntityCoords(PlayerPedId()))
-            local x, y, z = table.unpack(GetEntityCoords(PlayerPedId()))
-            local street, crossing = GetStreetNameAtCoord(x, y, z)
-            street = GetStreetNameFromHashKey(street)
-            local location = vector4(vehicleCoords.x, vehicleCoords.y, vehicleCoords.z, vehicleHeading)
-            while IsPedInAnyVehicle(PlayerPedId(), false) do Wait(100) end
+            while IsPedInAnyVehicle(PlayerPedId(), false) do Wait(10) end
+            local vehicleData = {
+                netid = NetworkGetNetworkIdFromEntity(vehicle),
+                plate = GetVehicleNumberPlateText(vehicle),
+                fuel = exports["LegacyFuel"]:GetFuel(vehicle),
+                engine = GetVehicleEngineHealth(vehicle),
+                body = GetVehicleBodyHealth(vehicle),
+                street = GetStreetNameFromHashKey(street),
+                model = GetDisplayNameFromVehicleModel(GetEntityModel(vehicle)),
+                location = vector4(vehicleCoords.x, vehicleCoords.y, vehicleCoords.z, vehicleHeading)
+            }
             TriggerCallback("mh-parkingV2:server:save", function(callback)
                 if callback.status then
                     SetEntityAsMissionEntity(vehicle, true, true)
@@ -304,8 +305,8 @@ function Parking.Functions.Save(vehicle)
                 elseif not callback.owner then
                     Notify(callback.message, "error", 5000)
                 end
-            end, plate, location, netid, model, street)
-        end
+            end, vehicleData)
+        end        
     end
 end
 
@@ -340,7 +341,7 @@ function Parking.Functions.SpawnVehicles(vehicles)
                 SetVehicleDamage(vehicle, vehicles[i].engine, vehicles[i].body)
                 TriggerServerEvent('mh-parkingV2:server:setVehLockState', VehToNet(vehicle), 2)
                 SetVehicleDoorsLocked(vehicle, 2)
-                exports[Config.FuelScript]:SetFuel(vehicle, vehicles[i].fuel)
+                exports["LegacyFuel"]:SetFuel(vehicle, vehicles[i].fuel)
                 Parking.Functions.AddParkedVehicle(vehicle, vehicles[i])
                 Wait(1000)
                 FreezeEntityPosition(vehicle, true)
@@ -555,93 +556,4 @@ function Parking.Functions.CreateBlips()
             end
         end
     end    
-end
--- 
-function Trim(value)
-    if not value then return nil end
-    return (string.gsub(value, '^%s*(.-)%s*$', '%1'))
-end
-
-function Round(value, numDecimalPlaces)
-    if not numDecimalPlaces then return math.floor(value + 0.5) end
-    local power = 10 ^ numDecimalPlaces
-    return math.floor((value * power) + 0.5) / (power)
-end
-
-function SamePlates(plate1, plate2)
-    return (Trim(plate1) == Trim(plate2))
-end
-
-function GetDistance(pos1, pos2)
-    return #(vector3(pos1.x, pos1.y, pos1.z) - vector3(pos2.x, pos2.y, pos2.z))
-end
-
-function LoadModel(model)
-    while not HasModelLoaded(model) do
-        RequestModel(model)
-        Wait(50)
-    end
-end
-
-function GetPedVehicleSeat(ped)
-    local vehicle = GetVehiclePedIsIn(ped, false)
-    for i = -2, GetVehicleMaxNumberOfPassengers(vehicle) do
-        if(GetPedInVehicleSeat(vehicle, i) == ped) then return i end
-    end
-    return -2
-end
-
-function GetClosestVehicle(coords)
-    local ped = PlayerPedId()
-    local vehicles = GetGamePool('CVehicle')
-    local closestDistance = -1
-    local closestVehicle = -1
-    if coords then
-        coords = type(coords) == 'table' and vec3(coords.x, coords.y, coords.z) or coords
-    else
-        coords = GetEntityCoords(ped)
-    end
-    for i = 1, #vehicles, 1 do
-        local vehicleCoords = GetEntityCoords(vehicles[i])
-        local distance = #(vehicleCoords - coords)
-        if closestDistance == -1 or closestDistance > distance then
-            closestVehicle = vehicles[i]
-            closestDistance = distance
-        end
-    end
-    return closestVehicle, closestDistance
-end
-
-function Notify(message, type, length)
-    if Config.NotifyScript == "ox_lib" and GetResourceState(Config.NotifyScript) ~= 'missing' then
-        lib.notify({title = "MH Parking V2", description = message, type = type})
-    elseif Config.NotifyScript == "k5_notify" and GetResourceState(Config.NotifyScript) ~= 'missing' then
-        exports["k5_notify"]:notify("MH Parking V2", message, "k5style", length)
-    elseif Config.NotifyScript == "okokNotify" and GetResourceState(Config.NotifyScript) ~= 'missing' then
-        exports['okokNotify']:Alert("MH Parking V2", message, length, type)
-    elseif Config.NotifyScript == "Roda_Notifications" and GetResourceState(Config.NotifyScript) ~= 'missing' then
-        exports['Roda_Notifications']:showNotify("MH Parking V2", message, type, length)
-    end
-end
-
-function Draw3DText(x, y, z, textInput, fontId, scaleX, scaleY)
-    local p = GetGameplayCamCoords()
-    local dist = #(p - vector3(x, y, z))
-    local scale = (1 / dist) * 20
-    local fov = (1 / GetGameplayCamFov()) * 100
-    local scale = scale * fov
-    SetTextScale(scaleX * scale, scaleY * scale)
-    SetTextFont(fontId)
-    SetTextProportional(1)
-    SetTextColour(250, 250, 250, 255)
-    SetTextDropshadow(1, 1, 1, 1, 255)
-    SetTextEdge(2, 0, 0, 0, 150)
-    SetTextDropShadow()
-    SetTextOutline()
-    SetTextEntry("STRING")
-    SetTextCentre(1)
-    AddTextComponentString(textInput)
-    SetDrawOrigin(x, y, z + 2, 0)
-    DrawText(0.0, 0.0)
-    ClearDrawOrigin()
 end
