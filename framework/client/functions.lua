@@ -279,7 +279,7 @@ function Parking.Functions.Save(vehicle)
     local allowToPark = Parking.Functions.AllowToPark(GetEntityCoords(PlayerPedId()))
     if allowToPark then
         if DoesEntityExist(vehicle) then
-            local canSave = false
+            local canSave = true
             local vehicleCoords = GetEntityCoords(vehicle)
             local vehicleHeading = GetEntityHeading(vehicle)
             while IsPedInAnyVehicle(PlayerPedId(), false) do Wait(10) end
@@ -293,11 +293,7 @@ function Parking.Functions.Save(vehicle)
                 model = GetDisplayNameFromVehicleModel(GetEntityModel(vehicle)),
                 location = vector4(vehicleCoords.x, vehicleCoords.y, vehicleCoords.z, vehicleHeading)
             }
-            if Config.OnlyAutoParkWhenEngineIsOff and GetIsVehicleEngineRunning(vehicle) == 0 then
-                canSave = true
-            else
-                canSave = true
-            end
+            if Config.OnlyAutoParkWhenEngineIsOff and GetIsVehicleEngineRunning(vehicle) then canSave = false end
             if canSave then
                 TriggerCallback("mh-parkingV2:server:save", function(callback)
                     if callback.status then
