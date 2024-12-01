@@ -43,7 +43,7 @@ Config.UseUnableParkingBlips = true -- If this you see blip for radius in the ma
 Config.UseParkingLotsBlips = true  --If true players see parking lot blips on the map
 
 
--- This is when you need to fuel and you can't use the auto park system.
+-- This is when you need to use a atm, you can't use the auto park system.
 -- This goes automatic so leave it as it is.
 Config.ATMModels = {
     ['prop_atm_02'] = true,
@@ -51,7 +51,7 @@ Config.ATMModels = {
     ['prop_fleeca_atm'] = true,
 }
 
--- This is when you need to fuel and you can't use the auto park system.
+-- This is when you close to a gasstation, you can't use the auto park system.
 -- This goes automatic so leave it as it is.
 Config.DisableNeedByPumpModels = {
     ['prop_vintage_pump'] = true,
@@ -65,7 +65,7 @@ Config.DisableNeedByPumpModels = {
 
 -- This are locations where you can't use the auto park system.
 -- the reason for this is it can be that you need to use the vehicle on that point.
--- So if you want that you can't use the park system cause you can't use the vehicle when parked.
+-- So if you want that, you can't use the park system cause you can't use the vehicle when parked.
 -- If you want to see the radius on the map you need to set Config.DebugBlipForRadius to true
 Config.NoParkingLocations = {
     -- Default locations
@@ -92,8 +92,8 @@ Config.NoParkingLocations = {
 
 ---------------------------------------Parking lots-------------------------------------
 -- Parking lots
--- If false players can park anyware, if true they can park anyware they want.
--- Players are always not allwed to park close by -> (Config.DisableNeedByLocations or Config.DisableNeedByPumpModels)
+-- If false players can park anyware, if true they can park only on parkinglots.
+-- Players are not allwed to park close by -> (Config.DisableNeedByLocations or Config.DisableNeedByPumpModels)
 -- If you want to see the radius in the map you need to set Config.DebugBlipForRadius to true
 Config.UseParkingLotsOnly = false
 Config.AllowedParkingLots = {
