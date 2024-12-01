@@ -563,9 +563,7 @@ function Parking.Functions.CreateBlips()
 end
 
 function Parking.Functions.KeepEngineRunning()
-    local ped = GetPlayerPed(-1)
-    local veh = GetVehiclePedIsIn(ped, false)
-    if IsPedInAnyVehicle(ped, false) and IsControlPressed(2, 75) and not IsEntityDead(ped) then
-        SetVehicleEngineOn(veh, true, true, true)
+    if IsPedInAnyVehicle(PlayerPedId(), false) and IsControlPressed(2, 75) and not IsEntityDead(PlayerPedId()) then
+        SetVehicleEngineOn(GetVehiclePedIsIn(PlayerPedId(), false), true, true, true)
     end
 end
