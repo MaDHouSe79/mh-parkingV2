@@ -278,7 +278,8 @@ end
 function Parking.Functions.Save(vehicle)
     local allowToPark = Parking.Functions.AllowToPark(GetEntityCoords(PlayerPedId()))
     if allowToPark then
-        if DoesEntityExist(vehicle) and not GetIsVehicleEngineRunning(vehicle) then
+        if DoesEntityExist(vehicle) then
+            local canSave = false
             local vehicleCoords = GetEntityCoords(vehicle)
             local vehicleHeading = GetEntityHeading(vehicle)
             while IsPedInAnyVehicle(PlayerPedId(), false) do Wait(10) end
@@ -292,21 +293,28 @@ function Parking.Functions.Save(vehicle)
                 model = GetDisplayNameFromVehicleModel(GetEntityModel(vehicle)),
                 location = vector4(vehicleCoords.x, vehicleCoords.y, vehicleCoords.z, vehicleHeading)
             }
-            TriggerCallback("mh-parkingV2:server:save", function(callback)
-                if callback.status then
-                    SetEntityAsMissionEntity(vehicle, true, true)
-                    Parking.Functions.CreateTargetEntityMenu(vehicle)
-                    if not Config.DisableParkNotify then Notify(callback.message, "primary", 5000) end
-                    SetVehicleDoorsShut(vehicle, false)
-                    Wait(2000)
-                    FreezeEntityPosition(vehicle, true)
-                elseif callback.limit then
-                    Notify(callback.message, "error", 5000)
-                elseif not callback.owner then
-                    Notify(callback.message, "error", 5000)
-                end
-            end, vehicleData)
-        end        
+            if Config.OnlyAutoParkWhenEngineIsOff and GetIsVehicleEngineRunning(vehicle) == 0 then
+                canSave = true
+            else
+                canSave = true
+            end
+            if canSave then
+                TriggerCallback("mh-parkingV2:server:save", function(callback)
+                    if callback.status then
+                        SetEntityAsMissionEntity(vehicle, true, true)
+                        Parking.Functions.CreateTargetEntityMenu(vehicle)
+                        if not Config.DisableParkNotify then Notify(callback.message, "primary", 5000) end
+                        SetVehicleDoorsShut(vehicle, false)
+                        Wait(2000)
+                        FreezeEntityPosition(vehicle, true)
+                    elseif callback.limit then
+                        Notify(callback.message, "error", 5000)
+                    elseif not callback.owner then
+                        Notify(callback.message, "error", 5000)
+                    end
+                end, vehicleData)
+            end
+        end    
     end
 end
 
