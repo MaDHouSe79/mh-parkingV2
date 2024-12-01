@@ -135,7 +135,7 @@ function Parking.Functions.CreateTargetEntityMenu(vehicle)
                         icon = "fas fa-car",
                         label = Lang:t('target.park_vehicle'),
                         canInteract = function(entity, distance, data)
-                            local isParked = IsVehicleAlreadyListed(GetVehicleNumberPlateText(entity))
+                            local isParked = Parking.Functions.IsVehicleAlreadyListed(GetVehicleNumberPlateText(entity))
                             if isParked then return false end
                             return true
                         end
@@ -145,7 +145,7 @@ function Parking.Functions.CreateTargetEntityMenu(vehicle)
                         icon = "fas fa-car",
                         label = Lang:t('target.unpark_vehicle'),
                         canInteract = function(entity, distance, data)
-                            local isParked = IsVehicleAlreadyListed(GetVehicleNumberPlateText(entity))
+                            local isParked = Parking.Functions.IsVehicleAlreadyListed(GetVehicleNumberPlateText(entity))
                             if not isParked then return false end
                             return true
                         end
@@ -160,7 +160,7 @@ function Parking.Functions.CreateTargetEntityMenu(vehicle)
                     label = Lang:t('target.park_vehicle'),
                     event = "mh-parkingV2:client:park",
                     canInteract = function(entity, distance, coords, name)
-                        local isParked = IsVehicleAlreadyListed(GetVehicleNumberPlateText(entity))
+                        local isParked = Parking.Functions.IsVehicleAlreadyListed(GetVehicleNumberPlateText(entity))
                         if isParked then return false end
                         return true
                     end,
@@ -170,7 +170,7 @@ function Parking.Functions.CreateTargetEntityMenu(vehicle)
                     label = Lang:t('target.unpark_vehicle'),
                     event = "mh-parkingV2:client:drive",
                     canInteract = function(entity, distance, coords, name)
-                        local isParked = IsVehicleAlreadyListed(GetVehicleNumberPlateText(entity))
+                        local isParked = Parking.Functions.IsVehicleAlreadyListed(GetVehicleNumberPlateText(entity))
                         if not isParked then return false end
                         return true
                     end,
