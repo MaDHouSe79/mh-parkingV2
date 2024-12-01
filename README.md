@@ -45,6 +45,10 @@
 - Stap 3: Add `ensure [mh]` in `server.cfg` below `ensure [defaultmaps]`.
 - Step 4: Start your server.  
 
+# Commands
+- `/toggleparktext` this disable or enable the text above the parked vehicle. (for streamers)
+- `/parkmenu` to open the parked menu so you can set a waypoint.
+
 # Installation QB-Garages
 [README FILES](https://github.com/MaDHouSe79/mh-parkingV2/tree/main/readme)
 
