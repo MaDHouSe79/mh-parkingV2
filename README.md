@@ -30,7 +30,8 @@
 - I rewrote the parking script and now your vehicles are automatically parked, this happens when you get out or get in the vehicle.
 - I remove the F5 park/unpark and everything else that was no longer needed.
 - The Impound should also work automatically and the vehicle should disappear when the police impound a vehicle.
-- Auto park only when your engine is off, you can change this in the config file.
+- Auto park only when your engine is off, you can change this in the config file,
+- When you press `F` sort if wil park when you hold the `F` it let the engine running and don't park.
   
 # Dependencies
 - [oxmysql](https://github.com/overextended/oxmysql/releases/tag/v1.9.3)
