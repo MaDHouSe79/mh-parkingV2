@@ -16,25 +16,25 @@ end
 ----------------------------------------------------------------------------
 -- Target Script
 Config.UseTarget = GetConvar('UseTarget', 'false') == 'true'
-Config.TargetScript = "qb-target"         -- Default qb-target but you can also use ox_target.
+Config.TargetScript = "qb-target"          -- Default qb-target but you can also use ox_target.
 ----------------------------------------------------------------------------
 -- Fuel Script
-Config.FuelScript = 'LegacyFuel'          -- Default is LegacyFuel, if you use a other fuel script, for example ox_fuel
+Config.FuelScript = 'LegacyFuel'           -- Default is LegacyFuel, if you use a other fuel script, for example ox_fuel
 ----------------------------------------------------------------------------
 -- Notify Script
-Config.DisableParkNotify = false          -- Default true, if false you get many notifications when you enter or leave the vehicle, all other notify massages are stil enable.
-Config.NotifyScript = "ox_lib"            -- Default ox_lib, but you can use this scripts aswell (k5_notify, okokNotify, Roda_Notifications)
+Config.DisableParkNotify = false           -- Default true, if false you get many notifications when you enter or leave the vehicle, all other notify massages are stil enable.
+Config.NotifyScript = "ox_lib"             -- Default ox_lib, but you can use this scripts aswell (k5_notify, okokNotify, Roda_Notifications)
 ----------------------------------------------------------------------------
-Config.OnlyAutoParkWhenEngineIsOff = true -- auto park when vehicle engine is off.
+Config.OnlyAutoParkWhenEngineIsOff = false -- Default false, if true auto park only when vehicle engine is off.
 ----------------------------------------------------------------------------
-Config.ForceVehicleOnGound = true         -- If true this will force parked vehicles on the ground, sometimes the vehicles are in the air and by enable this is force the vehicle to the ground
+Config.ForceVehicleOnGound = true          -- If true this will force parked vehicles on the ground, sometimes the vehicles are in the air and by enable this is force the vehicle to the ground
 ----------------------------------------------------------------------------
 -- For performance
-Config.ViewDistance = true                -- If true vehicles are only visable in 100 meters around the players.
-Config.ParkedViewDistance = 100           -- Default 100 if your distance is over 100 meters the vehicles in that area will not render on screen.
-Config.UseParkedBlips = true              -- if true players can see a blip of the parked vehicle on the map
-Config.Maxparking = 2                     -- Default 1, this is max parked vehicles allowed per player, don't go to high with this...
-Config.UseAsVip = false                   -- if true `Config.Maxparking` does not work and you need to add a amount per player.
+Config.ViewDistance = true                 -- If true vehicles are only visable in 100 meters around the players.
+Config.ParkedViewDistance = 100            -- Default 100 if your distance is over 100 meters the vehicles in that area will not render on screen.
+Config.UseParkedBlips = true               -- if true players can see a blip of the parked vehicle on the map
+Config.Maxparking = 2                      -- Default 1, this is max parked vehicles allowed per player, don't go to high with this...
+Config.UseAsVip = false                    -- if true `Config.Maxparking` does not work and you need to add a amount per player.
 ----------------------------------------------------------------------------
 Config.UseVehicleOwnerText = true
 Config.VehicleOwnerTextDisplayDistance = 15
