@@ -46,7 +46,7 @@
 - Step 4: Start your server.  
 
 # Commands
-- `/toggleparktext` this disable or enable the text above the parked vehicle. (for streamers)
+- `/toggleparktext` this disable or enable the text above the parked vehicles. (for streamers)
 - `/parkmenu` to open the parked menu so you can set a waypoint.
 
 # Installation QB-Garages
