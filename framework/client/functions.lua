@@ -278,7 +278,7 @@ end
 function Parking.Functions.Save(vehicle)
     local allowToPark = Parking.Functions.AllowToPark(GetEntityCoords(PlayerPedId()))
     if allowToPark then
-        if DoesEntityExist(vehicle) then
+        if DoesEntityExist(vehicle) and not GetIsVehicleEngineRunning(vehicle) then
             local vehicleCoords = GetEntityCoords(vehicle)
             local vehicleHeading = GetEntityHeading(vehicle)
             while IsPedInAnyVehicle(PlayerPedId(), false) do Wait(10) end
