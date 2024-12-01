@@ -34,10 +34,6 @@ Config.UseParkedBlips = true            -- if true players can see a blip of the
 Config.Maxparking = 2                   -- Default 1, this is max parked vehicles allowed per player, don't go to high with this...
 Config.UseAsVip = false                 -- if true `Config.Maxparking` does not work and you need to add a amount per player.
 ----------------------------------------------------------------------------
-Config.AutoSave = false                 -- Default false, auto save player owned vehicle locations, this is dependend on the `Config.AutoSaveTimer`, if a player disconnect the vehicle wil be parked in that area.
-Config.AutoSaveTimer = 5                -- Default 5 secs, you can go higher if you want, don't go to low.
-Config.AutoSaveWhenLeaveVehicle = true  -- If true the vehicle will be automaticly saved, if false then set `Config.AutoSave` to `true`.
-----------------------------------------------------------------------------
 Config.UseVehicleOwnerText = true
 Config.VehicleOwnerTextDisplayDistance = 15
 ----------------------------------------------------------------------------
