@@ -32,6 +32,7 @@
 - The Impound should also work automatically and the vehicle should disappear when the police impound a vehicle.
 - Auto park only when your engine is off, you can change this in the config file,
 - When you press `F` sort if wil park when you hold the `F` it let the engine running and don't park.
+- And yes your vehicle will be back at the park location after server restart.
   
 # Dependencies
 - [oxmysql](https://github.com/overextended/oxmysql/releases/tag/v1.9.3)
