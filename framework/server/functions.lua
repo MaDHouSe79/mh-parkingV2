@@ -250,23 +250,12 @@ function Parking.Functions.RefreshVehicles(src)
                     local tmpVehicles = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE state = ? and plate = ?", {3, v.plate})[1]
                     local mods = json.decode(tmpVehicles.mods)
                     local coords = json.decode(tmpVehicles.location)
-                    vehicles[#vehicles + 1] = {
-                        citizenid = tmpVehicles.citizenid,
-                        fullname = fullname,
-                        plate = tmpVehicles.plate,
-                        model = tmpVehicles.vehicle,
-                        fuel = tmpVehicles.fuel,
-                        engine = tmpVehicles.engine,
-                        body = tmpVehicles.body,
-                        mods = mods,
-                        location = coords
-                    }  
+                    vehicles[#vehicles + 1] = {citizenid = tmpVehicles.citizenid, fullname = fullname, plate = tmpVehicles.plate, model = tmpVehicles.vehicle, fuel = tmpVehicles.fuel, engine = tmpVehicles.engine, body = tmpVehicles.body, mods = mods, location = coords}  
                     if Player.PlayerData.citizenid == v.citizenid then
                         if GetResourceState('qb-vehiclekeys') ~= 'missing' then
                             exports['qb-vehiclekeys']:GiveKeys(Player.PlayerData.source, tmpVehicles.plate)
                         end
                     end
-                    
                 end
             end
             TriggerClientEvent("mh-parkingV2:client:refreshVehicles", src, vehicles)
