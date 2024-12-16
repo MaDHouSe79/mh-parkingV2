@@ -36,7 +36,7 @@ Config.UseParkedBlips = true               -- if true players can see a blip of 
 Config.Maxparking = 2                      -- Default 1, this is max parked vehicles allowed per player, don't go to high with this...
 Config.UseAsVip = false                    -- if true `Config.Maxparking` does not work and you need to add a amount per player.
 ----------------------------------------------------------------------------
-Config.UseVehicleOwnerText = true
+Config.UseVehicleOwnerText = false
 Config.VehicleOwnerTextDisplayDistance = 15
 ----------------------------------------------------------------------------
 -- Stuff to automatic disable the auto parking system.
