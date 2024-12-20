@@ -11,7 +11,7 @@ function SamePlates(plate1, plate2)
 end
 
 function Parking.Functions.SetVehicleLockState(netid, state)
-    SetVehicleDoorsLocked(NetworkGetEntityFromNetworkId(vehNetId), state)
+    SetVehicleDoorsLocked(NetworkGetEntityFromNetworkId(netid), state)
 end
 
 function Parking.Functions.GetClosestVehicle(coords)
