@@ -105,25 +105,15 @@ function Parking.Functions.Save(src, data)
                     if type(result2) == 'table' and #result2 > 0 then
                         return {status = false, message = Lang:t('info.already_parked')}
                     else
+                        local citizenid, fullname, owned = nil, nil, nil  
                         if Config.Framework == 'esx' then
+                            citizenid, fullname = Player.identifier, Player.name
+                            owned = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE owner = ? AND plate = ? LIMIT 1", {citizenid, data.plate})[1]                           
                             MySQL.Async.execute('UPDATE owned_vehicles SET stored = ?, location = ?, street = ?, fuel = ?, body = ?, engine = ? WHERE plate = ? AND owner = ?', {3, json.encode(data.location), data.street, data.fuel, data.body, data.engine, data.plate, Player.identifier})
-                         elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
-                            MySQL.Async.execute('UPDATE player_vehicles SET state = ?, location = ?, street = ?, fuel = ?, body = ?, engine = ? WHERE plate = ? AND citizenid = ?', {3, json.encode(data.location), data.street, data.fuel, data.body, data.engine, data.plate, Player.PlayerData.citizenid})
-                        end
-                        local citizenid = nil
-                        local fullname = nil
-                        if Config.Framework == 'esx' then
-                            citizenid = Player.identifier
-                            fullname = Player.name
-                         elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
-                            citizenid = Player.PlayerData.citizenid
-                            fullname = Player.PlayerData.charinfo.firstname .. ' ' .. Player.PlayerData.charinfo.lastname
-                        end
-                        local owned = nil
-                        if Config.Framework == 'esx' then
-                            owned = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE owner = ? AND plate = ? LIMIT 1", {citizenid, data.plate})[1]
                         elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
+                            citizenid, fullname = Player.PlayerData.citizenid, Player.PlayerData.charinfo.firstname .. ' ' .. Player.PlayerData.charinfo.lastname
                             owned = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE citizenid = ? AND plate = ? LIMIT 1", {citizenid, data.plate})[1]
+                            MySQL.Async.execute('UPDATE player_vehicles SET state = ?, location = ?, street = ?, fuel = ?, body = ?, engine = ? WHERE plate = ? AND citizenid = ?', {3, json.encode(data.location), data.street, data.fuel, data.body, data.engine, data.plate, Player.PlayerData.citizenid})                    
                         end
                         if owned.vehicle ~= nil then model = owned.vehicle else model = data.model end
                         local _data = {citizenid = citizenid, fullname = fullname, entity = vehicle, plate = data.plate, model = model, location = data.location}
