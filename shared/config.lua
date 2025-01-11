@@ -40,15 +40,6 @@ Config.DebugBlipForRadius = true   -- If true you see a circle aera on the map, 
 Config.UseUnableParkingBlips = true -- If this you see blip for radius in the map.
 Config.UseParkingLotsBlips = true  --If true players see parking lot blips on the map
 
-
--- This is when you need to use a atm, you can't use the auto park system.
--- This goes automatic so leave it as it is.
-Config.ATMModels = {
-    ['prop_atm_02'] = true,
-    ['prop_atm_03'] = true,
-    ['prop_fleeca_atm'] = true,
-}
-
 -- This is when you close to a gasstation, you can't use the auto park system.
 -- This goes automatic so leave it as it is.
 Config.DisableNeedByPumpModels = {
