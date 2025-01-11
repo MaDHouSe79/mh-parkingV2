@@ -123,64 +123,6 @@ function Parking.Functions.DeleteNearByVehicle(location)
     end
 end
 
-function Parking.Functions.CreateTargetEntityMenu(vehicle)
-    if DoesEntityExist(vehicle) then
-        local netid = NetworkGetNetworkIdFromEntity(vehicle)
-        if Config.TargetScript == "qb-target" then
-            exports['qb-target']:AddTargetEntity(netid, {
-                options = {
-                    {
-                        type = "client",
-                        event = "mh-parkingV2:client:park",
-                        icon = "fas fa-car",
-                        label = Lang:t('target.park_vehicle'),
-                        canInteract = function(entity, distance, data)
-                            local isParked = Parking.Functions.IsVehicleAlreadyListed(GetVehicleNumberPlateText(entity))
-                            if isParked then return false end
-                            return true
-                        end
-                    }, {
-                        type = "client",
-                        event = "mh-parkingV2:client:drive",
-                        icon = "fas fa-car",
-                        label = Lang:t('target.unpark_vehicle'),
-                        canInteract = function(entity, distance, data)
-                            local isParked = Parking.Functions.IsVehicleAlreadyListed(GetVehicleNumberPlateText(entity))
-                            if not isParked then return false end
-                            return true
-                        end
-                    }
-                }, 
-                distance = 2.5
-            })
-        elseif Config.TargetScript == "ox_target" then
-            exports.ox_target:addEntity(netid, {
-                {
-                    icon = "fas fa-parking",
-                    label = Lang:t('target.park_vehicle'),
-                    event = "mh-parkingV2:client:park",
-                    canInteract = function(entity, distance, coords, name)
-                        local isParked = Parking.Functions.IsVehicleAlreadyListed(GetVehicleNumberPlateText(entity))
-                        if isParked then return false end
-                        return true
-                    end,
-                    distance = 2.5
-                }, {
-                    icon = "fas fa-parking",
-                    label = Lang:t('target.unpark_vehicle'),
-                    event = "mh-parkingV2:client:drive",
-                    canInteract = function(entity, distance, coords, name)
-                        local isParked = Parking.Functions.IsVehicleAlreadyListed(GetVehicleNumberPlateText(entity))
-                        if not isParked then return false end
-                        return true
-                    end,
-                    distance = 2.5
-                }
-            })
-        end
-    end
-end
-
 function Parking.Functions.IsCloseByStationPump(coords)
     for hash in pairs(Config.DisableNeedByPumpModels) do
         local pump = GetClosestObjectOfType(coords.x, coords.y, coords.z, 10.0, hash, false, true, true)
@@ -298,7 +240,6 @@ function Parking.Functions.Save(vehicle)
                 TriggerCallback("mh-parkingV2:server:save", function(callback)
                     if callback.status then
                         SetEntityAsMissionEntity(vehicle, true, true)
-                        Parking.Functions.CreateTargetEntityMenu(vehicle)
                         if not Config.DisableParkNotify then Notify(callback.message, "primary", 5000) end
                         SetVehicleDoorsShut(vehicle, false)
                         Wait(2000)
