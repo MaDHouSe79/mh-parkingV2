@@ -286,7 +286,7 @@ function Parking.Functions.Save(vehicle)
             local vehicleData = {
                 netid = NetworkGetNetworkIdFromEntity(vehicle),
                 plate = GetVehicleNumberPlateText(vehicle),
-                fuel = exports["LegacyFuel"]:GetFuel(vehicle),
+                fuel = exports[Config.FuelScript]:GetFuel(vehicle),
                 engine = GetVehicleEngineHealth(vehicle),
                 body = GetVehicleBodyHealth(vehicle),
                 street = GetStreetNameFromHashKey(street),
@@ -336,7 +336,7 @@ function Parking.Functions.SpawnVehicles(vehicles)
                 SetModelAsNoLongerNeeded(vehicles[i].model)
                 SetEntityInvincible(vehicle, true)
                 SetEntityHeading(vehicle, vehicles[i].location.w)
-                SetVehicleLivery(vehicle, vehicles[i].mods.livery)
+                SetVehicleLivery(vehicle, livery)
                 SetVehicleEngineHealth(vehicle, vehicles[i].mods.engineHealth)
                 SetVehicleBodyHealth(vehicle, vehicles[i].mods.bodyHealth)
                 SetVehiclePetrolTankHealth(vehicle, vehicles[i].mods.tankHealth)
@@ -345,7 +345,7 @@ function Parking.Functions.SpawnVehicles(vehicles)
                 SetVehicleDamage(vehicle, vehicles[i].engine, vehicles[i].body)
                 TriggerServerEvent('mh-parkingV2:server:setVehLockState', VehToNet(vehicle), 2)
                 SetVehicleDoorsLocked(vehicle, 2)
-                exports["LegacyFuel"]:SetFuel(vehicle, vehicles[i].fuel)
+                exports[Config.FuelScript]:SetFuel(vehicle, vehicles[i].fuel)
                 Parking.Functions.AddParkedVehicle(vehicle, vehicles[i])
                 Wait(1000)
                 FreezeEntityPosition(vehicle, true)
