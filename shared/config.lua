@@ -14,16 +14,12 @@ elseif GetResourceState("qbx-core") ~= 'missing' then
     Config.Framework = 'qbx'
 end
 ----------------------------------------------------------------------------
--- Target Script
-Config.UseTarget = GetConvar('UseTarget', 'false') == 'true'
-Config.TargetScript = "qb-target"          -- Default qb-target but you can also use ox_target.
-----------------------------------------------------------------------------
 -- Fuel Script
 Config.FuelScript = 'LegacyFuel'           -- Default is LegacyFuel, if you use a other fuel script, for example ox_fuel
 ----------------------------------------------------------------------------
 -- Notify Script
 Config.DisableParkNotify = false           -- Default true, if false you get many notifications when you enter or leave the vehicle, all other notify massages are stil enable.
-Config.NotifyScript = "ox_lib"             -- Default ox_lib, but you can use this scripts aswell (k5_notify, okokNotify, Roda_Notifications)
+Config.NotifyScript = "qb"                 -- Default qb, you can use (qb, ox_lib, k5_notify, okokNotify, Roda_Notifications)
 ----------------------------------------------------------------------------
 Config.OnlyAutoParkWhenEngineIsOff = true  -- Default true, if true auto park only when vehicle engine is off.
 ----------------------------------------------------------------------------
@@ -36,7 +32,7 @@ Config.UseParkedBlips = true               -- if true players can see a blip of 
 Config.Maxparking = 2                      -- Default 1, this is max parked vehicles allowed per player, don't go to high with this...
 Config.UseAsVip = false                    -- if true `Config.Maxparking` does not work and you need to add a amount per player.
 ----------------------------------------------------------------------------
-Config.UseVehicleOwnerText = false
+Config.UseVehicleOwnerText = true
 Config.VehicleOwnerTextDisplayDistance = 15
 ----------------------------------------------------------------------------
 -- Stuff to automatic disable the auto parking system.
