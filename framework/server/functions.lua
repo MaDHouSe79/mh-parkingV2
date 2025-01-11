@@ -119,8 +119,15 @@ function Parking.Functions.Save(src, data)
                             citizenid = Player.PlayerData.citizenid
                             fullname = Player.PlayerData.charinfo.firstname .. ' ' .. Player.PlayerData.charinfo.lastname
                         end
-                        local data = {citizenid = citizenid, fullname = fullname, entity = vehicle, plate = data.plate, model = data.model, location = data.location}
-                        TriggerClientEvent('mh-parkingV2:client:addVehicle', -1, data)
+                        local owned = nil
+                        if Config.Framework == 'esx' then
+                            owned = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE owner = ? AND plate = ? LIMIT 1", {citizenid, data.plate})[1]
+                        elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
+                            owned = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE citizenid = ? AND plate = ? LIMIT 1", {citizenid, data.plate})[1]
+                        end
+                        if owned.vehicle ~= nil then model = owned.vehicle else model = data.model end
+                        local _data = {citizenid = citizenid, fullname = fullname, entity = vehicle, plate = data.plate, model = model, location = data.location}
+                        TriggerClientEvent('mh-parkingV2:client:addVehicle', -1, _data)
                         return {status = true, message = Lang:t('info.vehicle_parked')}
                     end
                 else
