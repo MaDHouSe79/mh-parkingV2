@@ -431,15 +431,16 @@ end
 function Parking.Functions.DisplayOwnerText()
     local playerCoords = GetEntityCoords(PlayerPedId())
     for k, vehicle in pairs(LocalVehicles) do
-        local owner, model, brand, plate = vehicle.fullname, "", "", ""
-        for k, v in pairs(Config.Vehicles) do
-            if v.model == vehicle.model then
-                model, brand, plate = v.name, v.brand, v.plate
-            end
-        end
         if GetDistance(playerCoords, vehicle.location) < Config.VehicleOwnerTextDisplayDistance then
-            if model ~= nil and brand ~= nil and owner ~= nil then
-                local owner = Lang:t("info.owner", {owner = owner})
+            local owner, plate, model, brand = vehicle.fullname, vehicle.plate, "", ""
+            for k, v in pairs(Config.Vehicles) do
+                if v.model:lower() == vehicle.model:lower() then
+                    model, brand = v.name, v.brand
+                    break
+                end
+            end
+            if model ~= nil and brand ~= nil then
+                local owner = Lang:t("info.owner", {owner = vehicle.fullname})
                 local model = Lang:t("info.model", {model = model})
                 local brand = Lang:t("info.brand", {brand = brand})
                 local plate = Lang:t("info.plate", {plate = vehicle.plate})
