@@ -104,7 +104,9 @@ function GetClosestVehicle(coords)
 end
 
 function Notify(message, type, length)
-    if Config.NotifyScript == "ox_lib" and GetResourceState(Config.NotifyScript) ~= 'missing' then
+    if Config.NotifyScript == "qb" then
+        Framework.Functions.Notify(message, type, length)
+    elseif Config.NotifyScript == "ox_lib" and GetResourceState(Config.NotifyScript) ~= 'missing' then
         lib.notify({title = "MH Parking V2", description = message, type = type})
     elseif Config.NotifyScript == "k5_notify" and GetResourceState(Config.NotifyScript) ~= 'missing' then
         exports["k5_notify"]:notify("MH Parking V2", message, "k5style", length)
