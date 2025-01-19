@@ -24,7 +24,6 @@
 
 # My Youtube Channel and Discord
 - [Subscribe](https://www.youtube.com/c/@MaDHouSe79) 
-- [Discord](https://discord.gg/vJ9EukCmJQ)
 
 # MH Parking V2 by MaDHouSe79
 - I rewrote the parking script and now your vehicles are automatically parked, this happens when you get out or get in the vehicle.
