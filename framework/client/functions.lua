@@ -261,22 +261,23 @@ function Parking.Functions.SpawnVehicles(vehicles)
         for i = 1, #vehicles, 1 do
             if not Parking.Functions.IsVehicleAlreadyListed(vehicles[i].plate) then
                 local livery = -1
-                LoadModel(vehicles[i].model)
+                local model = GetHashKey(vehicles[i].model)
+                LoadModel(model)
                 Parking.Functions.DeleteLocalVehicle(vehicles[i].plate)
                 local closestVehicle, closestDistance = GetClosestVehicle(vehicles[i].location)
                 if closestDistance <= 0.5 then DeleteEntity(closestVehicle) while DoesEntityExist(closestVehicle) do Citizen.Wait(10) end end
-                local vehicle = CreateVehicle(vehicles[i].model, vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z + 0.2, vehicles[i].location.w, true)
-                while not DoesEntityExist(vehicle) do Citizen.Wait(500) end  
+                local vehicle = CreateVehicle(model, vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z + 0.2, vehicles[i].location.w, false, false)
+                SetModelAsNoLongerNeeded(model)
+                while not DoesEntityExist(vehicle) do Citizen.Wait(500) end 
+                SetEntityAsMissionEntity(vehicle, true, true)
                 NetworkFadeInEntity(vehicle, false, true)
                 while NetworkIsEntityFading(vehicle) do Wait(0) end
-                SetEntityAsMissionEntity(vehicle, true, true)
-                if vehicles[i].mods.livery ~= nil then livery = vehicles[i].mods.livery end
-                SetVehicleProperties(vehicle, vehicles[i].mods)
                 RequestCollisionAtCoord(vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z)
-                SetVehicleOnGroundProperly(vehicle)
-                SetModelAsNoLongerNeeded(vehicles[i].model)
+                SetVehicleOnGroundProperly(vehicle)                
+                SetVehicleProperties(vehicle, vehicles[i].mods)
                 SetEntityInvincible(vehicle, true)
                 SetEntityHeading(vehicle, vehicles[i].location.w)
+                if vehicles[i].mods.livery ~= nil then livery = vehicles[i].mods.livery end
                 SetVehicleLivery(vehicle, livery)
                 SetVehicleEngineHealth(vehicle, vehicles[i].mods.engineHealth)
                 SetVehicleBodyHealth(vehicle, vehicles[i].mods.bodyHealth)
@@ -288,7 +289,7 @@ function Parking.Functions.SpawnVehicles(vehicles)
                 SetVehicleDoorsLocked(vehicle, 2)
                 exports[Config.FuelScript]:SetFuel(vehicle, vehicles[i].fuel)
                 Parking.Functions.AddParkedVehicle(vehicle, vehicles[i])
-                Wait(1000)
+                Wait(1500)
                 FreezeEntityPosition(vehicle, true)
             end
         end
