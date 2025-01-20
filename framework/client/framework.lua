@@ -138,3 +138,7 @@ function Draw3DText(x, y, z, textInput, fontId, scaleX, scaleY)
     DrawText(0.0, 0.0)
     ClearDrawOrigin()
 end
+
+function GetStreetName(entity)
+    return GetStreetNameFromHashKey(GetStreetNameAtCoord(GetEntityCoords(entity).x, GetEntityCoords(entity).y, GetEntityCoords(entity).z))
+end
