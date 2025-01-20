@@ -231,7 +231,7 @@ function Parking.Functions.Save(vehicle)
                 fuel = exports[Config.FuelScript]:GetFuel(vehicle),
                 engine = GetVehicleEngineHealth(vehicle),
                 body = GetVehicleBodyHealth(vehicle),
-                street = GetStreetNameFromHashKey(street),
+                street = GetStreetName(vehicle),
                 model = GetDisplayNameFromVehicleModel(GetEntityModel(vehicle)),
                 location = vector4(vehicleCoords.x, vehicleCoords.y, vehicleCoords.z, vehicleHeading)
             }
