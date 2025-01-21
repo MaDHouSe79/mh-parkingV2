@@ -266,9 +266,13 @@ function Parking.Functions.SpawnVehicles(vehicles)
                 Parking.Functions.DeleteLocalVehicle(vehicles[i].plate)
                 local closestVehicle, closestDistance = GetClosestVehicle(vehicles[i].location)
                 if closestDistance <= 0.5 then DeleteEntity(closestVehicle) while DoesEntityExist(closestVehicle) do Citizen.Wait(10) end end
-                local vehicle = CreateVehicle(model, vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z + 0.2, vehicles[i].location.w, false)
+                local vehicle = CreateVehicle(model, vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z + 0.2, vehicles[i].location.w, true, true)
                 SetModelAsNoLongerNeeded(model)
-                while not DoesEntityExist(vehicle) do Citizen.Wait(500) end 
+                while not DoesEntityExist(vehicle) do Citizen.Wait(500) end
+		local netid = NetworkGetNetworkIdFromEntity(vehicle)
+                SetNetworkIdExistsOnAllMachines(netid, true)
+                NetworkSetNetworkIdDynamic(netid, false)
+                SetNetworkIdCanMigrate(netid, false)
                 SetEntityAsMissionEntity(vehicle, true, true)
                 NetworkFadeInEntity(vehicle, false, true)
                 while NetworkIsEntityFading(vehicle) do Wait(0) end
