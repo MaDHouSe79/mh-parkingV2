@@ -13,6 +13,7 @@ elseif GetResourceState("qb-core") ~= 'missing' then
 elseif GetResourceState("qbx-core") ~= 'missing' then
     Config.Framework = 'qbx'
 end
+Config.Vehicles = Vehicles
 ----------------------------------------------------------------------------
 -- Fuel Script
 Config.FuelScript = 'LegacyFuel'           -- Default is LegacyFuel, if you use a other fuel script, for example ox_fuel
