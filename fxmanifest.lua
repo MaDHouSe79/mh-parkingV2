@@ -9,6 +9,7 @@ shared_scripts {
     '@ox_lib/init.lua',
     'shared/locale.lua',
     'locales/en.lua',
+    'shared/vehicles.lua',
     'shared/config.lua',
 }
 client_scripts {
