@@ -292,7 +292,9 @@ function Parking.Functions.SpawnVehicles(vehicles)
                 SetVehicleDamage(vehicle, vehicles[i].engine, vehicles[i].body)
 		TriggerServerEvent('mh-parkingV2:server:setVehLockState', VehToNet(vehicle), 2)
                 SetVehicleDoorsLocked(vehicle, 2)
-                exports[Config.FuelScript]:SetFuel(vehicle, vehicles[i].fuel)
+                if GetResourceState(Config.FuelScript) ~= 'missing' then
+                    exports[Config.FuelScript]:SetFuel(vehicle, vehicles[i].fuel)
+                end
                 Wait(1500)
                 FreezeEntityPosition(vehicle, true)
             end
