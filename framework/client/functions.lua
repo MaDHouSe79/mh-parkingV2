@@ -289,7 +289,7 @@ function Parking.Functions.SpawnVehicles(vehicles)
                 SetVehiclePetrolTankHealth(vehicle, vehicles[i].mods.tankHealth)
                 SetVehRadioStation(vehicle, 'OFF')
                 SetVehicleDirtLevel(vehicle, 0)
-                SetVehicleDamage(vehicle, vehicles[i].engine, vehicles[i].body)
+                Parking.Functions.SetVehicleDamage(vehicle, vehicles[i].engine, vehicles[i].body)
 		TriggerServerEvent('mh-parkingV2:server:setVehLockState', VehToNet(vehicle), 2)
                 SetVehicleDoorsLocked(vehicle, 2)
                 if GetResourceState(Config.FuelScript) ~= 'missing' then
