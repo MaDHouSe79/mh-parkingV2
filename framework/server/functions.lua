@@ -145,7 +145,7 @@ function Parking.Functions.Drive(src, data)
              elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
                 MySQL.Async.execute('UPDATE player_vehicles SET state = 0 WHERE plate = ? AND citizenid = ?', {data.plate, Player.PlayerData.citizenid})
             end
-            TriggerClientEvent("mh-parkingV2:client:deletePlate", -1, plate)
+            TriggerClientEvent("mh-parkingV2:client:deletePlate", -1, data.plate)
             return {status = true, message = Lang:t('info.remove_vehicle_zone'), data = json.decode(result.mods)}
         else
             return {status = false, message = Lang:t('info.not_the_owner')}
