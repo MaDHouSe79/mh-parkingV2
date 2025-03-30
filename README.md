@@ -25,7 +25,7 @@
 # My Youtube Channel
 - [Subscribe](https://www.youtube.com/c/@MaDHouSe79) 
 
-# MH Parking V2 (QB/ESX) by MaDHouSe79
+# MH Parking V2 (QB/QBX/ESX) by MaDHouSe79
 - I rewrote the mh-parking script and now your vehicles are automatically parked, this happens when you get out or get in the vehicle.
 - I removed the F5 park/unpark and everything else that was no longer needed.
 - The Impound should also work automatically and the vehicle should disappear when the police impound a vehicle.
