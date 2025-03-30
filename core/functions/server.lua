@@ -254,6 +254,7 @@ function Parking.Functions.RefreshVehicles(src, onStart)
     elseif not onStart then
         playerId = src
     end
+    Wait(50)
     if playerId ~= -1 then
         local vehicles = CreateVehicleList()
         Wait(50)
