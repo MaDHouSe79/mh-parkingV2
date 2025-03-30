@@ -59,6 +59,7 @@ end
 function Parking.Functions.BlinkVehiclelights(vehicle, state)
     SetVehicleLights(vehicle, 2) Wait(150) SetVehicleLights(vehicle, 0) Wait(150) SetVehicleLights(vehicle, 2) Wait(150) SetVehicleLights(vehicle, 0)
     TriggerServerEvent('mh-parkingV2:server:setVehLockState', NetworkGetNetworkIdFromEntity(vehicle), state)
+    SetVehicleDoorsLocked(vehicle, state)
     TriggerServerEvent("InteractSound_SV:PlayWithinDistance", 5, "lock", 0.2)
 end
 
@@ -242,6 +243,7 @@ function Parking.Functions.Save(vehicle)
                         SetEntityAsMissionEntity(vehicle, true, true)
                         if not Config.DisableParkNotify then Notify(callback.message, "primary", 5000) end
                         SetVehicleDoorsShut(vehicle, false)
+			Parking.Functions.BlinkVehiclelights(vehicle, 2) -- 1 Open 2 Locked
                         Wait(2000)
                         FreezeEntityPosition(vehicle, true)
                     elseif callback.limit then
