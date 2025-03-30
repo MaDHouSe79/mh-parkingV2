@@ -87,7 +87,7 @@ function populateVehicleList(garageLabel, vehicles) {
         } else if (v.state === 2) {
             status = "Impound";
 
-        } else if (v.state === 3) { // mh-oarking
+        } else if (v.state === 3) { // mh-parkingV2
             status = "Parked outside"
         }
 
@@ -100,7 +100,7 @@ function populateVehicleList(garageLabel, vehicles) {
             driveButton.disabled = true;
         }
 
-        if (status === "Parked outside") { // mh-parking 
+        if (status === "Parked outside") { // mh-parkingV2
             driveButton.style.backgroundColor = "#222";
             driveButton.disabled = true;
         }
