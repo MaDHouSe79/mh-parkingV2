@@ -259,6 +259,7 @@ function Parking.Functions.Save(vehicle)
             while IsPedInAnyVehicle(PlayerPedId(), false) do Wait(100) end
             if Config.OnlyAutoParkWhenEngineIsOff and GetIsVehicleEngineRunning(vehicle) then canSave = false end
             if canSave then
+                SetEntityAsMissionEntity(vehicle, true, true)
                 TriggerServerEvent("mh-parkingV2:server:ClearAllSeats", NetworkGetNetworkIdFromEntity(vehicle))
                 Wait(50)
                 for i = 0, GetNumberOfVehicleDoors(vehicle), 1 do
@@ -270,7 +271,6 @@ function Parking.Functions.Save(vehicle)
                 end
                 TriggerCallback("mh-parkingV2:server:Save", function(callback)
                     if callback.status then
-                        SetEntityAsMissionEntity(vehicle, true, true)
                         if not Config.DisableParkNotify then Notify(callback.message, "primary", 5000) end
                         Parking.Functions.BlinkVehiclelights(vehicle, 2) -- 1 Open 2 Locked
                     elseif callback.limit then
