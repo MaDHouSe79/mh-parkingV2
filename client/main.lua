@@ -23,3 +23,4 @@ CreateThread(function() while true do Wait(3000) if isLoggedIn then Parking.Func
 CreateThread(function() while true do Wait(0) if isLoggedIn then Parking.Functions.GetInAndOutVehicle() Wait(50) end end end)
 CreateThread(function() while true do Wait(0) if isLoggedIn then Parking.Functions.KeepEngineRunning() end end end)
 CreateThread(function() while true do if isLoggedIn and displayOwnerText then Parking.Functions.DisplayOwnerText() end Wait(0) end end)
+CreateThread(function() while true do sleep = 100 if isLoggedIn and disableControll then sleep = 0 Parking.Functions.DisableControll() end Wait(sleep) end end)
