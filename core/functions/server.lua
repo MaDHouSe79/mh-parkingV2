@@ -227,22 +227,6 @@ function Parking.Functions.LeftVehicle(src, currentSeat, netId)
     end
 end
 
-local function GetSinglePlayerId()
-    if playerId == -1 then
-        local players = GetPlayers()
-        for k, v in pairs(players) do
-            if v.PlayerData ~= nil and v.PlayerData.source ~= nil and type(v.PlayerData.source) == 'number' and v.PlayerData.source > 0 then
-                playerId = v.PlayerData.source
-                break
-            end
-        end
-        return
-    elseif playerId ~= -1 and playerId > 0 then
-        playerId = -1
-        return
-    end
-end
-
 function Parking.Functions.RefreshVehicles(src, onStart)
     if onStart then
         if playerId == -1 then GetSinglePlayerId() end
