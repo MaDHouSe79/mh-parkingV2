@@ -222,18 +222,22 @@ function Parking.Functions.Save(vehicle)
             local canSave = true
             local vehicleCoords = GetEntityCoords(vehicle)
             local vehicleHeading = GetEntityHeading(vehicle)
-            while IsPedInAnyVehicle(PlayerPedId(), false) do Wait(10) end
+            while IsPedInAnyVehicle(PlayerPedId(), false) do Wait(100) end
             if Config.OnlyAutoParkWhenEngineIsOff and GetIsVehicleEngineRunning(vehicle) then canSave = false end
             if canSave then
+                local doors = GetNumberOfVehicleDoors(vehicle)
+                for i = 0, doors, 1 do
+                    while GetVehicleDoorAngleRatio(vehicle, i) > 0.0 do
+                        SetVehicleDoorShut(vehicle, i, false)
+                        Citizen.Wait(50)
+                    end
+                    Citizen.Wait(50)
+                end
                 TriggerCallback("mh-parkingV2:server:save", function(callback)
                     if callback.status then
                         SetEntityAsMissionEntity(vehicle, true, true)
                         if not Config.DisableParkNotify then Notify(callback.message, "primary", 5000) end
-                        SetVehicleDoorsShut(vehicle, true)
                         Parking.Functions.BlinkVehiclelights(vehicle, 2) -- 1 Open 2 Locked
-                        Wait(3000)
-                        FreezeEntityPosition(vehicle, true)
-                        SetEntityInvincible(vehicle, true)
                     elseif callback.limit then
                         Notify(callback.message, "error", 5000)
                     elseif not callback.owner then
@@ -249,6 +253,7 @@ function Parking.Functions.Save(vehicle)
                     model = GetDisplayNameFromVehicleModel(GetEntityModel(vehicle)),
                     location = vector4(vehicleCoords.x, vehicleCoords.y, vehicleCoords.z, vehicleHeading)
                 })
+
             end
         end
     end
