@@ -29,22 +29,8 @@ end
 
 function Parking.Functions.AddParkedVehicle(entity, data)
     local blip = nil
-    if PlayerData.citizenid == data.citizenid then
-        blip = Parking.Functions.CreateParkedBlip(Lang:t('info.parked_blip',{model = GetDisplayNameFromVehicleModel(GetEntityModel(data.entity))}), data.location)
-        TriggerEvent("qb-vehiclekeys:client:AddKeys", data.plate)
-    end
-    LocalVehicles[#LocalVehicles + 1] = {
-        citizenid = data.citizenid,
-        fullname = data.fullname,
-        plate = data.plate,
-        model = data.model,
-        blip = blip,
-        location = data.location,
-        entity = entity or nil,
-        fuel = data.fuel,
-        body = data.body,
-        engine = data.engine,
-    }
+    if PlayerData.citizenid == data.citizenid then blip = Parking.Functions.CreateParkedBlip(Lang:t('info.parked_blip',{model = GetDisplayNameFromVehicleModel(GetEntityModel(data.entity))}), data.location) end
+    LocalVehicles[#LocalVehicles + 1] = {citizenid = data.citizenid, fullname = data.fullname, plate = data.plate, model = data.model, blip = blip, location = data.location, entity = entity or nil, fuel = data.fuel, body = data.body, engine = data.engine}
 end
 
 function Parking.Functions.GetPedVehicleSeat(ped)
