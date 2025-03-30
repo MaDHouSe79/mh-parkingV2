@@ -67,9 +67,17 @@ function Parking.Functions.BlinkVehiclelights(vehicle, state)
     SetVehicleLights(vehicle, 2)
     Wait(150)
     SetVehicleLights(vehicle, 0)
-    TriggerServerEvent('mh-parkingV2:server:setVehLockState', NetworkGetNetworkIdFromEntity(vehicle), state)
+    TriggerServerEvent('mh-parkingV2:server:SetVehLockState', NetworkGetNetworkIdFromEntity(vehicle), state)
     SetVehicleDoorsLocked(vehicle, state)
     TriggerServerEvent("InteractSound_SV:PlayWithinDistance", 5, "lock", 0.2)
+    Wait(1000)
+    if state then
+        FreezeEntityPosition(vehicle, true)
+        SetEntityInvincible(vehicle, true)
+    else
+        FreezeEntityPosition(vehicle, false)
+        SetEntityInvincible(vehicle, false)
+    end
 end
 
 function Parking.Functions.RemoveVehicles(vehicles)
@@ -113,9 +121,9 @@ function Parking.Functions.DeleteNearByVehicle(location)
     local vehicle, distance = GetClosestVehicle(location)
     if distance <= 1 then
         for i = 1, #LocalVehicles do
-            if LocalVehicles[i].entity == vehicle then 
+            if LocalVehicles[i].entity == vehicle then
                 RemoveBlip(LocalVehicles[i].blip)
-                LocalVehicles[i] = nil 
+                LocalVehicles[i] = nil
             end
             local tmpModel = GetEntityModel(vehicle)
             SetModelAsNoLongerNeeded(tmpModel)
@@ -168,7 +176,6 @@ function Parking.Functions.CreateBlipCircle(coords, text, radius, color, sprite)
         SetBlipColour(blip, color)
         SetBlipAlpha(blip, 128)
     end
-    -- create a blip in the middle
     blip = AddBlipForCoord(coords)
     SetBlipHighDetail(blip, true)
     SetBlipSprite(blip, sprite)
@@ -195,16 +202,16 @@ function Parking.Functions.Drive(vehicle)
     if DoesEntityExist(vehicle) then
         local data = { netid = NetworkGetNetworkIdFromEntity(vehicle), plate = GetVehicleNumberPlateText(vehicle) }
         while not IsPedInAnyVehicle(PlayerPedId(), false) do Wait(100) end
-        TriggerCallback("mh-parkingV2:server:drive", function(callback)
+        TriggerCallback("mh-parkingV2:server:Drive", function(callback)
             if callback.status then
                 SetEntityAsMissionEntity(vehicle, true, true)
                 Parking.Functions.DeteteParkedBlip(vehicle)
-                TriggerCallback("mh-parkingV2:server:getVehicleData", function(vehicleData)
+                TriggerCallback("mh-parkingV2:server:GetVehicleData", function(vehicleData)
                     if type(vehicleData) == 'table' then
                         Parking.Functions.DeleteLocalVehicle(data.plate)
                         SetEntityInvincible(vehicle, false)
                         FreezeEntityPosition(vehicle, false)
-                        TriggerServerEvent('mh-parkingV2:server:setVehLockState', netid, 1)
+                        TriggerServerEvent('mh-parkingV2:server:SetVehLockState', netid, 1)
                         if not Config.DisableParkNotify then Notify(callback.message, "primary", 5000) end
                     elseif type(vehicleData) == 'boolean' then
                         Notify(callback.message, "error", 5000)
@@ -243,7 +250,7 @@ function Parking.Functions.Save(vehicle)
                     end
                     Wait(50)
                 end
-                TriggerCallback("mh-parkingV2:server:save", function(callback)
+                TriggerCallback("mh-parkingV2:server:Save", function(callback)
                     if callback.status then
                         SetEntityAsMissionEntity(vehicle, true, true)
                         if not Config.DisableParkNotify then Notify(callback.message, "primary", 5000) end
@@ -274,18 +281,18 @@ function Parking.Functions.SpawnVehicles(vehicles)
     if type(vehicles) == 'table' and #vehicles > 0 and vehicles[1] then
         for i = 1, #vehicles, 1 do
             if not Parking.Functions.IsVehicleAlreadyListed(vehicles[i].plate) then
-                local livery = -1
                 local model = GetHashKey(vehicles[i].model)
                 LoadModel(model)
                 Parking.Functions.DeleteLocalVehicle(vehicles[i].plate)
                 local closestVehicle, closestDistance = GetClosestVehicle(vehicles[i].location)
-                if closestDistance <= 0.5 then
+                if closestVehicle ~= -1 and closestDistance <= 0.5 then
                     DeleteEntity(closestVehicle)
                     while DoesEntityExist(closestVehicle) do Citizen.Wait(50) end
                 end
                 local vehicle = CreateVehicle(model, vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z + 0.2, vehicles[i].location.w, true, true)
                 while not DoesEntityExist(vehicle) do Citizen.Wait(500) end
                 SetEntityAsMissionEntity(vehicle, true, true)
+                SetVehicleProperties(vehicle, vehicles[i].mods)
                 Parking.Functions.AddParkedVehicle(vehicle, vehicles[i])
                 SetModelAsNoLongerNeeded(model)
                 local netid = VehToNet(vehicle)
@@ -293,21 +300,18 @@ function Parking.Functions.SpawnVehicles(vehicles)
                 NetworkSetNetworkIdDynamic(netid, false)
                 SetNetworkIdCanMigrate(netid, true)
                 NetworkFadeInEntity(vehicle, false)
-                while NetworkIsEntityFading(vehicle) do Wait(10) end
+                while NetworkIsEntityFading(vehicle) do Citizen.Wait(50) end
                 RequestCollisionAtCoord(vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z)
                 SetVehicleOnGroundProperly(vehicle)
-                SetVehicleProperties(vehicle, vehicles[i].mods)
-                SetEntityInvincible(vehicle, true)
                 SetEntityHeading(vehicle, vehicles[i].location.w)
-                if vehicles[i].mods.livery ~= nil then livery = vehicles[i].mods.livery end
-                SetVehicleLivery(vehicle, livery)
+                SetEntityInvincible(vehicle, true)
                 SetVehicleEngineHealth(vehicle, vehicles[i].engine)
                 SetVehicleBodyHealth(vehicle, vehicles[i].body)
                 SetVehiclePetrolTankHealth(vehicle, vehicles[i].mods.tankHealth)
                 SetVehRadioStation(vehicle, 'OFF')
                 SetVehicleDirtLevel(vehicle, 0)
                 SetVehicleDamage(vehicle, vehicles[i].engine, vehicles[i].body)
-                TriggerServerEvent('mh-parkingV2:server:setVehLockState', VehToNet(vehicle), 2)
+                TriggerServerEvent('mh-parkingV2:server:SetVehLockState', VehToNet(vehicle), 2)
                 SetVehicleDoorsLocked(vehicle, 2)
                 if GetResourceState(Config.FuelScript) ~= 'missing' then exports[Config.FuelScript]:SetFuel(vehicle, vehicles[i].fuel) end
                 Wait(1500)
@@ -364,7 +368,7 @@ function Parking.Functions.GetInAndOutVehicle()
             local name = GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))
             local netId = VehToNet(vehicle)
             isEnteringVehicle = true
-            TriggerServerEvent('mh-parkingV2:server:enteringVehicle', vehicle, seat, name, netId)
+            TriggerServerEvent('mh-parkingV2:server:EnteringVehicle', vehicle, seat, name, netId)
         elseif not DoesEntityExist(GetVehiclePedIsTryingToEnter(ped)) and not IsPedInAnyVehicle(ped, true) and isEnteringVehicle then
             isEnteringVehicle = false
         elseif IsPedInAnyVehicle(ped, false) then
@@ -374,13 +378,13 @@ function Parking.Functions.GetInAndOutVehicle()
             currentSeat = GetPedVehicleSeat(ped)
             local name = GetDisplayNameFromVehicleModel(GetEntityModel(currentVehicle))
             local netId = VehToNet(currentVehicle)
-            TriggerServerEvent('mh-parkingV2:server:enteredVehicle', currentVehicle, currentSeat, name, netId)
+            TriggerServerEvent('mh-parkingV2:server:EnteredVehicle', currentVehicle, currentSeat, name, netId)
         end
     elseif isInVehicle then
         if not IsPedInAnyVehicle(ped, false) or IsPlayerDead(PlayerId()) then
             local name = GetDisplayNameFromVehicleModel(GetEntityModel(currentVehicle))
             local netId = VehToNet(currentVehicle)
-            TriggerServerEvent('mh-parkingV2:server:leftVehicle', currentVehicle, currentSeat, name, netId)
+            TriggerServerEvent('mh-parkingV2:server:LeftVehicle', currentVehicle, currentSeat, name, netId)
             isInVehicle = false
             currentVehicle = 0
             currentSeat = 0
