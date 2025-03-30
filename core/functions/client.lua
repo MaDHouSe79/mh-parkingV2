@@ -28,9 +28,8 @@ function Parking.Functions.CreateParkedBlip(label, location)
     end
 end
 
-function Parking.Functions.AddParkedVehicle(entity, data)
+function Parking.Functions.AddParkedVehicle(hash, entity, data)
     local blip = nil
-    local hash = GetEntityModel(entity)
     local name = "unknow"
     local brand = "unknow"
     if Config.Vehicles[hash] then
@@ -315,7 +314,7 @@ function Parking.Functions.SpawnVehicles(vehicles)
                 while not DoesEntityExist(vehicle) do Citizen.Wait(500) end
                 SetEntityAsMissionEntity(vehicle, true, true)
                 SetVehicleProperties(vehicle, vehicles[i].mods)
-                Parking.Functions.AddParkedVehicle(GetHashKey(model), vehicles[i])
+                Parking.Functions.AddParkedVehicle(model, vehicle, vehicles[i])
                 SetModelAsNoLongerNeeded(model)
                 local netid = VehToNet(vehicle)
                 SetNetworkIdExistsOnAllMachines(netid, true)
