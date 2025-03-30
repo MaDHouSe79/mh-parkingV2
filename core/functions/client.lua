@@ -278,7 +278,7 @@ function Parking.Functions.SpawnVehicles(vehicles)
                 Parking.Functions.AddParkedVehicle(vehicle, vehicles[i])
                 SetEntityAsMissionEntity(vehicle, true, true)
                 NetworkFadeInEntity(vehicle, false)
-                while NetworkIsEntityFading(vehicle) do Wait(0) end
+                while NetworkIsEntityFading(vehicle) do Wait(1) end
                 RequestCollisionAtCoord(vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z)
                 SetVehicleOnGroundProperly(vehicle)
                 SetVehicleProperties(vehicle, vehicles[i].mods)
