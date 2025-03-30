@@ -233,6 +233,9 @@ function GetVehicleList()
                 local mods = json.decode(tmpVehicles.mods)
                 local coords = json.decode(tmpVehicles.location)
                 vehicles[#vehicles + 1] = {citizenid = tmpVehicles.citizenid, fullname = fullname, plate = tmpVehicles.plate, model = tmpVehicles.vehicle, fuel = tmpVehicles.fuel, engine = tmpVehicles.engine, body = tmpVehicles.body, mods = mods, location = coords}
+                if target.PlayerData.citizenid == v.citizenid and target.PlayerData.source ~= nil then
+                    TriggerClientEvent("qb-vehiclekeys:client:AddKeys", target.PlayerData.source, tmpVehicles.plate)
+                end
             end
         end
     end
