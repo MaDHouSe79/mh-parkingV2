@@ -270,15 +270,15 @@ function Parking.Functions.SpawnVehicles(vehicles)
                 end
                 local vehicle = CreateVehicle(model, vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z + 0.2, vehicles[i].location.w, true, true)
                 while not DoesEntityExist(vehicle) do Citizen.Wait(500) end
+                SetEntityAsMissionEntity(vehicle, true, true)
+                Parking.Functions.AddParkedVehicle(vehicle, vehicles[i])
                 SetModelAsNoLongerNeeded(model)
                 local netid = VehToNet(vehicle)
                 SetNetworkIdExistsOnAllMachines(netid, true)
                 NetworkSetNetworkIdDynamic(netid, false)
                 SetNetworkIdCanMigrate(netid, true)
-                Parking.Functions.AddParkedVehicle(vehicle, vehicles[i])
-                SetEntityAsMissionEntity(vehicle, true, true)
                 NetworkFadeInEntity(vehicle, false)
-                while NetworkIsEntityFading(vehicle) do Wait(1) end
+                while NetworkIsEntityFading(vehicle) do Wait(10) end
                 RequestCollisionAtCoord(vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z)
                 SetVehicleOnGroundProperly(vehicle)
                 SetVehicleProperties(vehicle, vehicles[i].mods)
