@@ -215,6 +215,16 @@ function Parking.Functions.Drive(vehicle)
     end
 end
 
+function Parking.Functions.GetOutVehicle(netid)
+    local vehicle = NetworkGetEntityFromNetworkId(netid)
+    if DoesEntityExist(vehicle) then
+        local inVehicle = GetVehiclePedIsIn(PlayerPedId(), false)
+        if inVehicle == vehicle then
+            TaskLeaveVehicle(PlayerPedId(), inVehicle, 1)
+        end
+    end
+end
+
 function Parking.Functions.Save(vehicle)
     local allowToPark = Parking.Functions.AllowToPark(GetEntityCoords(PlayerPedId()))
     if allowToPark then
