@@ -225,13 +225,12 @@ function Parking.Functions.Save(vehicle)
             while IsPedInAnyVehicle(PlayerPedId(), false) do Wait(100) end
             if Config.OnlyAutoParkWhenEngineIsOff and GetIsVehicleEngineRunning(vehicle) then canSave = false end
             if canSave then
-                local doors = GetNumberOfVehicleDoors(vehicle)
-                for i = 0, doors, 1 do
+                for i = 0, GetNumberOfVehicleDoors(vehicle), 1 do
                     while GetVehicleDoorAngleRatio(vehicle, i) > 0.0 do
                         SetVehicleDoorShut(vehicle, i, false)
-                        Citizen.Wait(50)
+                        Wait(50)
                     end
-                    Citizen.Wait(50)
+                    Wait(50)
                 end
                 TriggerCallback("mh-parkingV2:server:save", function(callback)
                     if callback.status then
