@@ -223,16 +223,6 @@ function Parking.Functions.Save(vehicle)
             local vehicleCoords = GetEntityCoords(vehicle)
             local vehicleHeading = GetEntityHeading(vehicle)
             while IsPedInAnyVehicle(PlayerPedId(), false) do Wait(10) end
-            local vehicleData = {
-                netid = NetworkGetNetworkIdFromEntity(vehicle),
-                plate = GetVehicleNumberPlateText(vehicle),
-                fuel = exports[Config.FuelScript]:GetFuel(vehicle),
-                engine = GetVehicleEngineHealth(vehicle),
-                body = GetVehicleBodyHealth(vehicle),
-                street = GetStreetName(vehicle),
-                model = GetDisplayNameFromVehicleModel(GetEntityModel(vehicle)),
-                location = vector4(vehicleCoords.x, vehicleCoords.y, vehicleCoords.z, vehicleHeading)
-            }
             if Config.OnlyAutoParkWhenEngineIsOff and GetIsVehicleEngineRunning(vehicle) then canSave = false end
             if canSave then
                 TriggerCallback("mh-parkingV2:server:save", function(callback)
@@ -249,7 +239,16 @@ function Parking.Functions.Save(vehicle)
                     elseif not callback.owner then
                         Notify(callback.message, "error", 5000)
                     end
-                end, vehicleData)
+                end, {
+                    netid = NetworkGetNetworkIdFromEntity(vehicle),
+                    plate = GetVehicleNumberPlateText(vehicle),
+                    fuel = exports[Config.FuelScript]:GetFuel(vehicle),
+                    engine = GetVehicleEngineHealth(vehicle),
+                    body = GetVehicleBodyHealth(vehicle),
+                    street = GetStreetName(vehicle),
+                    model = GetDisplayNameFromVehicleModel(GetEntityModel(vehicle)),
+                    location = vector4(vehicleCoords.x, vehicleCoords.y, vehicleCoords.z, vehicleHeading)
+                })
             end
         end
     end
