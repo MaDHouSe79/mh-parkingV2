@@ -189,11 +189,7 @@ function Parking.Functions.LeftVehicle(src, currentSeat, netId)
 end
 
 function Parking.Functions.RefreshVehicles(src, onStart)
-    if onStart then
-        if playerId == -1 then GetSinglePlayerId() end
-    elseif not onStart then
-        if src == -1 then playerId = src end
-    end
+    if onStart then GetSinglePlayerId() else playerId = src end
     Wait(50)
     if playerId ~= -1 then
         local vehicles = CreateVehicleList()
