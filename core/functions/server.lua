@@ -208,47 +208,41 @@ function Parking.Functions.LeftVehicle(src, currentSeat, netId)
     end
 end
 
-function Parking.Functions.RefreshVehicles(src)
-    local Player = GetPlayer(src)
-    if Player then
-        local result = nil
-        if Config.Framework == 'esx' then
-            result = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE stored = ?", {3})
-         elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
-            result = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE state = ?", {3})
-        end
-        if type(result) == 'table' then
-            local vehicles = {}
-            for k, v in pairs(result) do
-                local fullname = "unknow"
-                if Config.Framework == 'esx' then
-                    local char = MySQL.Sync.fetchAll("SELECT * FROM users WHERE owner = ?", {v.citizenid})[1]
-                    if char then fullname = char.firstname.. ' ' ..char.lastname end
-                    local tmpVehicles = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE stored = ? AND owner = ?", {3, v.citizenid})[1]
-                    local mods = json.decode(tmpVehicles.vehicle)
-                    local coords = json.decode(tmpVehicles.location)
-                    vehicles[#vehicles + 1] = {citizenid = tmpVehicles.owner, fullname = fullname, plate = tmpVehicles.plate, model = mods.model, fuel = mods.fuelLevel, engine = mods.engineHealth, body = mods.bodyHealth, mods = mods, location = coords}
-                    if Player.identifier == v.citizenid then
-                        --exports['qb-vehiclekeys']:GiveKeys(Player.PlayerData.source, tmpVehicles.plate)
-                    end
-                 elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
-                    local target = Framework.Functions.GetPlayerByCitizenId(v.citizenid) or Framework.Functions.GetOfflinePlayerByCitizenId(v.citizenid)
-                    fullname = target.PlayerData.charinfo.firstname .. ' ' .. target.PlayerData.charinfo.lastname
-                    local tmpVehicles = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE state = ? and plate = ?", {3, v.plate})[1]
-                    local mods = json.decode(tmpVehicles.mods)
-                    local coords = json.decode(tmpVehicles.location)
-                    vehicles[#vehicles + 1] = {citizenid = tmpVehicles.citizenid, fullname = fullname, plate = tmpVehicles.plate, model = tmpVehicles.vehicle, fuel = tmpVehicles.fuel, engine = tmpVehicles.engine, body = tmpVehicles.body, mods = mods, location = coords}
-                    if Player.PlayerData.citizenid == v.citizenid then
-                        if GetResourceState('qb-vehiclekeys') ~= 'missing' then
-                            exports['qb-vehiclekeys']:GiveKeys(Player.PlayerData.source, tmpVehicles.plate)
-                        end
-                    end
-                end
+function GetVehicleList()
+    local result = nil
+    local vehicles = {}
+    if Config.Framework == 'esx' then
+        result = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE stored = ?", {3})
+    elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
+        result = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE state = ?", {3})
+    end
+    if type(result) == 'table' then
+        for k, v in pairs(result) do
+            local fullname = "unknow"
+            if Config.Framework == 'esx' then
+                local char = MySQL.Sync.fetchAll("SELECT * FROM users WHERE owner = ?", {v.citizenid})[1]
+                if char then fullname = char.firstname.. ' ' ..char.lastname end
+                local tmpVehicles = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE stored = ? AND owner = ?", {3, v.citizenid})[1]
+                local mods = json.decode(tmpVehicles.vehicle)
+                local coords = json.decode(tmpVehicles.location)
+                vehicles[#vehicles + 1] = {citizenid = tmpVehicles.owner, fullname = fullname, plate = tmpVehicles.plate, model = mods.model, fuel = mods.fuelLevel, engine = mods.engineHealth, body = mods.bodyHealth, mods = mods, location = coords}
+             elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
+                local target = Framework.Functions.GetPlayerByCitizenId(v.citizenid) or Framework.Functions.GetOfflinePlayerByCitizenId(v.citizenid)
+                fullname = target.PlayerData.charinfo.firstname .. ' ' .. target.PlayerData.charinfo.lastname
+                local tmpVehicles = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE state = ? and plate = ?", {3, v.plate})[1]
+                local mods = json.decode(tmpVehicles.mods)
+                local coords = json.decode(tmpVehicles.location)
+                vehicles[#vehicles + 1] = {citizenid = tmpVehicles.citizenid, fullname = fullname, plate = tmpVehicles.plate, model = tmpVehicles.vehicle, fuel = tmpVehicles.fuel, engine = tmpVehicles.engine, body = tmpVehicles.body, mods = mods, location = coords}
             end
-            Wait(50)
-            TriggerClientEvent("mh-parkingV2:client:refreshVehicles", src, vehicles)
         end
     end
+    return vehicles
+end
+
+function Parking.Functions.RefreshVehicles(src)
+    local vehicles = GetVehicleList()
+    Wait(50)
+    TriggerClientEvent("mh-parkingV2:client:refreshVehicles", src, vehicles)
 end
 
 function Parking.Functions.RefreshVehiclesOnStart()
@@ -259,35 +253,9 @@ function Parking.Functions.RefreshVehiclesOnStart()
         break
     end
     if id ~= -1 then
-        local result = nil
-        if Config.Framework == 'esx' then
-            result = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE stored = ?", {3})
-        elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
-            result = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE state = ?", {3})
-        end
-        if type(result) == 'table' then
-            local vehicles = {}
-            for k, v in pairs(result) do
-                local fullname = "unknow"
-                if Config.Framework == 'esx' then
-                    local char = MySQL.Sync.fetchAll("SELECT * FROM users WHERE owner = ?", {v.citizenid})[1]
-                    if char then fullname = char.firstname.. ' ' ..char.lastname end
-                    local tmpVehicles = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE stored = ? AND owner = ?", {3, v.citizenid})[1]
-                    local mods = json.decode(tmpVehicles.vehicle)
-                    local coords = json.decode(tmpVehicles.location)
-                    vehicles[#vehicles + 1] = {citizenid = tmpVehicles.owner, fullname = fullname, plate = tmpVehicles.plate, model = mods.model, fuel = mods.fuelLevel, engine = mods.engineHealth, body = mods.bodyHealth, mods = mods, location = coords}
-                elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
-                    local target = Framework.Functions.GetPlayerByCitizenId(v.citizenid) or Framework.Functions.GetOfflinePlayerByCitizenId(v.citizenid)
-                    fullname = target.PlayerData.charinfo.firstname .. ' ' .. target.PlayerData.charinfo.lastname
-                    local tmpVehicles = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE state = ? and plate = ?", {3, v.plate})[1]
-                    local mods = json.decode(tmpVehicles.mods)
-                    local coords = json.decode(tmpVehicles.location)
-                    vehicles[#vehicles + 1] = {citizenid = tmpVehicles.citizenid, fullname = fullname, plate = tmpVehicles.plate, model = tmpVehicles.vehicle, fuel = tmpVehicles.fuel, engine = tmpVehicles.engine, body = tmpVehicles.body, mods = mods, location = coords}
-                end
-            end
-            Wait(50)
-            TriggerClientEvent("mh-parkingV2:client:refreshVehicles", id, vehicles)
-        end
+        local vehicles = GetVehicleList()
+        Wait(50)
+        TriggerClientEvent("mh-parkingV2:client:refreshVehicles", id, vehicles)
     end
 end
 
