@@ -1,3 +1,22 @@
+## qb-garages (old)
+- you need to find this in your qb-garages server and client file
+```lua
+if v.state == 0 then
+    v.state = Lang:t("status.out")
+elseif v.state == 1 then
+    v.state = Lang:t("status.garaged")
+elseif v.state == 2 then
+    v.state = Lang:t("status.impound")
+end
+```
+
+- Add this below `v.state = Lang:t("status.impound")`
+```lua
+elseif v.state == 3 then
+    v.state = "Parked outside"
+```
+# ------------------------------------------------------------------------------
+
 ## qb-garages (new)
 - Find `function populateVehicleList(garageLabel, vehicles) {` 
 - Replace the code with this code below in `qb-garage/html/script.js` around line 43
@@ -229,26 +248,4 @@ function populateVehicleList(garageLabel, vehicles) {
 
     vehicleContainerElem.appendChild(fragment);
 }
-```
-
-
-# ------------------------------------------------------------------------------
-
-
-## qb-garages (old)
-- you need to find this in your qb-garages server and client file
-```lua
-if v.state == 0 then
-    v.state = Lang:t("status.out")
-elseif v.state == 1 then
-    v.state = Lang:t("status.garaged")
-elseif v.state == 2 then
-    v.state = Lang:t("status.impound")
-end
-```
-
-- Add this below `v.state = Lang:t("status.impound")`
-```lua
-elseif v.state == 3 then
-    v.state = "Parked outside"
 ```
