@@ -60,6 +60,15 @@ function Parking.Functions.DeteteParkedBlip(vehicle)
 end
 
 function Parking.Functions.BlinkVehiclelights(vehicle, state)
+    local ped = PlayerPedId()
+    local model = 'prop_cuff_keys_01'
+    LoadAnimDict('anim@mp_player_intmenu@key_fob@')
+    LoadModel(model)
+    local object = CreateObject(model, 0, 0, 0, true, true, true)
+    while not DoesEntityExist(object) do Wait(1) end
+    AttachEntityToEntity(object, ped, GetPedBoneIndex(ped, 57005), 0.1, 0.0, 0.0, 0.0, 0.0, 0.0, true, true, false, true, 1, true)
+    TaskPlayAnim(ped, 'anim@mp_player_intmenu@key_fob@', 'fob_click', 8.0, -8.0, -1, 52, 0, false, false, false)
+    TriggerServerEvent("InteractSound_SV:PlayWithinDistance", 5, "lock", 0.2)
     SetVehicleLights(vehicle, 2)
     Wait(150)
     SetVehicleLights(vehicle, 0)
@@ -69,7 +78,10 @@ function Parking.Functions.BlinkVehiclelights(vehicle, state)
     SetVehicleLights(vehicle, 0)
     TriggerServerEvent('mh-parkingV2:server:SetVehLockState', NetworkGetNetworkIdFromEntity(vehicle), state)
     SetVehicleDoorsLocked(vehicle, state)
-    TriggerServerEvent("InteractSound_SV:PlayWithinDistance", 5, "lock", 0.2)
+    if IsEntityPlayingAnim(ped, 'anim@mp_player_intmenu@key_fob@', 'fob_click', 3) then
+        DeleteObject(object)
+        StopAnimTask(ped, 'anim@mp_player_intmenu@key_fob@', 'fob_click', 8.0)
+    end
     Wait(1000)
     if state then
         FreezeEntityPosition(vehicle, true)
