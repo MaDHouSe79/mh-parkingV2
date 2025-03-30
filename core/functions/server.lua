@@ -239,23 +239,25 @@ function GetVehicleList()
     return vehicles
 end
 
-function Parking.Functions.RefreshVehicles(src)
-    local vehicles = GetVehicleList()
-    Wait(50)
-    TriggerClientEvent("mh-parkingV2:client:refreshVehicles", src, vehicles)
-end
-
-function Parking.Functions.RefreshVehiclesOnStart()
-    local players = GetPlayers()
-    local id = -1
-    for i = 1, #players do
-        id = players[i].PlayerData.source
-        break
-    end
-    if id ~= -1 then
-        local vehicles = GetVehicleList()
+function Parking.Functions.RefreshVehicles(src, onStart)
+    if onStart then
+        local players = GetPlayers()
+        local id = -1
+        for i = 1, #players do
+            id = players[i].PlayerData.source
+            break
+        end
+        if id ~= -1 then
+            local vehicles = CreateVehicleList()
+            Wait(50)
+            TriggerClientEvent("mh-parkingV2:client:refreshVehicles", id, vehicles)
+            return
+        end
+    elseif not onStart then
+        local vehicles = CreateVehicleList()
         Wait(50)
-        TriggerClientEvent("mh-parkingV2:client:refreshVehicles", id, vehicles)
+        TriggerClientEvent("mh-parkingV2:client:refreshVehicles", src, vehicles)
+        return
     end
 end
 
