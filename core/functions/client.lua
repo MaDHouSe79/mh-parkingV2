@@ -311,7 +311,7 @@ function Parking.Functions.SpawnVehicles(vehicles)
                 SetNetworkIdExistsOnAllMachines(netid, true)
                 NetworkSetNetworkIdDynamic(netid, false)
                 SetNetworkIdCanMigrate(netid, true)
-                NetworkFadeInEntity(vehicle, false)
+                NetworkFadeInEntity(vehicle, true)
                 while NetworkIsEntityFading(vehicle) do Citizen.Wait(50) end
                 RequestCollisionAtCoord(vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z)
                 SetVehicleOnGroundProperly(vehicle)
