@@ -35,6 +35,7 @@ elseif GetResourceState("qb-core") ~= 'missing' then
     function GetPlayerData() return Framework.Functions.GetPlayerData() end
     function IsDead() return Framework.Functions.GetPlayerData().metadata['isdead'] end
     function SetJob(job) PlayerData.job = job end
+    RegisterNetEvent('QBCore:Player:SetPlayerData', function(data) PlayerData = data end)
 elseif GetResourceState("qbx-core") ~= 'missing' then
     Config.Framework = 'qbx'
     Framework = exports['qbx-core']:GetCoreObject()
@@ -47,4 +48,5 @@ elseif GetResourceState("qbx-core") ~= 'missing' then
     function GetPlayerData() return Framework.Functions.GetPlayerData() end
     function IsDead() return Framework.Functions.GetPlayerData().metadata['isdead'] end
     function SetJob(job) PlayerData.job = job end
+    RegisterNetEvent('QBCore:Player:SetPlayerData', function(data) PlayerData = data end)
 end
