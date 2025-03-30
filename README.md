@@ -49,7 +49,7 @@
 - `/toggleparktext` this disable or enable the text above the parked vehicles. (for streamers)
 - `/parkmenu` to open the parked menu so you can set a waypoint.
 
-# Installation QB-Garages
+# Read Files
 [README FILES](https://github.com/MaDHouSe79/mh-parkingV2/tree/main/readme)
 
 # 🐞 Any bugs issues or suggestions, let my know. 👊😎
