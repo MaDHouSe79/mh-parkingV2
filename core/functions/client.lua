@@ -30,8 +30,13 @@ end
 
 function Parking.Functions.AddParkedVehicle(entity, data)
     local blip = nil
-    local name = Config.Vehicles[GetEntityModel(entity)].name
-    local brand = Config.Vehicles[GetEntityModel(entity)].brand
+    local hash = GetEntityModel(entity)
+    local name = "unknow"
+    local brand = "unknow"
+    if Config.Vehicles[hash] then
+        name = Config.Vehicles[hash].name
+        brand = Config.Vehicles[hash].brand
+    end
     if PlayerData.citizenid == data.citizenid then blip = Parking.Functions.CreateParkedBlip(Lang:t('info.parked_blip', { model = name .." "..brand }), data.location) end
     LocalVehicles[#LocalVehicles + 1] = {citizenid = data.citizenid, fullname = data.fullname, plate = data.plate, model = data.model, blip = blip, location = data.location, entity = entity or nil, fuel = data.fuel, body = data.body, engine = data.engine}
 end
@@ -310,7 +315,7 @@ function Parking.Functions.SpawnVehicles(vehicles)
                 while not DoesEntityExist(vehicle) do Citizen.Wait(500) end
                 SetEntityAsMissionEntity(vehicle, true, true)
                 SetVehicleProperties(vehicle, vehicles[i].mods)
-                Parking.Functions.AddParkedVehicle(vehicle, vehicles[i])
+                Parking.Functions.AddParkedVehicle(GetHashKey(model), vehicles[i])
                 SetModelAsNoLongerNeeded(model)
                 local netid = VehToNet(vehicle)
                 SetNetworkIdExistsOnAllMachines(netid, true)
