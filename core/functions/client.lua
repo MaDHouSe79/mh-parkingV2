@@ -215,6 +215,16 @@ function Parking.Functions.AllowToPark(coords)
     return isAllowd
 end
 
+function Parking.Functions.ClearAllSeats(netid)
+    local vehicle = NetworkGetEntityFromNetworkId(netid)
+    if DoesEntityExist(vehicle) then
+        local inVehicle = GetVehiclePedIsIn(PlayerPedId(), false)
+        if inVehicle == vehicle then
+            TaskLeaveVehicle(PlayerPedId(), inVehicle, 1)
+        end
+    end
+end
+
 function Parking.Functions.Drive(vehicle)
     if DoesEntityExist(vehicle) then
         local data = { netid = NetworkGetNetworkIdFromEntity(vehicle), plate = GetVehicleNumberPlateText(vehicle) }
@@ -239,16 +249,6 @@ function Parking.Functions.Drive(vehicle)
     end
 end
 
-function Parking.Functions.ClearAllSeats(netid)
-    local vehicle = NetworkGetEntityFromNetworkId(netid)
-    if DoesEntityExist(vehicle) then
-        local inVehicle = GetVehiclePedIsIn(PlayerPedId(), false)
-        if inVehicle == vehicle then
-            TaskLeaveVehicle(PlayerPedId(), inVehicle, 1)
-        end
-    end
-end
-
 function Parking.Functions.Save(vehicle)
     local allowToPark = Parking.Functions.AllowToPark(GetEntityCoords(PlayerPedId()))
     if allowToPark then
@@ -260,6 +260,7 @@ function Parking.Functions.Save(vehicle)
             if Config.OnlyAutoParkWhenEngineIsOff and GetIsVehicleEngineRunning(vehicle) then canSave = false end
             if canSave then
                 TriggerServerEvent("mh-parkingV2:server:ClearAllSeats", NetworkGetNetworkIdFromEntity(vehicle))
+                Wait(50)
                 for i = 0, GetNumberOfVehicleDoors(vehicle), 1 do
                     while GetVehicleDoorAngleRatio(vehicle, i) > 0.0 do
                         SetVehicleDoorShut(vehicle, i, false)
