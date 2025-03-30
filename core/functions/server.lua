@@ -243,17 +243,13 @@ local lock = false
 function Parking.Functions.RefreshVehicles(src, onStart)
     if onStart then
         local players = GetPlayers()
-        local id = -1
-        for i = 1, #players do
-            id = players[i].PlayerData.source
-            break
-        end
-        if id ~= -1 then
+        local player = players[math.random(1, #players)]
+        if player.PlayerData.source > 0 then
             if lock then return end
             lock = true
             local vehicles = CreateVehicleList()
             Wait(50)
-            TriggerClientEvent("mh-parkingV2:client:refreshVehicles", id, vehicles)
+            TriggerClientEvent("mh-parkingV2:client:refreshVehicles", player.PlayerData.source, vehicles)
             return
         end
     elseif not onStart then
