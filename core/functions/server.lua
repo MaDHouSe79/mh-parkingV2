@@ -1,23 +1,6 @@
 Parking = {}
 Parking.Functions = {}
 
-function Parking.Functions.IsOwner(src, plate)
-    local Player = GetPlayer(src)
-    if Player then
-        local result = nil
-        if Config.Framework == 'esx' then
-            result = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE owner = ? AND plate = ?", { Player.identifier, plate })[1]
-        elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
-            result = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE citizenid = ? AND plate = ?", { Player.PlayerData.citizenid, plate })[1]
-        end
-        if result ~= nil and SamePlates(result.plate, plate) then
-            return { owner = true }
-        else
-            return { owner = false, message = Lang:t('info.not_the_owner') }
-        end
-    end
-end
-
 function Parking.Functions.SetVehicleLockState(netid, state)
     SetVehicleDoorsLocked(NetworkGetEntityFromNetworkId(netid), state)
 end
