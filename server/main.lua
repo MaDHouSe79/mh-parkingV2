@@ -15,5 +15,5 @@ RegisterNetEvent("mh-parkingV2:server:enteringVehicle", function(currentVehicle,
 RegisterNetEvent('mh-parkingV2:server:leftVehicle', function(currentVehicle, currentSeat, vehicleName, netId) Parking.Functions.LeftVehicle(source, currentSeat, netId) end)
 RegisterNetEvent('mh-parkingV2:server:refreshVehicles', function() Parking.Functions.RefreshVehicles(source, false) end)
 RegisterNetEvent('mh-parkingV2:server:refreshVehiclesOnStart', function() Parking.Functions.RefreshVehicles(source, true) end)
-RegisterNetEvent('mh-parkingV2:server:clearAllSeats', function() Parking.Functions.ClearAllSeats(netid) end)
+RegisterNetEvent('mh-parkingV2:server:ClearAllSeats', function() Parking.Functions.ClearAllSeats(netid) end)
 CreateThread(function() Parking.Functions.Init() end)
