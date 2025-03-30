@@ -246,6 +246,7 @@ function Parking.Functions.Save(vehicle)
 			Parking.Functions.BlinkVehiclelights(vehicle, 2) -- 1 Open 2 Locked
                         Wait(2000)
                         FreezeEntityPosition(vehicle, true)
+			SetEntityInvincible(vehicle, true)
                     elseif callback.limit then
                         Notify(callback.message, "error", 5000)
                     elseif not callback.owner then
