@@ -13,15 +13,14 @@ shared_scripts {
     'shared/config.lua',
 }
 client_scripts {
-    'framework/client/framework.lua',
-    'framework/client/functions.lua',
+    'core/framework/client.lua',
+    'core/functions/client.lua',
     'client/main.lua',
-
 }
 server_scripts {
     '@oxmysql/lib/MySQL.lua',
-    'framework/server/framework.lua',
-    'framework/server/functions.lua',
+    'core/framework/server.lua',
+    'core/functions/server.lua',
     'server/main.lua',
     'server/update.lua',
 }
