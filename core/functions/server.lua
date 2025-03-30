@@ -1,6 +1,5 @@
 Parking = {}
 Parking.Functions = {}
-playerId = -1
 
 function Parking.Functions.IsOwner(src, plate)
     local Player = GetPlayer(src)
