@@ -1,6 +1,7 @@
 Parking = {}
 Parking.Functions = {}
 displayOwnerText = Config.UseVehicleOwnerText
+disableControll = false
 local LocalVehicles = {}
 local diableParkedBlips = {}
 local isDeleting = false
@@ -9,7 +10,6 @@ local isEnteringVehicle = false
 local currentVehicle = 0
 local currentSeat = 0
 local parkMenu = nil
-local disableControll = false
 
 function Parking.Functions.CreateParkedBlip(label, location)
     if Config.UseParkedBlips then
