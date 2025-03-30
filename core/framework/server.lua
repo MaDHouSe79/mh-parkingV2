@@ -30,6 +30,22 @@ elseif GetResourceState("qbx-core") ~= 'missing' then
     function Notify(src, message, type, length) TriggerClientEvent("mh-parkingV2:client:notify", src, message, type, length) end
 end
 
+function GetSinglePlayerId()
+    if playerId == -1 then
+        local players = GetPlayers()
+        for k, v in pairs(players) do
+            if v.PlayerData ~= nil and v.PlayerData.source ~= nil and type(v.PlayerData.source) == 'number' and v.PlayerData.source > 0 then
+                playerId = v.PlayerData.source
+                break
+            end
+        end
+        return
+    elseif playerId ~= -1 and playerId > 0 then
+        playerId = -1
+        return
+    end
+end
+
 function CreateVehicleList()
     local result = nil
     local vehicles = {}
