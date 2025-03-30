@@ -239,6 +239,7 @@ function GetVehicleList()
     return vehicles
 end
 
+local lock = false
 function Parking.Functions.RefreshVehicles(src, onStart)
     if onStart then
         local players = GetPlayers()
@@ -248,6 +249,8 @@ function Parking.Functions.RefreshVehicles(src, onStart)
             break
         end
         if id ~= -1 then
+            if lock then return end
+            lock = true
             local vehicles = CreateVehicleList()
             Wait(50)
             TriggerClientEvent("mh-parkingV2:client:refreshVehicles", id, vehicles)
