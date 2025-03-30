@@ -11,16 +11,18 @@ local currentVehicle = 0
 local currentSeat = 0
 local parkMenu = nil
 
-function Parking.Functions.CreateParkedBlip(label, location)
+function Parking.Functions.CreateParkedBlip(data)
     if Config.UseParkedBlips then
-        local blip = AddBlipForCoord(location.x, location.y, location.z)
+        local name = Config.Vehicles[GetHashKey(data.model)].name or "unknow"
+        local brand = Config.Vehicles[GetHashKey(data.model)].brand or "unknow"
+        local blip = AddBlipForCoord(data.location.x, data.location.y, data.location.z)
         SetBlipSprite(blip, 545)
         SetBlipDisplay(blip, 4)
         SetBlipScale(blip, 0.6)
         SetBlipAsShortRange(blip, true)
         SetBlipColour(blip, 25)
         BeginTextCommandSetBlipName("STRING")
-        AddTextComponentSubstringPlayerName(label)
+        AddTextComponentSubstringPlayerName(Lang:t('info.parked_blip', { model = name .." "..brand }))
         EndTextCommandSetBlipName(blip)
         return blip
     else
@@ -30,9 +32,7 @@ end
 
 function Parking.Functions.AddParkedVehicle(entity, data)
     local blip = nil
-    local name = Config.Vehicles[GetHashKey(data.model)].name or "unknow"
-    local brand = Config.Vehicles[GetHashKey(data.model)].brand or "unknow"
-    if PlayerData.citizenid == data.citizenid then blip = Parking.Functions.CreateParkedBlip(Lang:t('info.parked_blip', { model = name .." "..brand }), data.location) end
+    if PlayerData.citizenid == data.citizenid then blip = Parking.Functions.CreateParkedBlip(data) else blip = nil end
     LocalVehicles[#LocalVehicles + 1] = {citizenid = data.citizenid, fullname = data.fullname, plate = data.plate, model = data.model, blip = blip, location = data.location, entity = entity or nil, fuel = data.fuel, body = data.body, engine = data.engine}
 end
 
