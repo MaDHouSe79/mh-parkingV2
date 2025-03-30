@@ -84,6 +84,7 @@ function Parking.Functions.BlinkVehiclelights(vehicle, state)
         DeleteObject(object)
         StopAnimTask(ped, 'anim@mp_player_intmenu@key_fob@', 'fob_click', 8.0)
     end
+    disableControll = false
     Wait(1000)
     if state then
         FreezeEntityPosition(vehicle, true)
@@ -92,7 +93,6 @@ function Parking.Functions.BlinkVehiclelights(vehicle, state)
         FreezeEntityPosition(vehicle, false)
         SetEntityInvincible(vehicle, false)
     end
-    disableControll = false
 end
 
 function Parking.Functions.RemoveVehicles(vehicles)
