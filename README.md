@@ -25,19 +25,19 @@
 # My Youtube Channel and Discord
 - [Subscribe](https://www.youtube.com/c/@MaDHouSe79) 
 
-# MH Parking V2 (QB/ESX) by MaDHouSe79
-- I rewrote the parking script and now your vehicles are automatically parked, this happens when you get out or get in the vehicle.
-- I remove the F5 park/unpark and everything else that was no longer needed.
+# MH Parking V2 by MaDHouSe79
+- I rewrote the mh-parking script and now your vehicles are automatically parked, this happens when you get out or get in the vehicle.
+- I removed the F5 park/unpark and everything else that was no longer needed.
 - The Impound should also work automatically and the vehicle should disappear when the police impound a vehicle.
 - Auto park only when your engine is off, you can change this in the config file,
-- When you press `F` sort it wil park when you hold the `F` it let the engine running and don't park.
-- And yes your vehicle will be back at the park location after server restart.
+- When you press `F` sort it will park and when you hold the `F` it let the engine running and it will not park,
+- and yes your vehicle will be back at the park location after server restart.
   
-# Dependencies
+# Dependencies (QB/ESX)
 - [oxmysql](https://github.com/overextended/oxmysql/releases/tag/v1.9.3)
-- [qb-core](https://github.com/qbcore-framework/qb-core)
-- [qb-policejob](https://github.com/qbcore-framework/qb-policejob)
-- [qb-vehiclekeys](https://github.com/qbcore-framework/qb-vehiclekeys)
+- [qb-core](https://github.com/qbcore-framework/qb-core) or [esx](https://github.com/esx-framework)
+- [qb-policejob](https://github.com/qbcore-framework/qb-policejob) (for qb-core)
+- [qb-vehiclekeys](https://github.com/qbcore-framework/qb-vehiclekeys) (for qb-core)
 
 # Installation
 - Step 1: First stop your server.
@@ -51,33 +51,6 @@
 
 # Installation QB-Garages
 [README FILES](https://github.com/MaDHouSe79/mh-parkingV2/tree/main/readme)
-
-# Impound 
-- The Impound should also work automatically and the vehicle should disappear when the police impound the vehicle.
-- Impound Example
-```lua
-local vehicle, distance = QBCore.Functions.GetClosestVehicle(GetEntityCoords(PlayerPedId()))
-if vehicle ~= 0 and distance <= 3.0 then
-    PlayerData = QBCore.Functions.GetPlayerData()
-    if PlayerData.job.name == 'police' and PlayerData.job.onduty then
-        local plate = QBCore.Functions.GetPlate(vehicle)
-        TriggerServerEvent('mh-parkingV2:server:Impound', plate)
-    end
-end
-```
-
-# Towing vehicle example
-- this for mechanics (client side call)
-```lua
-local vehicle, distance = QBCore.Functions.GetClosestVehicle(GetEntityCoords(PlayerPedId()))
-if vehicle ~= 0 and distance <= 3.0 then
-    PlayerData = QBCore.Functions.GetPlayerData()
-    if PlayerData.job.name == 'mechanic' and PlayerData.job.onduty then
-        local plate = QBCore.Functions.GetPlate(vehicle)
-        TriggerServerEvent('mh-parkingV2:server:TowVehicle', plate)
-    end
-end
-```
 
 # 🐞 Any bugs issues or suggestions, let my know. 👊😎
 
