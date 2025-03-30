@@ -1,5 +1,6 @@
 Parking = {}
 Parking.Functions = {}
+playerId = -1
 
 function Parking.Functions.IsOwner(src, plate)
     local Player = GetPlayer(src)
@@ -226,7 +227,6 @@ function Parking.Functions.LeftVehicle(src, currentSeat, netId)
     end
 end
 
-local playerId = -1
 local function GetSinglePlayerId()
     if playerId == -1 then
         local players = GetPlayers()
