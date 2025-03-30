@@ -402,38 +402,6 @@ function Parking.Functions.DisplayOwnerText()
     end
 end
 
-function Parking.Functions.TargetPark()
-    local vehicle, distance = Parking.Functions.GetClosestVehicle(GetEntityCoords(PlayerPedId()))
-    if vehicle ~= -1 and distance ~= -1 and distance <= 5.0 then
-        local plate = GetVehicleNumberPlateText(vehicle)
-        TriggerCallback('mh-parkingV2:server:isVehicleParked', function(isNotParked)
-            if not isNotParked then
-                Parking.Functions.BlinkVehiclelights(vehicle, 2) -- 1 Open 2 Locked
-                Wait(500)
-                Parking.Functions.Save(vehicle)
-            end
-        end, plate, 0)
-    else
-        Notify(Lang:t('info.no_vehicle_nearby'), "error", 2000)
-    end
-end
-
-function Parking.Functions.TargetDrive()
-    local vehicle, distance = GetClosestVehicle(GetEntityCoords(PlayerPedId()))
-    if vehicle ~= -1 and distance ~= -1 and distance <= 5.0 then
-        local plate = GetVehicleNumberPlateText(vehicle)
-        TriggerCallback('mh-parkingV2:server:isVehicleParked', function(isParked)
-            if isParked then
-                Parking.Functions.BlinkVehiclelights(vehicle, 1)  -- 1 Open 2 Locked
-                Wait(500)
-                Parking.Functions.Drive(vehicle)
-            end
-        end, plate, 3)
-    else
-        Notify(Lang:t('info.no_vehicle_nearby'), "error", 2000)
-    end
-end
-
 function Parking.Functions.AutoPark(driver, netid)
     if isLoggedIn then
         local player = GetPlayerServerId(PlayerId())
