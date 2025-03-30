@@ -101,7 +101,7 @@ function Parking.Functions.DeleteLocalVehicle(plate)
         for i = 1, #LocalVehicles do
             if LocalVehicles[i] ~= nil and LocalVehicles[i].plate ~= nil then
                 if SamePlates(LocalVehicles[i].plate, plate) then
-                    if LocalVehicles[i].blip ~= nil then RemoveBlip(LocalVehicles[i].blip) end
+                    RemoveBlip(LocalVehicles[i].blip)
                     LocalVehicles[i] = nil
                 end
             end
@@ -113,7 +113,10 @@ function Parking.Functions.DeleteNearByVehicle(location)
     local vehicle, distance = GetClosestVehicle(location)
     if distance <= 1 then
         for i = 1, #LocalVehicles do
-            if LocalVehicles[i].entity == vehicle then LocalVehicles[i] = nil end
+            if LocalVehicles[i].entity == vehicle then 
+                RemoveBlip(LocalVehicles[i].blip)
+                LocalVehicles[i] = nil 
+            end
             local tmpModel = GetEntityModel(vehicle)
             SetModelAsNoLongerNeeded(tmpModel)
             DeleteEntity(vehicle)
