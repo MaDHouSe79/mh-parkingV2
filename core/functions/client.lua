@@ -30,7 +30,7 @@ end
 
 function Parking.Functions.AddParkedVehicle(entity, data)
     local blip = nil
-    if PlayerData.citizenid == data.citizenid then blip = Parking.Functions.CreateParkedBlip(Lang:t('info.parked_blip', { model = GetDisplayNameFromVehicleModel(GetEntityModel(data.entity)) }), data.location) end
+    if PlayerData.citizenid == data.citizenid then blip = Parking.Functions.CreateParkedBlip(Lang:t('info.parked_blip', {model = Config.Vehicles[GetEntityModel(entity)].name}), data.location) end
     LocalVehicles[#LocalVehicles + 1] = {citizenid = data.citizenid, fullname = data.fullname, plate = data.plate, model = data.model, blip = blip, location = data.location, entity = entity or nil, fuel = data.fuel, body = data.body, engine = data.engine}
 end
 
