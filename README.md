@@ -52,8 +52,6 @@
 # Read Files
 [README FILES](https://github.com/MaDHouSe79/mh-parkingV2/tree/main/readme)
 
-# 🐞 Any bugs issues or suggestions, let my know. 👊😎
-
 # LICENSE
 [GPL LICENSE](./LICENSE)<br />
 &copy; [MaDHouSe79](https://www.youtube.com/@MaDHouSe79)
