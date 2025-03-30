@@ -10,8 +10,6 @@ RegisterNetEvent("mh-parkingV2:client:refreshVehicles", function(vehicles) Parki
 RegisterNetEvent("mh-parkingV2:client:notify", function(message, type, length) Notify(message, type, length) end)
 RegisterNetEvent("mh-parkingV2:client:deletePlate", function(plate) Parking.Functions.DeleteLocalVehicle(plate) end)
 RegisterNetEvent("mh-parkingV2:client:addVehicle", function(data) Parking.Functions.AddParkedVehicle(data.entity, data) end)
-RegisterNetEvent("mh-parkingV2:client:park", function() Parking.Functions.TargetPark() end)
-RegisterNetEvent("mh-parkingV2:client:drive", function() Parking.Functions.TargetDrive() end)
 RegisterNetEvent("mh-parkingV2:client:autoPark", function(driver, netid) Parking.Functions.AutoPark(driver, netid) end)
 RegisterNetEvent("mh-parkingV2:client:autoDrive", function(driver, netid) Parking.Functions.AutoDrive(driver, netid) end)
 RegisterNetEvent('mh-parkingV2:client:GetVehicleMenu', function() Parking.Functions.GetVehicleMenu() end)
