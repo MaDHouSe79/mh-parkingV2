@@ -9,6 +9,7 @@ local isEnteringVehicle = false
 local currentVehicle = 0
 local currentSeat = 0
 local parkMenu = nil
+local disableControll = false
 
 function Parking.Functions.CreateParkedBlip(label, location)
     if Config.UseParkedBlips then
@@ -60,6 +61,7 @@ function Parking.Functions.DeteteParkedBlip(vehicle)
 end
 
 function Parking.Functions.BlinkVehiclelights(vehicle, state)
+    disableControll = true
     local ped = PlayerPedId()
     local model = 'prop_cuff_keys_01'
     LoadAnimDict('anim@mp_player_intmenu@key_fob@')
@@ -90,6 +92,7 @@ function Parking.Functions.BlinkVehiclelights(vehicle, state)
         FreezeEntityPosition(vehicle, false)
         SetEntityInvincible(vehicle, false)
     end
+    disableControll = false
 end
 
 function Parking.Functions.RemoveVehicles(vehicles)
@@ -314,8 +317,10 @@ function Parking.Functions.SpawnVehicles(vehicles)
                 NetworkFadeInEntity(vehicle, true)
                 while NetworkIsEntityFading(vehicle) do Citizen.Wait(50) end
                 RequestCollisionAtCoord(vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z)
-                SetVehicleOnGroundProperly(vehicle)
                 SetEntityHeading(vehicle, vehicles[i].location.w)
+                local retval, groundZ = GetGroundZFor_3dCoord(vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z, false)
+                if retval then SetEntityCoords(vehicle, vehicles[i].location.x, vehicles[i].location.y, groundZ) end
+                SetVehicleOnGroundProperly(vehicle)
                 SetEntityInvincible(vehicle, true)
                 SetVehicleEngineHealth(vehicle, vehicles[i].engine)
                 SetVehicleBodyHealth(vehicle, vehicles[i].body)
@@ -432,6 +437,7 @@ function Parking.Functions.AutoPark(driver, netid)
         local vehicle = NetworkGetEntityFromNetworkId(netid)
         if DoesEntityExist(vehicle) then
             if player == driver then
+                disableControll = true
                 Parking.Functions.Save(vehicle)
             elseif player ~= driver then
                 TaskLeaveVehicle(player, vehicle, 1)
@@ -517,4 +523,20 @@ function Parking.Functions.KeepEngineRunning()
     if IsPedInAnyVehicle(PlayerPedId(), false) and IsControlPressed(2, 75) and not IsEntityDead(PlayerPedId()) then
         SetVehicleEngineOn(GetVehiclePedIsIn(PlayerPedId(), false), true, true, true)
     end
+end
+
+function Parking.Functions.DisableControll()
+    if IsPauseMenuActive() then SetFrontendActive(false) end
+    DisableAllControlActions(0)
+    EnableControlAction(0, 1, true)
+    EnableControlAction(0, 2, true)
+    EnableControlAction(0, 245, true)
+    EnableControlAction(0, 38, true)
+    EnableControlAction(0, 0, true)
+    EnableControlAction(0, 322, true)
+    EnableControlAction(0, 288, true)
+    EnableControlAction(0, 213, true)
+    EnableControlAction(0, 249, true)
+    EnableControlAction(0, 46, true)
+    EnableControlAction(0, 47, true)
 end
