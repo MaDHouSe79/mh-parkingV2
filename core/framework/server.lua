@@ -3,6 +3,7 @@
 --[[ ===================================================== ]] --
 Framework = nil
 CreateCallback = nil
+playerId = -1
 
 if GetResourceState("es_extended") ~= 'missing' then
     Config.Framework = 'esx'
