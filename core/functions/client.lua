@@ -316,8 +316,8 @@ function Parking.Functions.SpawnVehicles(vehicles)
                 local vehicle = CreateVehicle(model, vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z + 0.2, vehicles[i].location.w, true, true)
                 while not DoesEntityExist(vehicle) do Citizen.Wait(500) end
                 SetEntityAsMissionEntity(vehicle, true, true)
-                SetVehicleProperties(vehicle, vehicles[i].mods)
                 Parking.Functions.AddParkedVehicle(vehicle, vehicles[i])
+                SetVehicleProperties(vehicle, vehicles[i].mods)
                 SetModelAsNoLongerNeeded(model)
                 local netid = VehToNet(vehicle)
                 SetNetworkIdExistsOnAllMachines(netid, true)
@@ -530,6 +530,7 @@ end
 
 function Parking.Functions.KeepEngineRunning()
     if IsPedInAnyVehicle(PlayerPedId(), false) and IsControlPressed(2, 75) and not IsEntityDead(PlayerPedId()) then
+        disableControll = false
         SetVehicleEngineOn(GetVehiclePedIsIn(PlayerPedId(), false), true, true, true)
     end
 end
