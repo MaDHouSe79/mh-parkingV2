@@ -198,6 +198,13 @@ function Parking.Functions.RefreshVehicles(src, onStart)
     end
 end
 
+function Parking.Functions.ClearAllSeats(netid)
+    local vehicle = NetworkGetEntityFromNetworkId(netId)
+    if DoesEntityExist(vehicle) then
+        TriggerClientEvent("mh-parkingV2:client:GetOutVehicle", -1, netid)
+    end
+end
+
 function Parking.Functions.Init()
     Wait(3000)
     if Config.Framework == 'esx' then
