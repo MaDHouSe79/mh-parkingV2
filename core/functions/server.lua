@@ -201,7 +201,7 @@ end
 function Parking.Functions.ClearAllSeats(netid)
     local vehicle = NetworkGetEntityFromNetworkId(netId)
     if DoesEntityExist(vehicle) then
-        TriggerClientEvent("mh-parkingV2:client:GetOutVehicle", -1, netid)
+        TriggerClientEvent("mh-parkingV2:client:ClearAllSeats", -1, netid)
     end
 end
 
