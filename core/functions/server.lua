@@ -208,15 +208,12 @@ function Parking.Functions.LeftVehicle(src, currentSeat, netId)
     end
 end
 
-local lock = false
+local playerId = -1
 function Parking.Functions.RefreshVehicles(src, onStart)
-    local playerId = -1
     if onStart then
-        if lock then return end
-        lock = true
         local players = GetPlayers()
         local player = players[math.random(1, #players)]
-        playerId = player.PlayerData.source
+        if playerId == -1 then playerId = player.PlayerData.source else playerId = -1 end
     elseif not onStart then
         playerId = src
     end
