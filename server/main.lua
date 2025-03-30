@@ -12,6 +12,6 @@ RegisterNetEvent('mh-parkingV2:server:Impound', function(plate) Parking.Function
 RegisterNetEvent('mh-parkingV2:server:TowVehicle', function(plate) Parking.Functions.TowVehicle(source, plate) end)
 RegisterNetEvent("mh-parkingV2:server:enteringVehicle", function(currentVehicle, currentSeat, vehicleName, netId) Parking.Functions.EnteringVehicle(source, currentSeat, netId) end)
 RegisterNetEvent('mh-parkingV2:server:leftVehicle', function(currentVehicle, currentSeat, vehicleName, netId) Parking.Functions.LeftVehicle(source, currentSeat, netId) end)
-RegisterNetEvent('mh-parkingV2:server:refreshVehicles', function() Parking.Functions.RefreshVehicles(source) end)
-RegisterNetEvent('mh-parkingV2:server:refreshVehiclesOnStart', function() Parking.Functions.RefreshVehiclesOnStart() end)
+RegisterNetEvent('mh-parkingV2:server:refreshVehicles', function() Parking.Functions.RefreshVehicles(source, false) end)
+RegisterNetEvent('mh-parkingV2:server:refreshVehiclesOnStart', function() Parking.Functions.RefreshVehicles(source, true) end)
 CreateThread(function() Parking.Functions.Init() end)
