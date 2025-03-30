@@ -1,8 +1,9 @@
 --[[ ===================================================== ]] --
 --[[       MH Realistic Parking V2 Script by MaDHouSe      ]] --
 --[[ ===================================================== ]] --
-Config = {}                             -- Placeholder don't edit or change or remove this.
-Config.Debug = false                    -- Default false, if true this will show prints in the server console.
+Config = {}                                -- Placeholder don't edit or change or remove this.
+Config.Debug = false                       -- Default false, if true this will show prints in the server console.
+Config.DebugBlipForRadius = true           -- If true you see a circle aera on the map, use this for debug only.
 ----------------------------------------------------------------------------
 -- Framework (Do not change this)
 Config.Framework = nil
@@ -13,7 +14,6 @@ elseif GetResourceState("qb-core") ~= 'missing' then
 elseif GetResourceState("qbx-core") ~= 'missing' then
     Config.Framework = 'qbx'
 end
-Config.Vehicles = Vehicles
 ----------------------------------------------------------------------------
 -- Fuel Script
 Config.FuelScript = 'LegacyFuel'           -- Default is LegacyFuel, if you use a other fuel script, for example ox_fuel
@@ -37,9 +37,6 @@ Config.UseVehicleOwnerText = true          -- If true show the owner and vehicle
 Config.VehicleOwnerTextDisplayDistance = 15
 ----------------------------------------------------------------------------
 -- Stuff to automatic disable the auto parking system.
-Config.DebugBlipForRadius = true   -- If true you see a circle aera on the map, use this for debug only.
-Config.UseUnableParkingBlips = true -- If this you see blip for radius in the map.
-Config.UseParkingLotsBlips = true  --If true players see parking lot blips on the map
 
 -- This is when you close to a gasstation, you can't use the auto park system.
 -- This goes automatic so leave it as it is.
@@ -52,11 +49,12 @@ Config.DisableNeedByPumpModels = {
     ['prop_gas_pump_old2'] = true,
     ['prop_gas_pump_old3'] = true
 }
-
+----------------------------------------------------------------------------
 -- This are locations where you can't use the auto park system.
 -- the reason for this is it can be that you need to use the vehicle on that point.
 -- So if you want that, you can't use the park system cause you can't use the vehicle when parked.
 -- If you want to see the radius on the map you need to set Config.DebugBlipForRadius to true
+Config.UseUnableParkingBlips = true -- If this you see blip for radius in the map.
 Config.NoParkingLocations = {
     -- Default locations
     {coords = vector3(-333.0179, -135.5331, 38.3735), radius = 15.0, color = 1, sprite = 163, job = 'mechanic'},   -- ls costum 1
@@ -86,6 +84,7 @@ Config.NoParkingLocations = {
 -- Players are not allwed to park close by -> (Config.DisableNeedByLocations or Config.DisableNeedByPumpModels)
 -- If you want to see the radius in the map you need to set Config.DebugBlipForRadius to true
 Config.UseParkingLotsOnly = false
+Config.UseParkingLotsBlips = true  --If true players see parking lot blips on the map
 Config.AllowedParkingLots = {
     {coords = vector3(96.9411, -1402.1882, 28.5636), radius = 10.0, color = 2, sprite = 237},   -- parkinglot 1
     {coords = vector3(228.7590, -786.5502, 30.0108), radius = 40.0, color = 2, sprite = 237},   -- parkinglot 2
