@@ -215,7 +215,7 @@ function Parking.Functions.Drive(vehicle)
     end
 end
 
-function Parking.Functions.GetOutVehicle(netid)
+function Parking.Functions.ClearAllSeats(netid)
     local vehicle = NetworkGetEntityFromNetworkId(netid)
     if DoesEntityExist(vehicle) then
         local inVehicle = GetVehiclePedIsIn(PlayerPedId(), false)
