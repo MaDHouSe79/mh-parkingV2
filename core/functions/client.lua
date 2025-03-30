@@ -288,7 +288,9 @@ function Parking.Functions.Save(vehicle)
                     model = GetDisplayNameFromVehicleModel(GetEntityModel(vehicle)),
                     location = vector4(vehicleCoords.x, vehicleCoords.y, vehicleCoords.z, vehicleHeading)
                 })
-
+            else
+                Wait(50)
+                disableControll = false
             end
         end
     end
