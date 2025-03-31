@@ -1,16 +1,11 @@
 --[[ ===================================================== ]] --
 --[[       MH Realistic Parking V2 Script by MaDHouSe      ]] --
 --[[ ===================================================== ]] --
-Framework = nil
-PlayerData = {}
-isLoggedIn = false
-TriggerCallback = nil
-OnPlayerLoaded = nil
-OnPlayerUnload = nil
-OnJobUpdate = nil
+Framework, TriggerCallback, OnPlayerLoaded, OnPlayerUnload = nil, nil, nil,nil
+OnJobUpdate, isLoggedIn, config, PlayerData = nil, false, {}, {}
 
 if GetResourceState("es_extended") ~= 'missing' then
-    Config.Framework = 'esx'
+    config.Framework = 'esx'
     Framework = exports['es_extended']:getSharedObject()
     TriggerCallback = Framework.TriggerServerCallback
     OnPlayerLoaded = 'esx:playerLoaded'
@@ -20,7 +15,7 @@ if GetResourceState("es_extended") ~= 'missing' then
     function IsDead() return (GetEntityHealth(PlayerPedId()) <= 0) end
     function SetJob(job) PlayerData.job = job end
 elseif GetResourceState("qb-core") ~= 'missing' then
-    Config.Framework = 'qb'
+    config.Framework = 'qb'
     Framework = exports['qb-core']:GetCoreObject()
     TriggerCallback = Framework.Functions.TriggerCallback
     OnPlayerLoaded = 'QBCore:Client:OnPlayerLoaded'
@@ -31,7 +26,7 @@ elseif GetResourceState("qb-core") ~= 'missing' then
     function SetJob(job) PlayerData.job = job end
     RegisterNetEvent('QBCore:Player:SetPlayerData', function(data) PlayerData = data end)
 elseif GetResourceState("qbx-core") ~= 'missing' then
-    Config.Framework = 'qbx'
+    config.Framework = 'qbx'
     Framework = exports['qbx-core']:GetCoreObject()
     TriggerCallback = Framework.Functions.TriggerCallback
     OnPlayerLoaded = 'QBCore:Client:OnPlayerLoaded'
@@ -41,6 +36,24 @@ elseif GetResourceState("qbx-core") ~= 'missing' then
     function IsDead() return Framework.Functions.GetPlayerData().metadata['isdead'] end
     function SetJob(job) PlayerData.job = job end
     RegisterNetEvent('QBCore:Player:SetPlayerData', function(data) PlayerData = data end)
+end
+
+function GetStreetName(entity)
+    return GetStreetNameFromHashKey(GetStreetNameAtCoord(GetEntityCoords(entity).x, GetEntityCoords(entity).y, GetEntityCoords(entity).z))
+end
+
+function Notify(message, type, length)
+    if config.NotifyScript == "qb" then
+        Framework.Functions.Notify(message, type, length)
+    elseif config.NotifyScript == "ox_lib" and GetResourceState(config.NotifyScript) ~= 'missing' then
+        lib.notify({title = "MH Parking V2", description = message, type = type})
+    elseif config.NotifyScript == "k5_notify" and GetResourceState(config.NotifyScript) ~= 'missing' then
+        exports["k5_notify"]:notify("MH Parking V2", message, "k5style", length)
+    elseif config.NotifyScript == "okokNotify" and GetResourceState(config.NotifyScript) ~= 'missing' then
+        exports['okokNotify']:Alert("MH Parking V2", message, length, type)
+    elseif config.NotifyScript == "Roda_Notifications" and GetResourceState(config.NotifyScript) ~= 'missing' then
+        exports['Roda_Notifications']:showNotify("MH Parking V2", message, type, length)
+    end
 end
 
 function LoadModel(model)
@@ -86,20 +99,6 @@ function GetClosestVehicle(coords)
     return closestVehicle, closestDistance
 end
 
-function Notify(message, type, length)
-    if Config.NotifyScript == "qb" then
-        Framework.Functions.Notify(message, type, length)
-    elseif Config.NotifyScript == "ox_lib" and GetResourceState(Config.NotifyScript) ~= 'missing' then
-        lib.notify({title = "MH Parking V2", description = message, type = type})
-    elseif Config.NotifyScript == "k5_notify" and GetResourceState(Config.NotifyScript) ~= 'missing' then
-        exports["k5_notify"]:notify("MH Parking V2", message, "k5style", length)
-    elseif Config.NotifyScript == "okokNotify" and GetResourceState(Config.NotifyScript) ~= 'missing' then
-        exports['okokNotify']:Alert("MH Parking V2", message, length, type)
-    elseif Config.NotifyScript == "Roda_Notifications" and GetResourceState(Config.NotifyScript) ~= 'missing' then
-        exports['Roda_Notifications']:showNotify("MH Parking V2", message, type, length)
-    end
-end
-
 function Draw3DText(x, y, z, textInput, fontId, scaleX, scaleY)
     local p = GetGameplayCamCoords()
     local dist = #(p - vector3(x, y, z))
@@ -120,10 +119,6 @@ function Draw3DText(x, y, z, textInput, fontId, scaleX, scaleY)
     SetDrawOrigin(x, y, z + 2, 0)
     DrawText(0.0, 0.0)
     ClearDrawOrigin()
-end
-
-function GetStreetName(entity)
-    return GetStreetNameFromHashKey(GetStreetNameAtCoord(GetEntityCoords(entity).x, GetEntityCoords(entity).y, GetEntityCoords(entity).z))
 end
 
 function GetVehicleProperties(vehicle)
