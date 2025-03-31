@@ -43,6 +43,13 @@ elseif GetResourceState("qbx-core") ~= 'missing' then
     RegisterNetEvent('QBCore:Player:SetPlayerData', function(data) PlayerData = data end)
 end
 
+function LoadModel(model)
+    if not HasModelLoaded(model) then
+        RequestModel(model)
+        while not HasModelLoaded(model) do Wait(1) end
+    end
+end
+
 function GetClosestVehicle(coords)
     local ped = PlayerPedId()
     local vehicles = GetGamePool('CVehicle')
