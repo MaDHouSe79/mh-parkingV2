@@ -385,6 +385,10 @@ function Parking.Functions.SetVehicleWaypoit(coords)
     end
 end
 
+local isInVehicle = false
+local isEnteringVehicle = false
+local currentVehicle = 0
+local currentSeat = 0
 function Parking.Functions.GetInAndOutVehicle()
     local ped = PlayerPedId()
     if not isInVehicle and not IsPlayerDead(PlayerId()) then
