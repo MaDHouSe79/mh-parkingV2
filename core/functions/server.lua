@@ -255,7 +255,7 @@ AddCommand("addvip", "Parking Add VIP", {{ name = 'ID', help = 'The id of the pl
     end
 end, 'admin')
 
-AddCommand("removevip", "Parking Remove Vip", {{ name = 'ID', help = 'The id of the player you want to remove.'}}, true, function(source, args)V
+AddCommand("removevip", "Parking Remove Vip", {{ name = 'ID', help = 'The id of the player you want to remove.'}}, true, function(source, args)
     if args[1] and tonumber(args[1]) > 0 then
         local Player = GetPlayer(tonumber(args[1]))
         if Player then
