@@ -61,7 +61,6 @@
 
 # Screenshots
 ![alttext](https://github.com/MaDHouSe79/mh-parkingV2/blob/main/screenshots/parked.png)
-![alttext](https://github.com/MaDHouSe79/mh-parkingV2/blob/main/screenshots/parkmenu.png)
 
 # LICENSE
 [GPL LICENSE](./LICENSE)<br />
