@@ -248,11 +248,11 @@ AddCommand("addvip", Lang:t('commands.addvip'), {{ name = 'ID', help = Lang:t('c
         if Player then
             if Config.Framework == 'esx' then
                 MySQL.Async.execute("UPDATE users SET parkvip = ?, parkmax = ? WHERE owner = ?", {1, amount, Player.identifier})
-                Notify(targetID, Lang:t('info.playeraddasvip'), "success", 10000)
+                if targetID ~= src then Notify(targetID, Lang:t('info.playeraddasvip'), "success", 10000) end
                 Notify(src, Lang:t('info.isaddedasvip'), "success", 10000)
             elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
                 MySQL.Async.execute("UPDATE players SET parkvip = ?, parkmax = ? WHERE citizenid = ?", {1, amount, Player.PlayerData.citizenid})
-                Notify(targetID, Lang:t('info.playeraddasvip'), "success", 10000)
+                if targetID ~= src then Notify(targetID, Lang:t('info.playeraddasvip'), "success", 10000) end
                 Notify(src, Lang:t('info.isaddedasvip'), "success", 10000)
             end
         end
