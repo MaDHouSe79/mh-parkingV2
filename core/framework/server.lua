@@ -75,6 +75,8 @@ function CreateVehicleList()
                     if DoesEntityExist(GetPlayerPed(target.PlayerData.source)) then
                         if GetResourceState("qb-vehiclekeys") ~= 'missing' then
                             exports['qb-vehiclekeys']:GiveKeys(target.PlayerData.source, tmpVehicles.plate)
+                        elseif GetResourceState("qbx_vehiclekeys") ~= 'missing' then
+                            TriggerClientEvent('vehiclekeys:client:SetOwner', target.PlayerData.source, tmpVehicles.plate)
                         end
                     end
                 end
