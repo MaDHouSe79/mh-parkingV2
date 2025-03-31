@@ -1,9 +1,9 @@
 --[[ ===================================================== ]] --
 --[[       MH Realistic Parking V2 Script by MaDHouSe      ]] --
 --[[ ===================================================== ]] --
-AddEventHandler('onResourceStart', function(resource) if resource == GetCurrentResourceName() then PlayerData, isLoggedIn = GetPlayerData(), true TriggerServerEvent("mh-parkingV2:server:LoadVehiclesOnStart") end end)
+AddEventHandler('onResourceStart', function(resource) if resource == GetCurrentResourceName() then PlayerData, isLoggedIn = GetPlayerData(), true TriggerServerEvent('mh-parkingV2:server:OnJoin') Wait(50) TriggerServerEvent("mh-parkingV2:server:LoadVehiclesOnStart") end end)
 AddEventHandler('onResourceStop', function(resource) if resource == GetCurrentResourceName() then  PlayerData, isLoggedIn = {}, false Parking.Functions.DeleteAllDisableParkedBlips() end end)
-RegisterNetEvent(OnPlayerLoaded, function() PlayerData, isLoggedIn = GetPlayerData(), true TriggerServerEvent("mh-parkingV2:server:RefreshVehicles") end)
+RegisterNetEvent(OnPlayerLoaded, function() PlayerData, isLoggedIn = GetPlayerData(), true TriggerServerEvent('mh-parkingV2:server:OnJoin') Wait(50) TriggerServerEvent("mh-parkingV2:server:RefreshVehicles") end)
 RegisterNetEvent(OnPlayerUnload, function() PlayerData, isLoggedIn = {}, false Parking.Functions.DeleteAllDisableParkedBlips() end)
 RegisterNetEvent(OnJobUpdate, function(job) SetJob(job) end)
 RegisterNetEvent("mh-parkingV2:client:RefreshVehicles", function(vehicles) Parking.Functions.RemoveVehicles(vehicles) Wait(1000) Parking.Functions.SpawnVehicles(vehicles) end)
@@ -14,6 +14,7 @@ RegisterNetEvent("mh-parkingV2:client:AutoPark", function(driver, netid) Parking
 RegisterNetEvent("mh-parkingV2:client:AutoDrive", function(driver, netid) Parking.Functions.AutoDrive(driver, netid) end)
 RegisterNetEvent('mh-parkingV2:client:GetVehicleMenu', function() Parking.Functions.GetVehicleMenu() end)
 RegisterNetEvent('mh-parkingV2:client:ClearAllSeats', function(netid) Parking.Functions.ClearAllSeats(netid) end)
+RegisterNetEvent('mh-parkingV2:client:OnJoin', function(data) Parking.Functions.OnJoin(data) end)
 RegisterCommand('toggleparktext', function() displayOwnerText = not displayOwnerText end, false)
 RegisterCommand('parkmenu', function() TriggerEvent('mh-parkingV2:client:GetVehicleMenu') end, false)
 CreateThread(function() Parking.Functions.RadialMenu() end)
