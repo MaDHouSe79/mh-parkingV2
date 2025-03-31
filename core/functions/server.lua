@@ -240,7 +240,7 @@ function Parking.Functions.Init()
     end
 end
 
-AddCommand("addvip", "Add as vip", {{ name = 'ID', help = 'The id of the player you want to add.' }, { name = 'Amount', help = 'Max park amount'}}, true, function(source, args)
+AddCommand("addvip", "Parking Add VIP", {{ name = 'ID', help = 'The id of the player you want to add.' }, { name = 'Amount', help = 'Max park amount'}}, true, function(source, args)
     if args[1] and tonumber(args[1]) > 0 then
         local amount = Config.Maxparking
         if args[2] and tonumber(args[2]) > 0 then amount = tonumber(args[2]) end
@@ -255,14 +255,14 @@ AddCommand("addvip", "Add as vip", {{ name = 'ID', help = 'The id of the player 
     end
 end, 'admin')
 
-AddCommand("removevip", "Remove vip", {{ name = 'ID', help = 'The id of the player you want to remove.'}}, true, function(source, args)
+AddCommand("removevip", "Parking Remove Vip", {{ name = 'ID', help = 'The id of the player you want to remove.'}}, true, function(source, args)V
     if args[1] and tonumber(args[1]) > 0 then
         local Player = GetPlayer(tonumber(args[1]))
         if Player then
             if Config.Framework == 'esx' then
-                MySQL.Async.execute("UPDATE users SET parkvip = ?, parkmax = ? WHERE owner = ?", {0, amount, Player.identifier})
+                MySQL.Async.execute("UPDATE users SET parkvip = ?, parkmax = ? WHERE owner = ?", {0, 0, Player.identifier})
             elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
-                MySQL.Async.execute("UPDATE players SET parkvip = ?, parkmax = ? WHERE citizenid = ?", {0, amount, Player.PlayerData.citizenid})
+                MySQL.Async.execute("UPDATE players SET parkvip = ?, parkmax = ? WHERE citizenid = ?", {0, 0, Player.PlayerData.citizenid})
             end
         end
     end
