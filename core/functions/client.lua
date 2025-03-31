@@ -264,14 +264,14 @@ function Parking.Functions.Save(vehicle)
                 end
                 TriggerCallback("mh-parkingV2:server:Save", function(callback)
                     if callback.status then
-                        if not Config.DisableParkNotify then Notify(callback.message, "primary", 5000) end
                         Parking.Functions.BlinkVehiclelights(vehicle, 2) -- 1 Open 2 Locked
+                        Notify(callback.message, "primary", 5000)
                     elseif callback.limit then
-                        Notify(callback.message, "error", 5000)
                         disableControll = false
+                        Notify(callback.message, "error", 5000)
                     elseif not callback.owner then
-                        Notify(callback.message, "error", 5000)
                         disableControll = false
+                        Notify(callback.message, "error", 5000)
                     end
                 end, {
                     netid = NetworkGetNetworkIdFromEntity(vehicle),
