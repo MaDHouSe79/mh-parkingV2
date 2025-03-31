@@ -496,7 +496,7 @@ function Parking.Functions.RadialMenu()
                 parkMenu = nil
             end
             parkMenu = exports['qb-radialmenu']:AddOption({
-                id = 'park_vehicle',
+                id = 'park_vehicles_menu',
                 title = 'Parked Menu',
                 icon = "square-parking",
                 type = 'client',
@@ -504,6 +504,17 @@ function Parking.Functions.RadialMenu()
                 shouldClose = true
             }, parkMenu)
         end)
+    elseif Config.Framework == 'esx' then
+        lib.addRadialItem({
+            {
+                id = 'park_vehicles_menu',
+                label = 'Parked Menu',
+                icon = 'square-parking',
+                onSelect = function()
+                    TriggerEvent("mh-parkingV2:client:GetVehicleMenu")
+                end
+            }
+        })
     end
 end
 
