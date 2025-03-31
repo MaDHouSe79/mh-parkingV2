@@ -1,4 +1,5 @@
-Parking, Parking.Functions = {}, {}
+Parking = {}
+Parking.Functions = {}
 displayOwnerText, disableControll = Config.UseVehicleOwnerText, false
 local LocalVehicles, diableParkedBlips, currentVehicle, currentSeat = {}, {}, 0, 0
 local isDeleting, isInVehicle, isEnteringVehicle, parkMenu = false, false, false, nil
