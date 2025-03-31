@@ -33,7 +33,8 @@
 - when you press `F` sort it will park and when you hold the `F` it let the engine running and it will not park,
 - and yes your vehicle will be back at the park location after server restart.
 - Everybody can park but vip players can park more vehicles then the max default in `sv_config.lua`. (SV_Config.Maxparking)
-
+- You can access the park menu with the radial menu.
+  
 # Dependencies (QB/ESX)
 - [oxmysql](https://github.com/overextended/oxmysql/releases/tag/v1.9.3)
 - [qb-core](https://github.com/qbcore-framework/qb-core) or [qbx-core](https://github.com/Qbox-project) or [esx](https://github.com/esx-framework)
