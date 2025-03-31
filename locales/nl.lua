@@ -14,6 +14,9 @@ local Translations = {
         ["plate"] = "Kenteken: ~g~%{plate}~s~",
         ["model"] = "Model: ~b~%{model}~s~",
         ["brand"] = "Brand ~o~%{brand}~s~",
+        ['playeraddasvip'] = "U bent toegevoegd als vip voor het parksysteemm",
+        ['isaddedasvip'] = "Speler is toegevoegd als vip voor het parksysteem",
+        ['playerremovedasvip'] = "Speler is verwijderd als vip voor het parksysteem",
     },
     commands = {
         ['addvip'] = "Parking VIP Toevoegen",
