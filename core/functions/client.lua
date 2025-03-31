@@ -251,15 +251,15 @@ function Parking.Functions.Save(vehicle)
             local canSave = true
             local vehicleCoords = GetEntityCoords(vehicle)
             local vehicleHeading = GetEntityHeading(vehicle)
-            local trailerdata = nil
+            local trailerdata = {}
             local hasTrailer, trailer = GetVehicleTrailerVehicle(vehicle)
             if hasTrailer then
                 local hashkey = GetEntityModel(trailer)
+                local trailerProps = GetVehicleProperties(trailer)
                 if config.Trailers[hashkey] and not config.Trailers[hashkey].iqnore then
-                    trailerdata = {hash = hashkey, coords = GetEntityCoords(trailer), heading = GetEntityHeading(trailer)}
+                    trailerdata = {hash = hashkey, coords = GetEntityCoords(trailer), heading = GetEntityHeading(trailer), mods = trailerProps}
                 end
             end
-
             while IsPedInAnyVehicle(PlayerPedId(), false) do Wait(100) end
             if config.OnlyAutoParkWhenEngineIsOff and GetIsVehicleEngineRunning(vehicle) then canSave = false end
             if canSave then
@@ -355,7 +355,6 @@ function Parking.Functions.SpawnVehicles(vehicles)
                             heading -= config.Trailers[vehicles[i].trailerdata.hash].heading
                         end
                     end
-
                     local trailerSpawnPos = GetOffsetFromEntityInWorldCoords(vehicle, 0.0, offset, 0.0)
                     local closestVehicle, closestDistance = GetClosestVehicle(trailerSpawnPos)
                     if closestVehicle ~= -1 and closestDistance <= 0.5 then
@@ -367,6 +366,7 @@ function Parking.Functions.SpawnVehicles(vehicles)
                     local entity = CreateVehicle(vehicles[i].trailerdata.hash, trailerSpawnPos.x, trailerSpawnPos.y, trailerSpawnPos.z, heading, true, true)
                     while not DoesEntityExist(entity) do Wait(500) end
                     SetEntityAsMissionEntity(entity, true, true)
+                    SetVehicleProperties(entity, vehicles[i].trailerdata.mods)
                     local netid = VehToNet(entity)
                     SetNetworkIdExistsOnAllMachines(netid, true)
                     NetworkSetNetworkIdDynamic(netid, false)
