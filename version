@@ -1,4 +1,4 @@
 {
-    "version": "1.0.10",
-    "message": "Move config data to server side and code cleanup."
+    "version": "1.0.11",
+    "message": "Save front wheel angkle when save."
 }
