@@ -34,14 +34,6 @@ function Parking.Functions.AddParkedVehicle(entity, data)
     LocalVehicles[#LocalVehicles + 1] = {citizenid = data.citizenid, fullname = data.fullname, plate = data.plate, model = data.model, blip = blip, location = data.location, entity = entity or nil, fuel = data.fuel, body = data.body, engine = data.engine}
 end
 
-function Parking.Functions.GetPedVehicleSeat(ped)
-    local vehicle = GetVehiclePedIsIn(ped, false)
-    for i = -2, GetVehicleMaxNumberOfPassengers(vehicle) do
-        if (GetPedInVehicleSeat(vehicle, i) == ped) then return i end
-    end
-    return -2
-end
-
 function Parking.Functions.IsVehicleAlreadyListed(plate)
     if #LocalVehicles > 0 then
         for i = 1, #LocalVehicles do
@@ -397,7 +389,7 @@ function Parking.Functions.GetInAndOutVehicle()
             isEnteringVehicle = false
             isInVehicle = true
             currentVehicle = GetVehiclePedIsUsing(ped)
-            currentSeat = Parking.Functions.GetPedVehicleSeat(ped)
+            currentSeat = GetPedVehicleSeat(ped)
             local name = GetDisplayNameFromVehicleModel(GetEntityModel(currentVehicle))
             local netId = VehToNet(currentVehicle)
             TriggerServerEvent('mh-parkingV2:server:EnteredVehicle', currentVehicle, currentSeat, name, netId)
