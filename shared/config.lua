@@ -30,8 +30,9 @@ Config.ForceVehicleOnGound = true          -- If true this will force parked veh
 Config.ViewDistance = true                 -- If true vehicles are only visable in 100 meters around the players.
 Config.ParkedViewDistance = 100            -- Default 100 if your distance is over 100 meters the vehicles in that area will not render on screen.
 Config.UseParkedBlips = true               -- if true players can see a blip of the parked vehicle on the map
-Config.Maxparking = 2                      -- Default 1, this is max parked vehicles allowed per player, don't go to high with this...
-Config.UseAsVip = false                    -- if true `Config.Maxparking` does not work and you need to add a amount per player.
+-- VIP Access
+Config.UseAsVip = false                    -- if true `Config.Maxparking` does not work on vip players and you need to add a amount per player.
+Config.Maxparking = 1                      -- Default 1, this is max parked allowed per player, don't go to high with this...
 ----------------------------------------------------------------------------
 Config.UseVehicleOwnerText = true          -- If true show the owner and vehicle text above vehicles when parked.
 Config.VehicleOwnerTextDisplayDistance = 15
