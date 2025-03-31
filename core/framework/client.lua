@@ -1,7 +1,7 @@
 --[[ ===================================================== ]] --
 --[[       MH Realistic Parking V2 Script by MaDHouSe      ]] --
 --[[ ===================================================== ]] --
-Framework, TriggerCallback, OnPlayerLoaded, OnPlayerUnload = nil, nil, nil,nil
+Framework, TriggerCallback, OnPlayerLoaded, OnPlayerUnload = nil, nil, nil, nil
 OnJobUpdate, isLoggedIn, config, PlayerData = nil, false, {}, {}
 
 if GetResourceState("es_extended") ~= 'missing' then
