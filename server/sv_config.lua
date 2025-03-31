@@ -105,7 +105,8 @@ SV_Config.AllowedParkingLots = {
     {coords = vector3(1183.6377, -1550.7142, 34.1825), radius = 20.0, color = 2, sprite = 237}, -- parkinglot 16
     {coords = vector3(131.8025, -712.3470, 32.4903), radius = 50.0, color = 2, sprite = 237},   -- parkinglot 17
 }
-
+----------------------------------------------------------------------------
+-- Vehicle list, you can add more if the vehicle does not exist in this list.
 SV_Config.Vehicles = {
     [437538602] = { model = "speeder2", name = "Speeder Yacht", brand = "Pegassi", category = "boats" },
     [191916658] = { model = "streamer216", name = "Streamer216", brand = "Mammoth", category = "planes" },
