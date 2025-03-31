@@ -62,8 +62,6 @@
 
 # Screenshots
 ![alttext](https://github.com/MaDHouSe79/mh-parkingV2/blob/main/screenshots/parked.png)
-
-- Up comming truck + trailer parking.
 ![alttext](https://github.com/MaDHouSe79/mh-parkingV2/blob/main/screenshots/trailer1.png)
 ![alttext](https://github.com/MaDHouSe79/mh-parkingV2/blob/main/screenshots/trailer2.png)
 
