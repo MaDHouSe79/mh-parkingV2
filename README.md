@@ -32,6 +32,7 @@
 - Auto park only when your engine is off, you can change this in the config file,
 - when you press `F` sort it will park and when you hold the `F` it let the engine running and it will not park,
 - and yes your vehicle will be back at the park location after server restart.
+- Everybody can park but vip players can park more vehicles then max default in config.lua.
   
 # Dependencies (QB/ESX)
 - [oxmysql](https://github.com/overextended/oxmysql/releases/tag/v1.9.3)
@@ -46,9 +47,11 @@
 - Step 4: Start your server.  
 
 # Commands
-- `/toggleparktext` this disable or enable the text above the parked vehicles. (for streamers)
-- `/parkmenu` to open the parked menu so you can set a waypoint.
-
+- `/toggleparktext` Disable or Enable the text above the parked vehicles. (for streamers)
+- `/parkmenu` Open the parked menu so you can set a waypoint.
+- `/addvip` Add a player as vip (admin only)
+- `/removevip` Remove a vip player (admin only)
+  
 # Read Files
 [README FILES](https://github.com/MaDHouSe79/mh-parkingV2/tree/main/readme)
 
