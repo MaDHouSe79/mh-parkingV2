@@ -246,9 +246,6 @@ function Parking.Functions.Save(vehicle)
             local canSave = true
             local vehicleCoords = GetEntityCoords(vehicle)
             local vehicleHeading = GetEntityHeading(vehicle)
-            local tangle = GetVehicleSteeringAngle(veh)
-            if tangle > 10.0 or tangle < -10.0 then angle = tangle end
-
             while IsPedInAnyVehicle(PlayerPedId(), false) do Wait(100) end
             if config.OnlyAutoParkWhenEngineIsOff and GetIsVehicleEngineRunning(vehicle) then canSave = false end
             if canSave then
