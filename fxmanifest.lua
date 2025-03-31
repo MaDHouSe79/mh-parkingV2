@@ -9,9 +9,9 @@ shared_scripts {
     '@ox_lib/init.lua',
     'shared/locale.lua',
     'locales/en.lua',
-    'shared/config.lua',
+    --'shared/config.lua',
     'shared/functions.lua',
-    'shared/vehicles.lua',
+    --'shared/vehicles.lua',
 }
 client_scripts {
     'core/framework/client.lua',
@@ -20,6 +20,7 @@ client_scripts {
 }
 server_scripts {
     '@oxmysql/lib/MySQL.lua',
+    'server/sv_config.lua',
     'core/framework/server.lua',
     'core/functions/server.lua',
     'server/main.lua',
