@@ -106,6 +106,20 @@ SV_Config.AllowedParkingLots = {
     {coords = vector3(131.8025, -712.3470, 32.4903), radius = 50.0, color = 2, sprite = 237},   -- parkinglot 17
 }
 ----------------------------------------------------------------------------
+-- Trailer list.
+SV_Config.Trailers = {
+    [712162987] = {model = "trailersmall", name = "trailersmall", offset = 7.2, heading = 50.0, iqnore = false }, -- does not spawn correctly so ignore it.
+    [524108981] = {model = "boattrailer", name = "boattrailer", offset = 7.2, heading = 50.0, iqnore = true }, -- does not spawn correctly so ignore it.
+    [1835260592] = {model = "boattrailer2", name = "boattrailer2", offset = 9.0, heading = 100.0, iqnore = true }, -- does not spawn correctly so ignore it.
+    [-877478386] = {model = "trailers", name = "trailers", offset = 6.1, iqnore = false},
+    [-1579533167] = {model = "trailers2", name = "trailers2", offset = 6.1, iqnore = false},
+    [-2058878099] = {model = "trailers3", name = "trailers3", offset = 6.1, iqnore = false},
+    [-100548694] = {model = "trailers4", name = "trailers4", offset = 6.1, iqnore = false},
+    [-1352468814] = {model = "trflat", name = "trflat", offset = 6.1, iqnore = false},
+    [2078290630] = {model = "tr2", name = "tr2", offset = 5.8, iqnore = false},
+    [2091594960] = {model = "tr4", name = "tr4", offset = 8.1, iqnore = false},
+}
+
 -- Vehicle list, you can add more if the vehicle does not exist in this list.
 SV_Config.Vehicles = {
     [437538602] = { model = "speeder2", name = "Speeder Yacht", brand = "Pegassi", category = "boats" },
