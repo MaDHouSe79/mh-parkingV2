@@ -32,7 +32,7 @@
 - Auto park only when your engine is off, you can change this in the config file,
 - when you press `F` sort it will park and when you hold the `F` it let the engine running and it will not park,
 - and yes your vehicle will be back at the park location after server restart.
-- Everybody can park but vip players can park more vehicles then max default in config.lua.
+- Everybody can park but vip players can park more vehicles then the max default in config.lua. (Config.Maxparking)
   
 # Dependencies (QB/ESX)
 - [oxmysql](https://github.com/overextended/oxmysql/releases/tag/v1.9.3)
