@@ -7,7 +7,7 @@ CreateCallback("mh-parkingV2:server:GetVehicles", function(source, cb) cb(Parkin
 CreateCallback("mh-parkingV2:server:Save", function(source, cb, data) cb(Parking.Functions.Save(source, data)) end)
 CreateCallback("mh-parkingV2:server:Drive", function(source, cb, data) cb(Parking.Functions.Drive(source, data)) end)
 AddEventHandler('onResourceStop', function(resource) if resource == GetCurrentResourceName() then playerId = -1 end end)
-AddEventHandler('onResourceStart', function(resource) if resource == GetCurrentResourceName() then Parking.Functions.OnJoin(source) end end)
+AddEventHandler('onResourceStart', function(resource) if resource == GetCurrentResourceName() then playerId = -1 Parking.Functions.OnJoin(source) end end)
 RegisterNetEvent('mh-parkingV2:server:SetVehLockState', function(vehNetId, state) Parking.Functions.SetVehicleLockState(NetworkGetEntityFromNetworkId(vehNetId), state) end)
 RegisterNetEvent("mh-parkingV2:server:EnteringVehicle", function(currentVehicle, currentSeat, vehicleName, netId) Parking.Functions.EnteringVehicle(source, currentSeat, netId) end)
 RegisterNetEvent('mh-parkingV2:server:LeftVehicle', function(currentVehicle, currentSeat, vehicleName, netId) Parking.Functions.LeftVehicle(source, currentSeat, netId) end)
