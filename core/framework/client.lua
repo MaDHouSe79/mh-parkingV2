@@ -69,6 +69,13 @@ function LoadModel(model)
     end
 end
 
+function LoadAnimDict(dict)
+    if not HasAnimDictLoaded(dict) then
+        RequestAnimDict(dict)
+        while not HasAnimDictLoaded(dict) do Wait(1) end
+    end
+end
+
 function GetPedVehicleSeat(ped)
     local vehicle = GetVehiclePedIsIn(ped, false)
     for i = -2, GetVehicleMaxNumberOfPassengers(vehicle) do
