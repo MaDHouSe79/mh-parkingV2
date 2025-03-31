@@ -25,4 +25,9 @@ server_scripts {
     'server/update.lua',
 }
 
+dependencies {
+    'oxmysql',
+    'ox_lib',
+}
+
 lua54 'yes'
