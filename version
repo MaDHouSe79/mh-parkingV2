@@ -1,4 +1,4 @@
 {
-    "version": "1.0.9",
-    "message": "Update, code cleanup"
+    "version": "1.0.10",
+    "message": "Update, move config data to server side and code cleanup."
 }
