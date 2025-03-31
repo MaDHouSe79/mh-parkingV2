@@ -43,6 +43,34 @@ elseif GetResourceState("qbx-core") ~= 'missing' then
     RegisterNetEvent('QBCore:Player:SetPlayerData', function(data) PlayerData = data end)
 end
 
+function Draw3DText(x, y, z, textInput, fontId, scaleX, scaleY)
+    local p = GetGameplayCamCoords()
+    local dist = #(p - vector3(x, y, z))
+    local scale = (1 / dist) * 20
+    local fov = (1 / GetGameplayCamFov()) * 100
+    local scale = scale * fov
+    SetTextScale(scaleX * scale, scaleY * scale)
+    SetTextFont(fontId)
+    SetTextProportional(1)
+    SetTextColour(250, 250, 250, 255)
+    SetTextDropshadow(1, 1, 1, 1, 255)
+    SetTextEdge(2, 0, 0, 0, 150)
+    SetTextDropShadow()
+    SetTextOutline()
+    SetTextEntry("STRING")
+    SetTextCentre(1)
+    AddTextComponentString(textInput)
+    SetDrawOrigin(x, y, z + 2, 0)
+    DrawText(0.0, 0.0)
+    ClearDrawOrigin()
+end
+
+function GetDistance(pos1, pos2)
+    if pos1 ~= nil and pos2 ~= nil then
+        return #(vector3(pos1.x, pos1.y, pos1.z) - vector3(pos2.x, pos2.y, pos2.z))
+    end
+end
+
 function LoadModel(model)
     if not HasModelLoaded(model) then
         RequestModel(model)
