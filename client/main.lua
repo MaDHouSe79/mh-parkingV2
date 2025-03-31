@@ -19,6 +19,7 @@ RegisterCommand('toggleparktext', function() displayOwnerText = not displayOwner
 RegisterCommand('parkmenu', function() TriggerEvent('mh-parkingV2:client:GetVehicleMenu') end, false)
 CreateThread(function() Parking.Functions.RadialMenu() end)
 CreateThread(function() Parking.Functions.CreateBlips() end)
+CreateThread(function() Parking.Functions.CheckVehicleSteeringAngle() end)
 CreateThread(function() while true do Wait(2000) if isLoggedIn then Parking.Functions.MakeVehiclesVisable() end end end)
 CreateThread(function() while true do Wait(3000) if isLoggedIn then Parking.Functions.CheckDistanceToForceGrounded() end end end)
 CreateThread(function() while true do Wait(0) if isLoggedIn then Parking.Functions.GetInAndOutVehicle() Wait(50) end end end)
