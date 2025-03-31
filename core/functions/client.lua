@@ -286,6 +286,8 @@ function Parking.Functions.Save(vehicle)
             else
                 disableControll = false
             end
+        else
+            disableControll = false
         end
     else
         disableControll = false
