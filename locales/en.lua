@@ -15,9 +15,12 @@ local Translations = {
         ["model"] = "Model: ~b~%{model}~s~",
         ["brand"] = "Brand ~o~%{brand}~s~",
     },
-    target = {
-        ['park_vehicle'] = "Park Vehicle",
-        ['unpark_vehicle'] = "Unpark Vehicle",
+    commands = {
+        ['addvip'] = "Parking Add VIP",
+        ['addvip_info'] = "The id of the player you want to add",
+        ['addvip_info_amount'] = "Max park amount",
+        ['removevip'] = "Parking Remove Vip",
+        ['removevip_info'] = "The id of the player you want to remove",
     }
 }
 
