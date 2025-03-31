@@ -59,7 +59,7 @@
 [README FILES](https://github.com/MaDHouSe79/mh-parkingV2/tree/main/readme)
 
 # Screenshots
-![alttext](https://github.com/MaDHouSe79/mh-parkingV2/blob/main/screenshots/parked.png))
+![alttext](https://github.com/MaDHouSe79/mh-parkingV2/blob/main/screenshots/parked.png)
 
 # LICENSE
 [GPL LICENSE](./LICENSE)<br />
