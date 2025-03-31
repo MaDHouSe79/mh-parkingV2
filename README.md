@@ -37,6 +37,7 @@
   
 # Dependencies (QB/ESX)
 - [oxmysql](https://github.com/overextended/oxmysql/releases/tag/v1.9.3)
+- [ox_lib](https://github.com/overextended/ox_lib/releases)
 - [qb-core](https://github.com/qbcore-framework/qb-core) or [qbx-core](https://github.com/Qbox-project) or [esx](https://github.com/esx-framework)
 - [qb-policejob](https://github.com/qbcore-framework/qb-policejob) (for qb-core)
 - [qb-vehiclekeys](https://github.com/qbcore-framework/qb-vehiclekeys) (for qb-core)
