@@ -31,7 +31,20 @@ end
 function Parking.Functions.AddParkedVehicle(entity, data)
     local blip = nil
     if PlayerData.citizenid == data.citizenid then blip = Parking.Functions.CreateParkedBlip(data) else blip = nil end
-    LocalVehicles[#LocalVehicles + 1] = {citizenid = data.citizenid, fullname = data.fullname, plate = data.plate, model = data.model, blip = blip, location = data.location, entity = entity or nil, fuel = data.fuel, body = data.body, engine = data.engine, steerangle = data.steerangle}
+    LocalVehicles[#LocalVehicles + 1] = {
+        citizenid = data.citizenid,
+        fullname = data.fullname,
+        plate = data.plate,
+        model = data.model,
+        blip = blip,
+        location = data.location,
+        entity = entity,
+        fuel = data.fuel,
+        body = data.body,
+        engine = data.engine,
+        steerangle = data.steerangle,
+        trailerEntity = data.trailerEntity
+    }
 end
 
 function Parking.Functions.IsVehicleAlreadyListed(plate)
@@ -92,7 +105,7 @@ function Parking.Functions.RemoveVehicles(vehicles)
     if type(vehicles) == 'table' and #vehicles > 0 and vehicles[1] ~= nil then
         for i = 1, #vehicles, 1 do
             local vehicle, distance = GetClosestVehicle(vehicles[i].location)
-            if NetworkGetEntityIsLocal(vehicle) and distance < 1 then
+            if NetworkGetEntityIsLocal(vehicle) and distance < 1.0 then
                 local driver = GetPedInVehicleSeat(vehicle, -1)
                 if not DoesEntityExist(driver) or not IsPedAPlayer(driver) then
                     local tmpModel = GetEntityModel(vehicle)
@@ -101,9 +114,15 @@ function Parking.Functions.RemoveVehicles(vehicles)
                     NetworkFadeOutEntity(vehicle, false, true)
                     while NetworkIsEntityFading(vehicle) do Wait(0) end
                     Wait(100)
-                    DeleteEntity(vehicle)
+                    if DoesEntityExist(vehicle) then DeleteEntity(vehicle) end
                 end
             end
+        end
+        for i = 1, #LocalVehicles, 1 do
+            NetworkFadeOutEntity(LocalVehicles[i].trailerEntity, false, true)
+            while NetworkIsEntityFading(LocalVehicles[i].trailerEntity) do Wait(0) end
+            Wait(100)
+            if DoesEntityExist(LocalVehicles[i].trailerEntity) then DeleteEntity(LocalVehicles[i].trailerEntity) end
         end
     end
     LocalVehicles = {}
@@ -120,22 +139,6 @@ function Parking.Functions.DeleteLocalVehicle(plate)
                     LocalVehicles[i] = nil
                 end
             end
-        end
-    end
-end
-
-function Parking.Functions.DeleteNearByVehicle(location)
-    local vehicle, distance = GetClosestVehicle(location)
-    if distance <= 1 then
-        for i = 1, #LocalVehicles do
-            if LocalVehicles[i].entity == vehicle then
-                RemoveBlip(LocalVehicles[i].blip)
-                LocalVehicles[i] = nil
-            end
-            local tmpModel = GetEntityModel(vehicle)
-            SetModelAsNoLongerNeeded(tmpModel)
-            DeleteEntity(vehicle)
-            tmpModel = nil
         end
     end
 end
@@ -221,6 +224,8 @@ function Parking.Functions.Drive(vehicle)
         while not IsPedInAnyVehicle(PlayerPedId(), false) do Wait(100) end
         TriggerCallback("mh-parkingV2:server:Drive", function(callback)
             if callback.status then
+                local hasTrailer, trailer = GetVehicleTrailerVehicle(vehicle)
+                if hasTrailer then FreezeEntityPosition(trailer, false) end
                 SetEntityAsMissionEntity(vehicle, true, true)
                 Parking.Functions.DeteteParkedBlip(vehicle)
                 TriggerCallback("mh-parkingV2:server:GetVehicleData", function(vehicleData)
@@ -246,6 +251,15 @@ function Parking.Functions.Save(vehicle)
             local canSave = true
             local vehicleCoords = GetEntityCoords(vehicle)
             local vehicleHeading = GetEntityHeading(vehicle)
+            local trailerdata = nil
+            local hasTrailer, trailer = GetVehicleTrailerVehicle(vehicle)
+            if hasTrailer then
+                local hashkey = GetEntityModel(trailer)
+                if config.Trailers[hashkey] and not config.Trailers[hashkey].iqnore then
+                    trailerdata = {hash = hashkey, coords = GetEntityCoords(trailer), heading = GetEntityHeading(trailer)}
+                end
+            end
+
             while IsPedInAnyVehicle(PlayerPedId(), false) do Wait(100) end
             if config.OnlyAutoParkWhenEngineIsOff and GetIsVehicleEngineRunning(vehicle) then canSave = false end
             if canSave then
@@ -279,7 +293,8 @@ function Parking.Functions.Save(vehicle)
                     street = GetStreetName(vehicle),
                     model = GetDisplayNameFromVehicleModel(GetEntityModel(vehicle)),
                     location = vector4(vehicleCoords.x, vehicleCoords.y, vehicleCoords.z, vehicleHeading),
-                    steerangle = GetVehicleSteeringAngle(vehicle)
+                    steerangle = GetVehicleSteeringAngle(vehicle),
+                    trailerdata = trailerdata
                 })
             else
                 disableControll = false
@@ -305,10 +320,9 @@ function Parking.Functions.SpawnVehicles(vehicles)
                     DeleteEntity(closestVehicle)
                     while DoesEntityExist(closestVehicle) do Citizen.Wait(50) end
                 end
-                local vehicle = CreateVehicle(model, vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z + 0.2, vehicles[i].location.w, true, true)
+                local vehicle = CreateVehicle(model, vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z, vehicles[i].location.w, true, true)
                 while not DoesEntityExist(vehicle) do Citizen.Wait(500) end
                 SetEntityAsMissionEntity(vehicle, true, true)
-                Parking.Functions.AddParkedVehicle(vehicle, vehicles[i])
                 SetVehicleProperties(vehicle, vehicles[i].mods)
                 SetModelAsNoLongerNeeded(model)
                 local netid = VehToNet(vehicle)
@@ -330,7 +344,47 @@ function Parking.Functions.SpawnVehicles(vehicles)
                 TriggerServerEvent('mh-parkingV2:server:SetVehLockState', VehToNet(vehicle), 2)
                 SetVehicleDoorsLocked(vehicle, 2)
                 if GetResourceState(config.FuelScript) ~= 'missing' then exports[config.FuelScript]:SetFuel(vehicle, vehicles[i].fuel) end
-                Wait(1500)
+
+                if vehicles[i].trailerdata ~= nil then
+                    local trailerHeading = vehicles[i].trailerdata.heading
+                    local offset = -5.0
+                    local heading = trailerHeading
+                    if config.Trailers[vehicles[i].trailerdata.hash] then
+                        offset = -config.Trailers[vehicles[i].trailerdata.hash].offset
+                        if config.Trailers[vehicles[i].trailerdata.hash].heading ~= nil then
+                            heading -= config.Trailers[vehicles[i].trailerdata.hash].heading
+                        end
+                    end
+
+                    local trailerSpawnPos = GetOffsetFromEntityInWorldCoords(vehicle, 0.0, offset, 0.0)
+                    local closestVehicle, closestDistance = GetClosestVehicle(trailerSpawnPos)
+                    if closestVehicle ~= -1 and closestDistance <= 0.5 then
+                        DeleteEntity(closestVehicle)
+                        while DoesEntityExist(closestVehicle) do Citizen.Wait(50) end
+                    end
+                    Wait(50)
+                    LoadModel(vehicles[i].trailerdata.hash)
+                    local entity = CreateVehicle(vehicles[i].trailerdata.hash, trailerSpawnPos.x, trailerSpawnPos.y, trailerSpawnPos.z, heading, true, true)
+                    while not DoesEntityExist(entity) do Wait(500) end
+                    SetEntityAsMissionEntity(entity, true, true)
+                    local netid = VehToNet(entity)
+                    SetNetworkIdExistsOnAllMachines(netid, true)
+                    NetworkSetNetworkIdDynamic(netid, false)
+                    SetNetworkIdCanMigrate(netid, true)
+                    NetworkFadeInEntity(entity, true)
+                    while NetworkIsEntityFading(entity) do Citizen.Wait(50) end
+                    vehicles[i].trailerEntity = entity
+                    SetEntityHeading(entity, heading)
+                    local retval, groundZ = GetGroundZFor_3dCoord(trailerSpawnPos.x, trailerSpawnPos.y, trailerSpawnPos.z, false)
+                    if retval then SetEntityCoords(entity, trailerSpawnPos.x, trailerSpawnPos.y, groundZ) end
+                    SetVehicleOnGroundProperly(entity)
+                    SetVehicleDirtLevel(entity, 0)
+                    SetTrailerLegsRaised(entity)
+                    Wait(500)
+                    FreezeEntityPosition(entity, true)
+                end
+                Parking.Functions.AddParkedVehicle(vehicle, vehicles[i])
+                Wait(500)
                 FreezeEntityPosition(vehicle, true)
             end
         end
@@ -343,8 +397,10 @@ function Parking.Functions.MakeVehiclesVisable()
         for k, vehicle in pairs(LocalVehicles) do
             if GetDistance(playerCoords, vehicle.location) < 150 and not IsEntityVisible(vehicle.entity) then
                 SetEntityVisible(vehicle.entity, true)
+                if vehicle.trailerEntity ~= nil then SetEntityVisible(vehicle.trailerEntity, true) end
             elseif GetDistance(playerCoords, vehicle.location) > 150 and IsEntityVisible(vehicle.entity) then
                 SetEntityVisible(vehicle.entity, false)
+                if vehicle.trailerEntity ~= nil then SetEntityVisible(vehicle.trailerEntity, false) end
             end
         end
     end
@@ -354,7 +410,7 @@ function Parking.Functions.CheckDistanceToForceGrounded()
     if isLoggedIn and config.ForceVehicleOnGound and #LocalVehicles > 0 then
         for i = 1, #LocalVehicles do
             local playerCoords = GetEntityCoords(PlayerPedId())
-            if LocalVehicles[i].entity ~= nil and DoesEntityExist(LocalVehicles[i].entity) and not LocalVehicles[i].isGrounded then
+            if type(LocalVehicles[i]) == 'table' and LocalVehicles[i].entity ~= nil and DoesEntityExist(LocalVehicles[i].entity) and not LocalVehicles[i].isGrounded then
                 if GetVehicleWheelSuspensionCompression(LocalVehicles[i].entity) == 0 or GetDistance(playerCoords, LocalVehicles[i].location) < 150 then
                     SetEntityCoords(LocalVehicles[i].entity, LocalVehicles[i].location.x, LocalVehicles[i].location.y, LocalVehicles[i].location.z)
                     SetVehicleOnGroundProperly(LocalVehicles[i].entity)
@@ -564,8 +620,10 @@ function Parking.Functions.CheckVehicleSteeringAngle()
             speed = GetEntitySpeed(veh)
             local vehicle = GetVehiclePedIsIn(PlayerPedId(), true)
             if speed < 0.1 and DoesEntityExist(vehicle) and not GetIsTaskActive(PlayerPedId(), 151) and not GetIsVehicleEngineRunning(vehicle) then
-                SetVehicleSteeringAngle(GetVehiclePedIsIn(PlayerPedId(), true), angle)
+                SetVehicleSteeringAngle(vehicle, angle)
             end
+            local hasTrailer, trailer = GetVehicleTrailerVehicle(vehicle)
+            if hasTrailer then FreezeEntityPosition(trailer, false) end
         end
     end
 end
