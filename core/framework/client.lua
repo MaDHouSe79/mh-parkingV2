@@ -43,6 +43,75 @@ elseif GetResourceState("qbx-core") ~= 'missing' then
     RegisterNetEvent('QBCore:Player:SetPlayerData', function(data) PlayerData = data end)
 end
 
+function Trim(value)
+    if not value then return nil end
+    return (string.gsub(value, '^%s*(.-)%s*$', '%1'))
+end
+
+function Round(value, numDecimalPlaces)
+    if not numDecimalPlaces then return math.floor(value + 0.5) end
+    local power = 10 ^ numDecimalPlaces
+    return math.floor((value * power) + 0.5) / (power)
+end
+
+function SamePlates(plate1, plate2)
+    return (Trim(plate1) == Trim(plate2))
+end
+
+function GetDistance(pos1, pos2)
+    return #(vector3(pos1.x, pos1.y, pos1.z) - vector3(pos2.x, pos2.y, pos2.z))
+end
+
+function LoadModel(model)
+    while not HasModelLoaded(model) do
+        RequestModel(model)
+        Wait(50)
+    end
+end
+
+function GetPedVehicleSeat(ped)
+    local vehicle = GetVehiclePedIsIn(ped, false)
+    for i = -2, GetVehicleMaxNumberOfPassengers(vehicle) do
+        if(GetPedInVehicleSeat(vehicle, i) == ped) then return i end
+    end
+    return -2
+end
+
+function GetClosestVehicle(coords)
+    local ped = PlayerPedId()
+    local vehicles = GetGamePool('CVehicle')
+    local closestDistance = -1
+    local closestVehicle = -1
+    if coords then
+        coords = type(coords) == 'table' and vec3(coords.x, coords.y, coords.z) or coords
+    else
+        coords = GetEntityCoords(ped)
+    end
+    for i = 1, #vehicles, 1 do
+        local vehicleCoords = GetEntityCoords(vehicles[i])
+        local distance = #(vehicleCoords - coords)
+        if closestDistance == -1 or closestDistance > distance then
+            closestVehicle = vehicles[i]
+            closestDistance = distance
+        end
+    end
+    return closestVehicle, closestDistance
+end
+
+function Notify(message, type, length)
+    if Config.NotifyScript == "qb" then
+        Framework.Functions.Notify(message, type, length)
+    elseif Config.NotifyScript == "ox_lib" and GetResourceState(Config.NotifyScript) ~= 'missing' then
+        lib.notify({title = "MH Parking V2", description = message, type = type})
+    elseif Config.NotifyScript == "k5_notify" and GetResourceState(Config.NotifyScript) ~= 'missing' then
+        exports["k5_notify"]:notify("MH Parking V2", message, "k5style", length)
+    elseif Config.NotifyScript == "okokNotify" and GetResourceState(Config.NotifyScript) ~= 'missing' then
+        exports['okokNotify']:Alert("MH Parking V2", message, length, type)
+    elseif Config.NotifyScript == "Roda_Notifications" and GetResourceState(Config.NotifyScript) ~= 'missing' then
+        exports['Roda_Notifications']:showNotify("MH Parking V2", message, type, length)
+    end
+end
+
 function Draw3DText(x, y, z, textInput, fontId, scaleX, scaleY)
     local p = GetGameplayCamCoords()
     local dist = #(p - vector3(x, y, z))
@@ -65,17 +134,8 @@ function Draw3DText(x, y, z, textInput, fontId, scaleX, scaleY)
     ClearDrawOrigin()
 end
 
-function GetDistance(pos1, pos2)
-    if pos1 ~= nil and pos2 ~= nil then
-        return #(vector3(pos1.x, pos1.y, pos1.z) - vector3(pos2.x, pos2.y, pos2.z))
-    end
-end
-
-function LoadModel(model)
-    if not HasModelLoaded(model) then
-        RequestModel(model)
-        while not HasModelLoaded(model) do Wait(1) end
-    end
+function GetStreetName(entity)
+    return GetStreetNameFromHashKey(GetStreetNameAtCoord(GetEntityCoords(entity).x, GetEntityCoords(entity).y, GetEntityCoords(entity).z))
 end
 
 function GetClosestVehicle(coords)
