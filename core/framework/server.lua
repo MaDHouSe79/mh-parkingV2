@@ -63,14 +63,14 @@ function CreateVehicleList()
                 local tmpVehicles = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE stored = ? AND owner = ?", {3, v.citizenid})[1]
                 local mods = json.decode(tmpVehicles.vehicle)
                 local coords = json.decode(tmpVehicles.location)
-                vehicles[#vehicles + 1] = {citizenid = tmpVehicles.owner, fullname = fullname, plate = tmpVehicles.plate, model = mods.model, fuel = mods.fuelLevel, engine = mods.engineHealth, body = mods.bodyHealth, mods = mods, location = coords}
+                vehicles[#vehicles + 1] = {citizenid = tmpVehicles.owner, fullname = fullname, plate = tmpVehicles.plate, model = mods.model, fuel = mods.fuelLevel, engine = mods.engineHealth, body = mods.bodyHealth, mods = mods, location = coords, steerangle = tmpVehicles.steerangle}
              elseif SV_Config.Framework == 'qb' or SV_Config.Framework == 'qbx' then
                 local target = Framework.Functions.GetPlayerByCitizenId(v.citizenid) or Framework.Functions.GetOfflinePlayerByCitizenId(v.citizenid)
                 fullname = target.PlayerData.charinfo.firstname .. ' ' .. target.PlayerData.charinfo.lastname
                 local tmpVehicles = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE state = ? and plate = ?", {3, v.plate})[1]
                 local mods = json.decode(tmpVehicles.mods)
                 local coords = json.decode(tmpVehicles.location)
-                vehicles[#vehicles + 1] = {citizenid = tmpVehicles.citizenid, fullname = fullname, plate = tmpVehicles.plate, model = tmpVehicles.vehicle, fuel = tmpVehicles.fuel, engine = tmpVehicles.engine, body = tmpVehicles.body, mods = mods, location = coords}
+                vehicles[#vehicles + 1] = {citizenid = tmpVehicles.citizenid, fullname = fullname, plate = tmpVehicles.plate, model = tmpVehicles.vehicle, fuel = tmpVehicles.fuel, engine = tmpVehicles.engine, body = tmpVehicles.body, mods = mods, location = coords, steerangle = tmpVehicles.steerangle}
                 if target.PlayerData.citizenid == v.citizenid and target.PlayerData.source ~= nil then
                     if DoesEntityExist(GetPlayerPed(target.PlayerData.source)) then
                         if GetResourceState("qb-vehiclekeys") ~= 'missing' then
