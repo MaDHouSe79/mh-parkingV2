@@ -51,7 +51,10 @@
 - `/parkmenu` Open the parked menu so you can set a waypoint.
 - `/addvip [id] [amount]` Add a player as vip (admin only)
 - `/removevip [id]` Remove a vip player (admin only)
-  
+
+# Save front wheels angle
+- Before you press `F` press the keys `A` or `D` to turn your wheels and it will save that angle on your parked vehicle.
+
 # Read Files
 [README FILES](https://github.com/MaDHouSe79/mh-parkingV2/tree/main/readme)
 
