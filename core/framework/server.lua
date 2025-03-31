@@ -35,15 +35,6 @@ elseif GetResourceState("qbx-core") ~= 'missing' then
     function Notify(src, message, type, length) TriggerClientEvent("mh-parkingV2:client:Notify", src, message, type, length) end
 end
 
-function Trim(value)
-    if not value then return nil end
-    return (string.gsub(value, '^%s*(.-)%s*$', '%1'))
-end
-
-function SamePlates(plate1, plate2)
-    return (Trim(plate1) == Trim(plate2))
-end
-
 function GetSinglePlayerId()
     if playerId == -1 then
         local players = GetPlayers()
