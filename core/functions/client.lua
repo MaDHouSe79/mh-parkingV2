@@ -1,15 +1,7 @@
-Parking = {}
-Parking.Functions = {}
-displayOwnerText = Config.UseVehicleOwnerText
-disableControll = false
-local LocalVehicles = {}
-local diableParkedBlips = {}
-local isDeleting = false
-local isInVehicle = false
-local isEnteringVehicle = false
-local currentVehicle = 0
-local currentSeat = 0
-local parkMenu = nil
+Parking, Parking.Functions = {}, {}
+displayOwnerText, disableControll = Config.UseVehicleOwnerText, false
+local LocalVehicles, diableParkedBlips, currentVehicle, currentSeat = {}, {}, 0, 0
+local isDeleting, isInVehicle, isEnteringVehicle, parkMenu = false, false, false, nil
 
 function Parking.Functions.CreateParkedBlip(data)
     if Config.UseParkedBlips then
@@ -385,10 +377,6 @@ function Parking.Functions.SetVehicleWaypoit(coords)
     end
 end
 
-local isInVehicle = false
-local isEnteringVehicle = false
-local currentVehicle = 0
-local currentSeat = 0
 function Parking.Functions.GetInAndOutVehicle()
     local ped = PlayerPedId()
     if not isInVehicle and not IsPlayerDead(PlayerId()) then
