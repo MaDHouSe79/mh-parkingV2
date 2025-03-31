@@ -10,6 +10,7 @@ shared_scripts {
     'shared/locale.lua',
     'locales/en.lua',
     'shared/config.lua',
+    'shared/functions.lua',
     'shared/vehicles.lua',
 }
 client_scripts {
