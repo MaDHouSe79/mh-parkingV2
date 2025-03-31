@@ -50,7 +50,7 @@
 
 # Commands
 - `/toggleparktext` Disable or Enable the text above the parked vehicles. (for streamers)
-- `/parkmenu` Open the parked menu so you can set a waypoint.
+- `/parkmenu` Open the park menu so you can set a waypoint.
 - `/addvip [id] [amount]` Add a player as vip (admin only)
 - `/removevip [id]` Remove a vip player (admin only)
 
