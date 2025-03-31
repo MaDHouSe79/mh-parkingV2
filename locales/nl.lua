@@ -18,6 +18,13 @@ local Translations = {
     target = {
         ['park_vehicle'] = "Park Voertuig",
         ['unpark_vehicle'] = "Unpark Voertuig",
+    },
+    commands = {
+        ['addvip'] = "Parking VIP Toevoegen",
+        ['addvip_info'] = "De id can de player die je wilt toevoegen",
+        ['addvip_info_amount'] = "Max park totaal",
+        ['removevip'] = "Parking Vip Verwijderen",
+        ['removevip_info'] = "De ID van de player dat je wilt verwijderen",
     }
 }
 
