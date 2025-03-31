@@ -101,6 +101,7 @@ function Parking.Functions.Save(src, data)
                             citizenid, fullname = Player.PlayerData.citizenid, Player.PlayerData.charinfo.firstname .. ' ' .. Player.PlayerData.charinfo.lastname
                             owned = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE citizenid = ? AND plate = ? LIMIT 1", { citizenid, data.plate })[1]
                             MySQL.Async.execute('UPDATE player_vehicles SET state = ?, location = ?, street = ?, fuel = ?, body = ?, engine = ? WHERE plate = ? AND citizenid = ?', { 3, json.encode(data.location), data.street, data.fuel, data.body, data.engine, data.plate, citizenid })
+                            MySQL.update('UPDATE player_vehicles SET fuel = ?, engine = ?, body = ? WHERE plate = ? AND citizenid = ?', { data.fuel, data.engine, data.body, data.plate, citizenid })
                         end
                         if owned.vehicle ~= nil then model = owned.vehicle else model = data.model end
                         local _data = { citizenid = citizenid, fullname = fullname, entity = vehicle, plate = data.plate, model = model, location = data.location, fuel = data.fuel, body = data.body, engine = data.engine }
