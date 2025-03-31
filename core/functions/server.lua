@@ -239,30 +239,39 @@ function Parking.Functions.Init()
         MySQL.Async.execute('ALTER TABLE player_vehicles ADD COLUMN IF NOT EXISTS street TEXT NULL DEFAULT NULL')
     end
 end
-
 AddCommand("addvip", Lang:t('commands.addvip'), {{ name = 'ID', help = Lang:t('commands.addvip_info') }, { name = 'Amount', help = Lang:t('commands.addvip_info_amount')}}, true, function(source, args)
-    if args[1] and tonumber(args[1]) > 0 then
-        local amount = Config.Maxparking
-        if args[2] and tonumber(args[2]) > 0 then amount = tonumber(args[2]) end
-        local Player = GetPlayer(tonumber(args[1]))
+    local src, amount, targetID = source, Config.Maxparking, -1
+    if args[1] and tonumber(args[1]) > 0 then targetID = tonumber(args[1]) end
+    if args[2] and tonumber(args[2]) > 0 then amount = tonumber(args[2]) end
+    if targetID ~= -1 then
+        local Player = GetPlayer(targetID)
         if Player then
             if Config.Framework == 'esx' then
                 MySQL.Async.execute("UPDATE users SET parkvip = ?, parkmax = ? WHERE owner = ?", {1, amount, Player.identifier})
+                Notify(targetID, Lang:t('info.playeraddasvip'), "success", 10000)
+                Notify(src, Lang:t('info.isaddedasvip'), "success", 10000)
             elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
                 MySQL.Async.execute("UPDATE players SET parkvip = ?, parkmax = ? WHERE citizenid = ?", {1, amount, Player.PlayerData.citizenid})
+                Notify(targetID, Lang:t('info.playeraddasvip'), "success", 10000)
+                Notify(src, Lang:t('info.isaddedasvip'), "success", 10000)
             end
         end
     end
 end, 'admin')
 
 AddCommand("removevip", Lang:t('commands.removevip'), {{ name = 'ID', help = Lang:t('commands.removevip_info')}}, true, function(source, args)
-    if args[1] and tonumber(args[1]) > 0 then
-        local Player = GetPlayer(tonumber(args[1]))
+    local src = source
+    local targetID = -1
+    if args[1] and tonumber(args[1]) > 0 then targetID = tonumber(args[1]) end
+    if targetID ~= -1 then
+        local Player = GetPlayer(targetID)
         if Player then
             if Config.Framework == 'esx' then
                 MySQL.Async.execute("UPDATE users SET parkvip = ?, parkmax = ? WHERE owner = ?", {0, 0, Player.identifier})
+                Notify(src, Lang:t('info.playerremovedasvip'), "success", 10000)
             elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
                 MySQL.Async.execute("UPDATE players SET parkvip = ?, parkmax = ? WHERE citizenid = ?", {0, 0, Player.PlayerData.citizenid})
+                Notify(src, Lang:t('info.playerremovedasvip'), "success", 10000)
             end
         end
     end
