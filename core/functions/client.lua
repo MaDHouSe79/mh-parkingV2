@@ -65,7 +65,7 @@ function Parking.Functions.DeteteParkedBlip(vehicle)
     end
 end
 
-function Parking.Functions.BlinkVehiclelights(vehicle, state)
+function Parking.Functions.BlinkVehiclelights(vehicle, trailer, state)
     disableControll = true
     local ped = PlayerPedId()
     local model = 'prop_cuff_keys_01'
@@ -92,9 +92,17 @@ function Parking.Functions.BlinkVehiclelights(vehicle, state)
     disableControll = false
     Wait(1000)
     if state then
+        if trailer ~= nil then
+            FreezeEntityPosition(trailer, true)
+            SetEntityInvincible(trailer, true)
+        end
         FreezeEntityPosition(vehicle, true)
         SetEntityInvincible(vehicle, true)
     else
+        if trailer ~= nil then
+            FreezeEntityPosition(trailer, false)
+            SetEntityInvincible(trailer, false)
+        end
         FreezeEntityPosition(vehicle, false)
         SetEntityInvincible(vehicle, false)
     end
@@ -275,7 +283,7 @@ function Parking.Functions.Save(vehicle)
                 end
                 TriggerCallback("mh-parkingV2:server:Save", function(callback)
                     if callback.status then
-                        Parking.Functions.BlinkVehiclelights(vehicle, 2) -- 1 Open 2 Locked
+                        Parking.Functions.BlinkVehiclelights(vehicle, trailer, 2) -- 1 Open 2 Locked
                         Notify(callback.message, "primary", 5000)
                     elseif callback.limit then
                         disableControll = false
@@ -366,6 +374,7 @@ function Parking.Functions.SpawnVehicles(vehicles)
                     local entity = CreateVehicle(vehicles[i].trailerdata.hash, trailerSpawnPos.x, trailerSpawnPos.y, trailerSpawnPos.z, heading, true, true)
                     while not DoesEntityExist(entity) do Wait(500) end
                     SetEntityAsMissionEntity(entity, true, true)
+                    SetTrailerLegsRaised(entity)
                     SetVehicleProperties(entity, vehicles[i].trailerdata.mods)
                     local netid = VehToNet(entity)
                     SetNetworkIdExistsOnAllMachines(netid, true)
@@ -380,11 +389,12 @@ function Parking.Functions.SpawnVehicles(vehicles)
                     SetVehicleOnGroundProperly(entity)
                     SetVehicleDirtLevel(entity, 0)
                     SetTrailerLegsRaised(entity)
-                    Wait(500)
+                    AttachEntityToEntity(GetEntityBoneIndexByName(entity, 'attach_male'), GetEntityBoneIndexByName(vehicle, 'attach_female'), 1, 0.0, -1.0, 0.25, 0.0, 0.0, 0.0, false, false, true, false, 20, true)
+                    Wait(1500)
                     FreezeEntityPosition(entity, true)
                 end
                 Parking.Functions.AddParkedVehicle(vehicle, vehicles[i])
-                Wait(500)
+                Wait(1500)
                 FreezeEntityPosition(vehicle, true)
             end
         end
