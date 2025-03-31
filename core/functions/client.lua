@@ -268,11 +268,9 @@ function Parking.Functions.Save(vehicle)
                         Parking.Functions.BlinkVehiclelights(vehicle, 2) -- 1 Open 2 Locked
                     elseif callback.limit then
                         Notify(callback.message, "error", 5000)
-                        Wait(50)
                         disableControll = false
                     elseif not callback.owner then
                         Notify(callback.message, "error", 5000)
-                        Wait(50)
                         disableControll = false
                     end
                 end, {
@@ -286,10 +284,11 @@ function Parking.Functions.Save(vehicle)
                     location = vector4(vehicleCoords.x, vehicleCoords.y, vehicleCoords.z, vehicleHeading)
                 })
             else
-                Wait(50)
                 disableControll = false
             end
         end
+    else
+        disableControll = false
     end
 end
 
