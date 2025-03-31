@@ -15,10 +15,6 @@ local Translations = {
         ["model"] = "Model: ~b~%{model}~s~",
         ["brand"] = "Brand ~o~%{brand}~s~",
     },
-    target = {
-        ['park_vehicle'] = "Park Voertuig",
-        ['unpark_vehicle'] = "Unpark Voertuig",
-    },
     commands = {
         ['addvip'] = "Parking VIP Toevoegen",
         ['addvip_info'] = "De id can de player die je wilt toevoegen",
