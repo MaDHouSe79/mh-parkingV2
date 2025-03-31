@@ -1,7 +1,7 @@
 fx_version 'cerulean'
 game 'gta5'
 author 'MaDHouSe79'
-description 'MH ParkingV2 - A Realistic Vehicle Parking'
+description 'MH ParkingV2 - A Realistic Vehicle Parking System'
 version '1.0.7'
 repository 'https://github.com/MaDHouSe79/mh-parkingV2'
 shared_scripts {
