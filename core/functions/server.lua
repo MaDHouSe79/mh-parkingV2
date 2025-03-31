@@ -260,8 +260,7 @@ AddCommand("addvip", Lang:t('commands.addvip'), {{ name = 'ID', help = Lang:t('c
 end, 'admin')
 
 AddCommand("removevip", Lang:t('commands.removevip'), {{ name = 'ID', help = Lang:t('commands.removevip_info')}}, true, function(source, args)
-    local src = source
-    local targetID = -1
+    local src, targetID = source, -1
     if args[1] and tonumber(args[1]) > 0 then targetID = tonumber(args[1]) end
     if targetID ~= -1 then
         local Player = GetPlayer(targetID)
