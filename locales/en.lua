@@ -14,6 +14,9 @@ local Translations = {
         ["plate"] = "Plate: ~g~%{plate}~s~",
         ["model"] = "Model: ~b~%{model}~s~",
         ["brand"] = "Brand ~o~%{brand}~s~",
+        ['playeraddasvip'] = "You have been added as vip for the park system",
+        ['isaddedasvip'] = "Player has been added as vip for the park system",
+        ['playerremovedasvip'] = "Player has been removed as vip for the park system",
     },
     commands = {
         ['addvip'] = "Parking Add VIP",
