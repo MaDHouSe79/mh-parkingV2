@@ -31,7 +31,7 @@ end
 function Parking.Functions.AddParkedVehicle(entity, data)
     local blip = nil
     if PlayerData.citizenid == data.citizenid then blip = Parking.Functions.CreateParkedBlip(data) else blip = nil end
-    LocalVehicles[#LocalVehicles + 1] = {citizenid = data.citizenid, fullname = data.fullname, plate = data.plate, model = data.model, blip = blip, location = data.location, entity = entity or nil, fuel = data.fuel, body = data.body, engine = data.engine}
+    LocalVehicles[#LocalVehicles + 1] = {citizenid = data.citizenid, fullname = data.fullname, plate = data.plate, model = data.model, blip = blip, location = data.location, entity = entity or nil, fuel = data.fuel, body = data.body, engine = data.engine, steerangle = data.steerangle}
 end
 
 function Parking.Functions.IsVehicleAlreadyListed(plate)
@@ -246,6 +246,9 @@ function Parking.Functions.Save(vehicle)
             local canSave = true
             local vehicleCoords = GetEntityCoords(vehicle)
             local vehicleHeading = GetEntityHeading(vehicle)
+            local tangle = GetVehicleSteeringAngle(veh)
+            if tangle > 10.0 or tangle < -10.0 then angle = tangle end
+
             while IsPedInAnyVehicle(PlayerPedId(), false) do Wait(100) end
             if config.OnlyAutoParkWhenEngineIsOff and GetIsVehicleEngineRunning(vehicle) then canSave = false end
             if canSave then
@@ -278,7 +281,8 @@ function Parking.Functions.Save(vehicle)
                     body = GetVehicleBodyHealth(vehicle),
                     street = GetStreetName(vehicle),
                     model = GetDisplayNameFromVehicleModel(GetEntityModel(vehicle)),
-                    location = vector4(vehicleCoords.x, vehicleCoords.y, vehicleCoords.z, vehicleHeading)
+                    location = vector4(vehicleCoords.x, vehicleCoords.y, vehicleCoords.z, vehicleHeading),
+                    steerangle = GetVehicleSteeringAngle(vehicle)
                 })
             else
                 disableControll = false
@@ -321,6 +325,7 @@ function Parking.Functions.SpawnVehicles(vehicles)
                 local retval, groundZ = GetGroundZFor_3dCoord(vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z, false)
                 if retval then SetEntityCoords(vehicle, vehicles[i].location.x, vehicles[i].location.y, groundZ) end
                 SetVehicleOnGroundProperly(vehicle)
+                SetVehicleSteeringAngle(vehicle, vehicles[i].steerangle + 0.0)
                 SetEntityInvincible(vehicle, true)
                 SetVehRadioStation(vehicle, 'OFF')
                 SetVehicleDirtLevel(vehicle, 0)
@@ -548,4 +553,22 @@ function Parking.Functions.DisableControll()
     EnableControlAction(0, 249, true)
     EnableControlAction(0, 46, true)
     EnableControlAction(0, 47, true)
+end
+
+function Parking.Functions.CheckVehicleSteeringAngle()
+    local angle = 0.0
+    local speed = 0.0
+    while true do
+        Wait(0)
+        local veh = GetVehiclePedIsUsing(PlayerPedId())
+        if DoesEntityExist(veh) then
+            local tangle = GetVehicleSteeringAngle(veh)
+            if tangle > 10.0 or tangle < -10.0 then angle = tangle end
+            speed = GetEntitySpeed(veh)
+            local vehicle = GetVehiclePedIsIn(PlayerPedId(), true)
+            if speed < 0.1 and DoesEntityExist(vehicle) and not GetIsTaskActive(PlayerPedId(), 151) and not GetIsVehicleEngineRunning(vehicle) then
+                SetVehicleSteeringAngle(GetVehiclePedIsIn(PlayerPedId(), true), angle)
+            end
+        end
+    end
 end
