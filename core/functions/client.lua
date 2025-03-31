@@ -397,7 +397,7 @@ function Parking.Functions.GetInAndOutVehicle()
             isEnteringVehicle = false
             isInVehicle = true
             currentVehicle = GetVehiclePedIsUsing(ped)
-            currentSeat = GetPedVehicleSeat(ped)
+            currentSeat = Parking.Functions.GetPedVehicleSeat(ped)
             local name = GetDisplayNameFromVehicleModel(GetEntityModel(currentVehicle))
             local netId = VehToNet(currentVehicle)
             TriggerServerEvent('mh-parkingV2:server:EnteredVehicle', currentVehicle, currentSeat, name, netId)
