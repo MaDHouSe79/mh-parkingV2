@@ -18,13 +18,9 @@ function GetDistance(pos1, pos2)
 end
 
 function DoesVehicleAlreadyExsist(plate)
-    local vehicles = {}
-    for veh in EnumerateVehicles() do table.insert(vehicles, veh) end
-    if type(vehicles) == 'table' then
-        for i = 1, #vehicles, 1 do
-            if DoesEntityExist(vehicles[i]) then
-                if SamePlates(GetPlate(vehicles[i]), plate) then return true end
-            end
+    for vehicle in EnumerateVehicles() do
+        if DoesEntityExist(vehicle) then
+            if SamePlates(GetPlate(vehicle), plate) then return true end
         end
     end
     return false
