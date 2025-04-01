@@ -17,13 +17,22 @@ function GetDistance(pos1, pos2)
     return #(vector3(pos1.x, pos1.y, pos1.z) - vector3(pos2.x, pos2.y, pos2.z))
 end
 
+function GetPlate(vehicle)
+    if not DoesEntityExist(vehicle) then return nil end
+    return GetVehicleNumberPlateText(vehicle)
+end
+
 function DoesVehicleAlreadyExsist(plate)
+    if not plate then return false, -1 end
     for vehicle in EnumerateVehicles() do
         if DoesEntityExist(vehicle) then
-            if SamePlates(GetPlate(vehicle), plate) then return true end
+            local vehiclePlate = GetVehicleNumberPlateText(vehicle)
+            if vehiclePlate and SamePlates(vehiclePlate, plate) then
+                return true, vehicle
+            end
         end
     end
-    return false
+    return false, -1
 end
 
 entityEnumerator = {
