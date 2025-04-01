@@ -22,10 +22,8 @@ function DoesVehicleAlreadyExsist(plate)
     for veh in EnumerateVehicles() do table.insert(vehicles, veh) end
     if type(vehicles) == 'table' then
         for i = 1, #vehicles, 1 do
-            local vehicle = vehicles[i]
-            if DoesEntityExist(vehicle) then
-                tplate = GetPlate(vehicle)
-                if SamePlates(tplate, plate) then return true end
+            if DoesEntityExist(vehicles[i]) then
+                if SamePlates(GetPlate(vehicles[i]), plate) then return true end
             end
         end
     end
