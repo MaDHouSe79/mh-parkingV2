@@ -48,12 +48,19 @@ function Parking.Functions.AddParkedVehicle(entity, data)
 end
 
 function Parking.Functions.IsVehicleAlreadyListed(plate)
+    local isListed = false
     if #LocalVehicles > 0 then
         for i = 1, #LocalVehicles do
-            if SamePlates(LocalVehicles[i].plate, plate) then return true end
+            if LocalVehicles[i] and LocalVehicles[i].plate ~= nil then
+                if SamePlates(LocalVehicles[i].plate, plate) then
+                    isListed = true
+                    break
+                end
+                isListed = DoesVehicleAlreadyExsistOnServer(LocalVehicles[i].plate)
+            end
         end
     end
-    return false
+    return isListed
 end
 
 function Parking.Functions.DeteteParkedBlip(vehicle)
