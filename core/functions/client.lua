@@ -65,7 +65,7 @@ function Parking.Functions.DeteteParkedBlip(vehicle)
     end
 end
 
-function Parking.Functions.BlinkVehiclelights(vehicle, trailer, state)
+function Parking.Functions.BlinkVehiclelights(vehicle,state)
     disableControll = true
     local ped = PlayerPedId()
     local model = 'prop_cuff_keys_01'
@@ -92,17 +92,9 @@ function Parking.Functions.BlinkVehiclelights(vehicle, trailer, state)
     disableControll = false
     Wait(1000)
     if state then
-        if trailer ~= nil then
-            FreezeEntityPosition(trailer, true)
-            SetEntityInvincible(trailer, true)
-        end
         FreezeEntityPosition(vehicle, true)
         SetEntityInvincible(vehicle, true)
     else
-        if trailer ~= nil then
-            FreezeEntityPosition(trailer, false)
-            SetEntityInvincible(trailer, false)
-        end
         FreezeEntityPosition(vehicle, false)
         SetEntityInvincible(vehicle, false)
     end
@@ -259,7 +251,7 @@ function Parking.Functions.Save(vehicle)
             local canSave = true
             local vehicleCoords = GetEntityCoords(vehicle)
             local vehicleHeading = GetEntityHeading(vehicle)
-            local trailerdata = {}
+            local trailerdata = nil
             local hasTrailer, trailer = GetVehicleTrailerVehicle(vehicle)
             if hasTrailer then
                 local hashkey = GetEntityModel(trailer)
@@ -283,7 +275,7 @@ function Parking.Functions.Save(vehicle)
                 end
                 TriggerCallback("mh-parkingV2:server:Save", function(callback)
                     if callback.status then
-                        Parking.Functions.BlinkVehiclelights(vehicle, trailer, 2) -- 1 Open 2 Locked
+                        Parking.Functions.BlinkVehiclelights(vehicle, 2) -- 1 Open 2 Locked
                         Notify(callback.message, "primary", 5000)
                     elseif callback.limit then
                         disableControll = false
