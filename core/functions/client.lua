@@ -307,38 +307,6 @@ function Parking.Functions.Save(vehicle)
     end
 end
 
-function CreateTrailerTarget(trailer)
-    local netid = NetworkGetNetworkIdFromEntity(trailer)
-    if GetResourceState("qb-target") ~= 'missing' then
-        exports['qb-target']:AddTargetEntity(netid, {
-            options = {{
-                type = "client",
-                icon = 'fas fa-skull-crossbones',
-                label = "Park",
-                action = function(entity)
-                end,
-                canInteract = function(entity, distance, data)
-                    return true
-                end
-            }},
-            distance = 5.0
-        })
-    elseif GetResourceState("ox_target") ~= 'missing' then
-        exports.ox_target:addEntity(netid, {
-            options = {
-                icon = 'fas fa-skull-crossbones',
-                label = "Unpark",
-                onSelect = function(data)
-                end,
-                canInteract = function(data)
-                    return true
-                end,
-                distance = 5.0
-            },
-        })
-    end
-end
-
 function Parking.Functions.SpawnTrailer(vehicle, data)
     local offset, posX, posY = -5.0, 0.0, 0.0
     local heading = GetEntityHeading(vehicle)
@@ -377,7 +345,6 @@ function Parking.Functions.SpawnTrailer(vehicle, data)
     while NetworkIsEntityFading(entity) do Citizen.Wait(50) end
     SetVehicleOnGroundProperly(trailer)
     SetVehicleDirtLevel(trailer, 0)
-    CreateTrailerTarget(trailer)
     Wait(1500)
     if not IsEntityPositionFrozen(trailer) then FreezeEntityPosition(trailer, true) end
     if not IsEntityPositionFrozen(vehicle) then FreezeEntityPosition(vehicle, true) end
