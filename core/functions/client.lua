@@ -47,11 +47,6 @@ function Parking.Functions.AddParkedVehicle(entity, data)
     }
 end
 
-function Parking.Functions.IsVehicleAlreadyListed(plate)
-    local isListed = DoesVehicleAlreadyExsist(plate)
-    return isListed
-end
-
 function Parking.Functions.DeteteParkedBlip(vehicle)
     for k, v in pairs(LocalVehicles) do
         if v.entity == vehicle then
@@ -393,7 +388,8 @@ function Parking.Functions.SpawnVehicles(vehicles)
     while isDeleting do Citizen.Wait(1000) end
     if type(vehicles) == 'table' and #vehicles > 0 and vehicles[1] then
         for i = 1, #vehicles, 1 do
-            if not Parking.Functions.IsVehicleAlreadyListed(vehicles[i].plate) then
+            local isListed, listedVehicle = DoesVehicleAlreadyExsist(vehicles[i].plate)
+            if not isListed and listedVehicle == -1 then
                 local model = GetHashKey(vehicles[i].model)
                 LoadModel(model)
                 Parking.Functions.DeleteLocalVehicle(vehicles[i].plate)
@@ -436,6 +432,8 @@ function Parking.Functions.SpawnVehicles(vehicles)
                 end
                 Wait(50)
                 Parking.Functions.AddParkedVehicle(vehicle, vehicles[i])
+            elseif isListed and listedVehicle ~= -1 then
+                Parking.Functions.AddParkedVehicle(listedVehicle, vehicles[i])
             end
         end
     end
