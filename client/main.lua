@@ -2,7 +2,7 @@
 --[[       MH Realistic Parking V2 Script by MaDHouSe      ]] --
 --[[ ===================================================== ]] --
 AddEventHandler('onResourceStart', function(resource) if resource == GetCurrentResourceName() then PlayerData, isLoggedIn = GetPlayerData(), true TriggerServerEvent('mh-parkingV2:server:OnJoin') Wait(50) TriggerServerEvent("mh-parkingV2:server:LoadVehiclesOnStart") end end)
-AddEventHandler('onResourceStop', function(resource) if resource == GetCurrentResourceName() then  PlayerData, isLoggedIn = {}, false Parking.Functions.DeleteAllDisableParkedBlips() end end)
+AddEventHandler('onResourceStop', function(resource) if resource == GetCurrentResourceName() then PlayerData, isLoggedIn = {}, false Parking.Functions.DeleteAllTrailers() Wait(50) Parking.Functions.DeleteAllDisableParkedBlips() end end)
 RegisterNetEvent(OnPlayerLoaded, function() PlayerData, isLoggedIn = GetPlayerData(), true TriggerServerEvent('mh-parkingV2:server:OnJoin') Wait(50) TriggerServerEvent("mh-parkingV2:server:RefreshVehicles") end)
 RegisterNetEvent(OnPlayerUnload, function() PlayerData, isLoggedIn = {}, false Parking.Functions.DeleteAllDisableParkedBlips() end)
 RegisterNetEvent(OnJobUpdate, function(job) SetJob(job) end)
