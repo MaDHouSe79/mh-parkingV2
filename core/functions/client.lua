@@ -332,15 +332,11 @@ function Parking.Functions.SpawnTrailer(vehicle, data)
     end
     Wait(500)
     LoadModel(data.trailerdata.hash)
-    local trailer = CreateVehicle(data.trailerdata.hash, trailerSpawnPos.x, trailerSpawnPos.y, vehicleCoords.z, heading, true, true)
+    local trailer = CreateVehicle(data.trailerdata.hash, trailerSpawnPos.x, trailerSpawnPos.y, vehicleCoords.z, heading, true)
     while not DoesEntityExist(trailer) do Wait(500) end
     SetEntityAsMissionEntity(trailer, true, true)
     SetTrailerLegsRaised(trailer)
     SetVehicleProperties(trailer, data.trailerdata.mods)
-    local netid = VehToNet(trailer)
-    SetNetworkIdExistsOnAllMachines(netid, true)
-    NetworkSetNetworkIdDynamic(netid, false)
-    SetNetworkIdCanMigrate(netid, true)
     NetworkFadeInEntity(entity, true)
     while NetworkIsEntityFading(entity) do Citizen.Wait(50) end
     SetVehicleOnGroundProperly(trailer)
@@ -368,15 +364,11 @@ function Parking.Functions.SpawnVehicles(vehicles)
                     end
                 end
                 Wait(500)
-                local vehicle = CreateVehicle(model, vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z, vehicles[i].location.w, true, true)
+                local vehicle = CreateVehicle(model, vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z, vehicles[i].location.w, true)
                 while not DoesEntityExist(vehicle) do Citizen.Wait(500) end
                 SetEntityAsMissionEntity(vehicle, true, true)
                 SetVehicleProperties(vehicle, vehicles[i].mods)
                 SetModelAsNoLongerNeeded(model)
-                local netid = VehToNet(vehicle)
-                SetNetworkIdExistsOnAllMachines(netid, true)
-                NetworkSetNetworkIdDynamic(netid, false)
-                SetNetworkIdCanMigrate(netid, true)
                 NetworkFadeInEntity(vehicle, true)
                 while NetworkIsEntityFading(vehicle) do Citizen.Wait(50) end
                 RequestCollisionAtCoord(vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z)
