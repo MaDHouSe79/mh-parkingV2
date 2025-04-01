@@ -212,20 +212,29 @@ function Parking.Functions.LeftVehicle(src, currentSeat, netId)
 end
 
 local fistjoin = true
+triggerede = false
 function Parking.Functions.RefreshVehicles(src, onStart)
+    --print('---------- REFRESH VEHICLES ----------')
     if onStart then
+        --print('onStart')
         if fistjoin then
+            --print('fistjoin'..src)
             fistjoin = false
             GetSinglePlayerId()
         end
     elseif not onStart then
+        --print('not onStart')
         if fistjoin then
+            --print('fistjoin'..src)
             fistjoin = false
             playerId = src
         end
     end
     Wait(50)
+    if triggerede then return end
     if playerId ~= -1 then
+        --print(playerId..'spawned')
+        triggerede = true
         local vehicles = CreateVehicleList()
         Wait(50)
         TriggerClientEvent("mh-parkingV2:client:RefreshVehicles", playerId, vehicles)
