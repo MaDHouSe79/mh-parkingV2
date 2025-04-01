@@ -97,9 +97,7 @@ function Parking.Functions.Save(src, data)
                     if type(result2) == 'table' and #result2 > 0 then
                         return { status = false, message = Lang:t('info.already_parked') }
                     else
-                        local citizenid, fullname, owned = nil, nil, nil
-                        local trailerdata = nil
-                        print(data.trailerdata)
+                        local citizenid, fullname, owned, trailerdata = nil, nil, nil, nil
                         if data.trailerdata ~= nil then trailerdata = json.encode(data.trailerdata) end
                         if SV_Config.Framework == 'esx' then
                             citizenid, fullname = Player.identifier, Player.name
