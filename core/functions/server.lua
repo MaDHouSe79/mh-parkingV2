@@ -218,7 +218,7 @@ function Parking.Functions.RefreshVehicles(src, onStart)
             fistjoin = false
             GetSinglePlayerId()
         end
-    elseif not onStart then
+    else
         if fistjoin then
             fistjoin = false
             playerId = src
