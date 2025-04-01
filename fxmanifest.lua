@@ -2,8 +2,9 @@ fx_version 'cerulean'
 game 'gta5'
 author 'MaDHouSe79'
 description 'MH ParkingV2 - A Realistic Vehicle Parking System'
-version '1.0.12'
+version '1.0.11'
 repository 'https://github.com/MaDHouSe79/mh-parkingV2'
+
 shared_scripts {
     '@ox_lib/init.lua',
     'shared/locale.lua',

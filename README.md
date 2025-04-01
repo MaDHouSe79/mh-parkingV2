@@ -54,10 +54,6 @@
 - `/addvip [id] [amount]` Add a player as vip (admin only)
 - `/removevip [id]` Remove a vip player (admin only)
 
-# park with trailers
-- You can park with trailers see sv_config for more info.
-- The vehicle spawns in with a trailer when you park this vehicle with a trailer attached. 
-  
 # Save front wheels angle
 - Before you press `F` press the keys `A` or `D` to turn your wheels and it will save that angle on your parked vehicle.
 
@@ -66,10 +62,6 @@
 
 # Screenshots
 ![alttext](https://github.com/MaDHouSe79/mh-parkingV2/blob/main/screenshots/parked.png)
-![alttext](https://github.com/MaDHouSe79/mh-parkingV2/blob/main/screenshots/trailer1.png)
-![alttext](https://github.com/MaDHouSe79/mh-parkingV2/blob/main/screenshots/trailer2.png)
-![alttext](https://github.com/MaDHouSe79/mh-parkingV2/blob/main/screenshots/trailer3.png)
-![alttext](https://github.com/MaDHouSe79/mh-parkingV2/blob/main/screenshots/trailer4.png)
 
 # LICENSE
 [GPL LICENSE](./LICENSE)<br />

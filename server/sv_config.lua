@@ -20,7 +20,7 @@ SV_Config.FuelScript = 'LegacyFuel'           -- Default is LegacyFuel, if you u
 ----------------------------------------------------------------------------
 -- Notify Script
 SV_Config.DisableParkNotify = false           -- Default true, if false you get many notifications when you enter or leave the vehicle, all other notify massages are stil enable.
-SV_Config.NotifyScript = "qb"                 -- Default qb, you can use (qb, ox_lib, k5_notify, okokNotify, Roda_Notifications)
+SV_Config.NotifyScript = "ox_lib"             -- Default qb, you can use (qb, ox_lib, k5_notify, okokNotify, Roda_Notifications)
 ----------------------------------------------------------------------------
 SV_Config.OnlyAutoParkWhenEngineIsOff = true  -- Default true, if true auto park only when vehicle engine is off.
 ----------------------------------------------------------------------------
@@ -32,7 +32,7 @@ SV_Config.ParkedViewDistance = 100            -- Default 100 if your distance is
 SV_Config.UseParkedBlips = true               -- if true players can see a blip of the parked vehicle on the map
 ----------------------------------------------------------------------------
 -- VIP Access
-SV_Config.UseAsVip = false                    -- if true `SV_Config.Maxparking` does not work on vip players and you need to add a amount per player.
+SV_Config.UseAsVip = true                     -- if true `SV_Config.Maxparking` does not work on vip players and you need to add a amount per player.
 SV_Config.Maxparking = 1                      -- Default 1, this is max parked allowed per player, don't go to high with this...
 ----------------------------------------------------------------------------
 SV_Config.UseVehicleOwnerText = true          -- If true show the owner and vehicle text above vehicles when parked.
@@ -78,7 +78,6 @@ SV_Config.NoParkingLocations = {
     {coords = vector3(2339.808, 3042.183, 47.3141), radius = 10.0, color = 1, sprite = 163, job = 'scraptard'},    -- scraptard pos 4 (outside) (right)
     -- you can add more locations here.
 }
-
 ---------------------------------------Parking lots-------------------------------------
 -- Parking lots
 -- If false players can park anyware, if true they can park only on parkinglots.
@@ -105,8 +104,7 @@ SV_Config.AllowedParkingLots = {
     {coords = vector3(1183.6377, -1550.7142, 34.1825), radius = 20.0, color = 2, sprite = 237}, -- parkinglot 16
     {coords = vector3(131.8025, -712.3470, 32.4903), radius = 50.0, color = 2, sprite = 237},   -- parkinglot 17
 }
-----------------------------------------------------------------------------
--- Trailer list.
+
 SV_Config.Trailers = {
     [712162987] = {model = "trailersmall", name = "trailersmall", offset = {backwards = -5.80, posX = -0.85, posY = 1.0, heading = 70.20} },
     [524108981] = {model = "boattrailer", name = "boattrailer", offset = {backwards = -7.25, posX = -1.23, posY = 0.9, heading = 35.25} },
@@ -120,6 +118,7 @@ SV_Config.Trailers = {
     [2091594960] = {model = "tr4", name = "tr4", offset = {backwards = -7.8, posX = 0.0, posY = 0.0, rotX = 0.0, rotY = 0.0}},
 }
 
+----------------------------------------------------------------------------
 -- Vehicle list, you can add more if the vehicle does not exist in this list.
 SV_Config.Vehicles = {
     [437538602] = { model = "speeder2", name = "Speeder Yacht", brand = "Pegassi", category = "boats" },

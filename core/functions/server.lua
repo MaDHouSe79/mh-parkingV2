@@ -214,18 +214,18 @@ end
 local fistjoin = true
 triggerede = false
 function Parking.Functions.RefreshVehicles(src, onStart)
-    --print('---------- REFRESH VEHICLES ----------')
+    print('---------- REFRESH VEHICLES ----------')
     if onStart then
-        --print('onStart')
+        print('onStart')
         if fistjoin then
-            --print('fistjoin'..src)
+            print('fistjoin'..src)
             fistjoin = false
             GetSinglePlayerId()
         end
     elseif not onStart then
-        --print('not onStart')
+        print('not onStart')
         if fistjoin then
-            --print('fistjoin'..src)
+            print('fistjoin'..src)
             fistjoin = false
             playerId = src
         end
@@ -233,7 +233,7 @@ function Parking.Functions.RefreshVehicles(src, onStart)
     Wait(50)
     if triggerede then return end
     if playerId ~= -1 then
-        --print(playerId..'spawned')
+        print(playerId..'spawned')
         triggerede = true
         local vehicles = CreateVehicleList()
         Wait(50)
