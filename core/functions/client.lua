@@ -256,7 +256,7 @@ function Parking.Functions.Save(vehicle)
             if hasTrailer then
                 local hashkey = GetEntityModel(trailer)
                 local trailerProps = GetVehicleProperties(trailer)
-                if config.Trailers[hashkey] and not config.Trailers[hashkey].iqnore then
+                if config.Trailers[hashkey] then
                     trailerdata = {hash = hashkey, coords = GetEntityCoords(trailer), heading = GetEntityHeading(trailer), mods = trailerProps}
                 end
             end
@@ -307,6 +307,84 @@ function Parking.Functions.Save(vehicle)
     end
 end
 
+function CreateTrailerTarget(trailer)
+    local netid = NetworkGetNetworkIdFromEntity(trailer)
+    if GetResourceState("qb-target") ~= 'missing' then
+        exports['qb-target']:AddTargetEntity(netid, {
+            options = {{
+                type = "client",
+                icon = 'fas fa-skull-crossbones',
+                label = "Park",
+                action = function(entity)
+                end,
+                canInteract = function(entity, distance, data)
+                    return true
+                end
+            }},
+            distance = 5.0
+        })
+    elseif GetResourceState("ox_target") ~= 'missing' then
+        exports.ox_target:addEntity(netid, {
+            options = {
+                icon = 'fas fa-skull-crossbones',
+                label = "Unpark",
+                onSelect = function(data)
+                end,
+                canInteract = function(data)
+                    return true
+                end,
+                distance = 5.0
+            },
+        })
+    end
+end
+
+function Parking.Functions.SpawnTrailer(vehicle, data)
+    local offset, posX, posY = -5.0, 0.0, 0.0
+    local heading = GetEntityHeading(vehicle)
+    local vehicleCoords = GetEntityCoords(vehicle)
+    if config.Trailers[data.trailerdata.hash] then
+        if config.Trailers[data.trailerdata.hash].offset ~= nil then
+            offset = config.Trailers[data.trailerdata.hash].offset.backwards
+            if config.Trailers[data.trailerdata.hash].offset.heading ~= nil then
+                heading -= config.Trailers[data.trailerdata.hash].offset.heading
+                posX -= config.Trailers[data.trailerdata.hash].offset.posX
+                posY -= config.Trailers[data.trailerdata.hash].offset.posY
+            end
+        end
+    end
+    local trailerSpawnPos = GetOffsetFromEntityInWorldCoords(vehicle, posX, offset, 0.5)
+    local closestVehicle, closestDistance = GetClosestVehicle(trailerSpawnPos)
+    if closestVehicle ~= -1 and closestDistance <= 1.5 then
+        DeleteEntity(closestVehicle)
+        while DoesEntityExist(closestVehicle) do
+            DeleteEntity(closestVehicle)
+            Wait(50)
+        end
+    end
+    Wait(500)
+    LoadModel(data.trailerdata.hash)
+    local trailer = CreateVehicle(data.trailerdata.hash, trailerSpawnPos.x, trailerSpawnPos.y, vehicleCoords.z, heading, true, true)
+    while not DoesEntityExist(trailer) do Wait(500) end
+    SetEntityAsMissionEntity(trailer, true, true)
+    SetTrailerLegsRaised(trailer)
+    SetVehicleProperties(trailer, data.trailerdata.mods)
+    local netid = VehToNet(trailer)
+    SetNetworkIdExistsOnAllMachines(netid, true)
+    NetworkSetNetworkIdDynamic(netid, false)
+    SetNetworkIdCanMigrate(netid, true)
+    NetworkFadeInEntity(entity, true)
+    while NetworkIsEntityFading(entity) do Citizen.Wait(50) end
+    --local retval, groundZ = GetGroundZFor_3dCoord(trailerSpawnPos.x, trailerSpawnPos.y, vehicleCoords.z, false)
+    --if retval then SetEntityCoords(trailer, trailerSpawnPos.x, trailerSpawnPos.y, groundZ) end
+    SetVehicleOnGroundProperly(trailer)
+    SetVehicleDirtLevel(trailer, 0)
+    CreateTrailerTarget(trailer)
+    Wait(1500)
+    --if not IsEntityPositionFrozen(trailer) then FreezeEntityPosition(trailer, true) end
+    --if not IsEntityPositionFrozen(vehicle) then FreezeEntityPosition(vehicle, true) end
+end
+
 function Parking.Functions.SpawnVehicles(vehicles)
     while isDeleting do Citizen.Wait(1000) end
     if type(vehicles) == 'table' and #vehicles > 0 and vehicles[1] then
@@ -316,10 +394,13 @@ function Parking.Functions.SpawnVehicles(vehicles)
                 LoadModel(model)
                 Parking.Functions.DeleteLocalVehicle(vehicles[i].plate)
                 local closestVehicle, closestDistance = GetClosestVehicle(vehicles[i].location)
-                if closestVehicle ~= -1 and closestDistance <= 0.5 then
-                    DeleteEntity(closestVehicle)
-                    while DoesEntityExist(closestVehicle) do Citizen.Wait(50) end
+                if closestVehicle ~= -1 and closestDistance <= 5.0 then
+                    while DoesEntityExist(closestVehicle) do
+                        DeleteEntity(closestVehicle)
+                        Wait(50)
+                    end
                 end
+                Wait(500)
                 local vehicle = CreateVehicle(model, vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z, vehicles[i].location.w, true, true)
                 while not DoesEntityExist(vehicle) do Citizen.Wait(500) end
                 SetEntityAsMissionEntity(vehicle, true, true)
@@ -344,50 +425,12 @@ function Parking.Functions.SpawnVehicles(vehicles)
                 TriggerServerEvent('mh-parkingV2:server:SetVehLockState', VehToNet(vehicle), 2)
                 SetVehicleDoorsLocked(vehicle, 2)
                 if GetResourceState(config.FuelScript) ~= 'missing' then exports[config.FuelScript]:SetFuel(vehicle, vehicles[i].fuel) end
-
-                if vehicles[i].trailerdata ~= nil then
-                    local trailerHeading = vehicles[i].trailerdata.heading
-                    local offset = -5.0
-                    local heading = trailerHeading
-                    if config.Trailers[vehicles[i].trailerdata.hash] then
-                        offset = -config.Trailers[vehicles[i].trailerdata.hash].offset
-                        if config.Trailers[vehicles[i].trailerdata.hash].heading ~= nil then
-                            heading -= config.Trailers[vehicles[i].trailerdata.hash].heading
-                        end
-                    end
-                    local trailerSpawnPos = GetOffsetFromEntityInWorldCoords(vehicle, 0.0, offset, 0.0)
-                    local closestVehicle, closestDistance = GetClosestVehicle(trailerSpawnPos)
-                    if closestVehicle ~= -1 and closestDistance <= 0.5 then
-                        DeleteEntity(closestVehicle)
-                        while DoesEntityExist(closestVehicle) do Citizen.Wait(50) end
-                    end
-                    Wait(50)
-                    LoadModel(vehicles[i].trailerdata.hash)
-                    local entity = CreateVehicle(vehicles[i].trailerdata.hash, trailerSpawnPos.x, trailerSpawnPos.y, trailerSpawnPos.z, heading, true, true)
-                    while not DoesEntityExist(entity) do Wait(500) end
-                    SetEntityAsMissionEntity(entity, true, true)
-                    SetTrailerLegsRaised(entity)
-                    SetVehicleProperties(entity, vehicles[i].trailerdata.mods)
-                    local netid = VehToNet(entity)
-                    SetNetworkIdExistsOnAllMachines(netid, true)
-                    NetworkSetNetworkIdDynamic(netid, false)
-                    SetNetworkIdCanMigrate(netid, true)
-                    NetworkFadeInEntity(entity, true)
-                    while NetworkIsEntityFading(entity) do Citizen.Wait(50) end
-                    vehicles[i].trailerEntity = entity
-                    SetEntityHeading(entity, heading)
-                    local retval, groundZ = GetGroundZFor_3dCoord(trailerSpawnPos.x, trailerSpawnPos.y, trailerSpawnPos.z, false)
-                    if retval then SetEntityCoords(entity, trailerSpawnPos.x, trailerSpawnPos.y, groundZ) end
-                    SetVehicleOnGroundProperly(entity)
-                    SetVehicleDirtLevel(entity, 0)
-                    SetTrailerLegsRaised(entity)
-                    AttachEntityToEntity(GetEntityBoneIndexByName(entity, 'attach_male'), GetEntityBoneIndexByName(vehicle, 'attach_female'), 1, 0.0, -1.0, 0.25, 0.0, 0.0, 0.0, false, false, true, false, 20, true)
-                    Wait(1500)
-                    FreezeEntityPosition(entity, true)
-                end
                 Parking.Functions.AddParkedVehicle(vehicle, vehicles[i])
-                Wait(1500)
-                FreezeEntityPosition(vehicle, true)
+                if vehicles[i].trailerdata ~= nil then 
+                    Parking.Functions.SpawnTrailer(vehicle, vehicles[i])
+                else
+                    if not IsEntityPositionFrozen(vehicle) then FreezeEntityPosition(vehicle, true) end
+                end
             end
         end
     end
@@ -625,7 +668,7 @@ function Parking.Functions.CheckVehicleSteeringAngle()
                 SetVehicleSteeringAngle(vehicle, angle)
             end
             local hasTrailer, trailer = GetVehicleTrailerVehicle(vehicle)
-            if hasTrailer then FreezeEntityPosition(trailer, false) end
+            if hasTrailer and IsEntityPositionFrozen(trailer) then FreezeEntityPosition(trailer, false) end
         end
     end
 end
