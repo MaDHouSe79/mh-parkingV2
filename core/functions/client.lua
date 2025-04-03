@@ -26,11 +26,6 @@ function Parking.Functions.CreateTargetEntityMenu(entity)
                 event = "mh-parkingV2:client:Unparking",
                 icon = "fas fa-car",
                 label = "Unpark Vehicle"
-            }, {
-                type = "client",
-                event = "mh-parkingV2:client:Parking",
-                icon = "fas fa-car",
-                label = "Park Vehicle"
             }
         },
         distance = Config.InteractDistance
