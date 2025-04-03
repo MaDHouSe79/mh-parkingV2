@@ -79,6 +79,7 @@ function DoVehicleDamage(vehicle, body, engine)
     end
     SetVehicleEngineHealth(vehicle, engine)
     SetVehicleBodyHealth(vehicle, body)
+    SetVehiclePetrolTankHealth(vehicle, 1000.0)
 end
 
 function GetVehicleProperties(vehicle)

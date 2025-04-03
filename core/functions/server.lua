@@ -47,7 +47,7 @@ function Parking.Functions.RefreshVehicles(src)
 			end
 		end
 	end
-	TriggerClientEvent("mh-parkingV2:client:refreshVehicles", src, vehicles)
+	TriggerClientEvent("mh-parkingV2:client:RefreshVehicles", src, vehicles)
 end
 
 function Parking.Functions.IfPlayerIsVIPGetMaxParking(src)
@@ -106,7 +106,7 @@ function Parking.Functions.Save(src, data)
 				MySQL.Async.execute('UPDATE player_vehicles SET state = ?, location = ?, street = ?, trailerdata = ?, steerangle = ?, engine = ?, fuel = ?, body = ? WHERE plate = ? AND citizenid = ?',{3, location, data.street, trailerdata, data.steerangle, data.engine, data.fuel, data.body, plate, citizenid})
 			end
 			Wait(100)
-			TriggerClientEvent("mh-parkingV2:client:addVehicle", -1, {vehicle = result.vehicle, plate = plate, owner = citizenid, fullname = fullname, location = data.location, mods = data.mods, trailerdata = data.trailerdata, steerangle = data.steerangle, street = data.street, engine = data.engine, fuel = data.fuel, body = data.body}, src)
+			TriggerClientEvent("mh-parkingV2:client:AddVehicle", -1, {vehicle = result.vehicle, plate = plate, owner = citizenid, fullname = fullname, location = data.location, mods = data.mods, trailerdata = data.trailerdata, steerangle = data.steerangle, street = data.street, engine = data.engine, fuel = data.fuel, body = data.body}, src)
 			return { status = true, message = "car saved" }
 		end
 	end
@@ -130,7 +130,7 @@ function Parking.Functions.Drive(src, data)
 			MySQL.Async.execute('UPDATE player_vehicles SET state = ?, location = ? WHERE plate = ?', { 0, nil, plate })
 		end
 		Wait(50)
-		TriggerClientEvent("mh-parkingV2:client:deleteVehicle", -1, { plate = plate })
+		TriggerClientEvent("mh-parkingV2:client:DeleteVehicle", -1, { plate = plate })
 		return {status = true, message = "success", vehicle = result.vehicle, mods = mods, location = location, fuel = result.fuel, body = result.body, engine = result.engine}
 	else
 		return {status = false, message = "not parked"}

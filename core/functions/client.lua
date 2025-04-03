@@ -23,12 +23,12 @@ function Parking.Functions.CreateTargetEntityMenu(entity)
             {
                 name = "car",
                 type = "client",
-                event = "mh-parkingV2:client:unparking",
+                event = "mh-parkingV2:client:Unparking",
                 icon = "fas fa-car",
                 label = "Unpark Vehicle"
             }, {
                 type = "client",
-                event = "mh-parkingV2:client:parking",
+                event = "mh-parkingV2:client:Parking",
                 icon = "fas fa-car",
                 label = "Park Vehicle"
             }
@@ -257,7 +257,7 @@ function Parking.Functions.DeleteAllVehicles()
 end
 
 function Parking.Functions.Drive(vehicle)
-	TriggerCallback("mh-parkingV2:server:driveCar", function(callback)
+	TriggerCallback("mh-parkingV2:server:DriveCar", function(callback)
 		if callback.status then
 			SetEntityVisible(PlayerPedId(), false, 0)
 			DeleteVehicle(vehicle.entity)
@@ -329,9 +329,9 @@ function Parking.Functions.Save(vehicle)
 				end
 			end
 			TaskLeaveVehicle(PlayerPedId(), vehicle, 1)
-			Wait(3000)
+			Wait(2500)
 			Parking.Functions.BlinkVehiclelights(vehicle, true)
-			TriggerCallback("mh-parkingV2:server:saveCar", function(callback)
+			TriggerCallback("mh-parkingV2:server:SaveCar", function(callback)
 				if callback.status then
 					DeleteVehicle(vehicle)
 					TriggerServerEvent('mh-parkingV2:server:CreateOwnerVehicleBlip', vehPlate)
@@ -339,9 +339,7 @@ function Parking.Functions.Save(vehicle)
 				else
 					DisplayHelpText(callback.message)
 				end
-				Wait(1000)
 			end, {
-				trailerdata = trailerdata,
 				mods = GetVehicleProperties(vehicle),
 				fuel = exports[Config.FuelScript]:GetFuel(vehicle),
 				engine = GetVehicleEngineHealth(vehicle),
@@ -349,6 +347,7 @@ function Parking.Functions.Save(vehicle)
 				street = GetStreetName(vehicle),
 				steerangle = GetVehicleSteeringAngle(vehicle),
 				location = {x = vehPos.x, y = vehPos.y, z = vehPos.z, h = vehHead},
+				trailerdata = trailerdata,
 			})
 		end
 	end
@@ -413,8 +412,10 @@ function Parking.Functions.SpawnTrailer(vehicle, data)
     Parking.Functions.DeleteVehicleAtcoords(coords)
     Wait(500)
     LoadModel(data.trailerdata.hash)
+	Wait(50)
     local tempVeh = CreateVehicle(data.trailerdata.hash, trailerSpawnPos.x, trailerSpawnPos.y, vehicleCoords.z, heading, true)
     while not DoesEntityExist(tempVeh) do Wait(500) end
+
     SetEntityAsMissionEntity(tempVeh, true, true)
 	local plate = GetPlate(vehicle)
 	SetVehicleNumberPlateText(tempVeh, plate.."1")
@@ -455,16 +456,16 @@ function Parking.Functions.SpawnVehicles(vehicles)
 		Parking.Functions.LockDoors(tempVeh, vehicles[i])
 		NetworkFadeInEntity(tempVeh, true)
 		while NetworkIsEntityFading(tempVeh) do Citizen.Wait(50) end
-		Parking.Functions.SetVehicleOnTheGround(tempVeh, vehicles[i])
-		Wait(100)
 		if vehicles[i].trailerdata ~= nil then
 			vehicles[i].trailerEntity = Parking.Functions.SpawnTrailer(tempVeh, vehicles[i])
 		else
 			if not IsEntityPositionFrozen(tempVeh) then FreezeEntityPosition(tempVeh, true) end
 		end
+
 		Wait(50)
 		Parking.Functions.AddToTable(tempVeh, vehicles[i])
 		Wait(50)
+		Parking.Functions.SetVehicleOnTheGround(tempVeh, vehicles[i])
 		SetVehicleSteeringAngle(tempVeh, vehicles[i].steerangle + 0.0)
 		if PlayerData.citizenid == vehicles[i].owner then
 			Parking.Functions.CreateTargetEntityMenu(tempVeh)
@@ -489,16 +490,14 @@ function Parking.Functions.SpawnVehicle(vehicleData)
 	SetVehicleOnGroundProperly(tempVeh)
 	SetModelAsNoLongerNeeded(vehicleData.mods["model"])
 	SetEntityInvincible(tempVeh, true)
-	SetVehicleLivery(tempVeh, vehicleData.mods.livery)
 	DoVehicleDamage(tempVeh, vehicleData.body, vehicleData.engine)
 	exports[Config.FuelScript]:SetFuel(tempVeh, vehicleData.fuel)
+	SetVehicleLivery(tempVeh, vehicleData.mods.livery)
 	SetVehRadioStation(tempVeh, 'OFF')
 	SetVehicleDirtLevel(tempVeh, 0)
 	Parking.Functions.LockDoors(tempVeh, vehicleData)
 	NetworkFadeInEntity(tempVeh, true)
 	while NetworkIsEntityFading(tempVeh) do Citizen.Wait(50) end
-	Parking.Functions.SetVehicleOnTheGround(tempVeh, vehicleData)
-	Wait(100)
 	if vehicleData.trailerdata ~= nil then
 		vehicleData.trailerEntity = Parking.Functions.SpawnTrailer(tempVeh, vehicleData)
 	else
@@ -507,6 +506,7 @@ function Parking.Functions.SpawnVehicle(vehicleData)
 	Wait(50)
 	Parking.Functions.AddToTable(tempVeh, vehicleData)
 	Wait(50)
+	Parking.Functions.SetVehicleOnTheGround(tempVeh, vehicleData)
 	SetVehicleSteeringAngle(tempVeh, vehicleData.steerangle + 0.0)
 	if PlayerData.citizenid == vehicleData.owner then
 		Parking.Functions.CreateTargetEntityMenu(tempVeh)
@@ -523,7 +523,7 @@ function Parking.Functions.SpawnVehicleChecker()
 				if not SpawnedVehicles then
 					Parking.Functions.RemoveVehicles(GlobalVehicles)
 					while DeletingEntities do Wait(100) end
-					TriggerServerEvent("mh-parkingV2:server:refreshVehicles")
+					TriggerServerEvent("mh-parkingV2:server:RefreshVehicles")
 					SpawnedVehicles = true
 					Wait(2000)
 				end

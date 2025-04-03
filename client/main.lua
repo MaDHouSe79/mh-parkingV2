@@ -1,18 +1,17 @@
 --[[ ===================================================== ]] --
 --[[          MH Realistic Parking V2 by MaDHouSe79        ]] --
 --[[ ===================================================== ]] --
-LocalVehicles, GlobalVehicles, isLoggedIn, SpawnedVehicles, DeletingEntities, displayOwnerText = {}, {}, {}, false, false, false
+LocalVehicles, GlobalVehicles, isLoggedIn, SpawnedVehicles, DeletingEntities, displayOwnerText = {}, {}, {}, false, false, Config.UseVehicleOwnerText
 AddEventHandler('onResourceStop', function(resource) Parking.Functions.DeleteAllVehicles() PlayerData = {} isLoggedIn = false end)
-AddEventHandler('onResourceStart', function(resource) if resource == GetCurrentResourceName() then TriggerServerEvent('mh-parkingV2:server:onjoin') end end)
-RegisterNetEvent(OnPlayerLoaded, function()	TriggerServerEvent('mh-parkingV2:server:onjoin') end)
-RegisterNetEvent(OnPlayerUnload, function()	Parking.Functions.DeleteAllVehicles() PlayerData = {} isLoggedIn = false end)
-RegisterNetEvent("mh-parkingV2:client:onjoin", function(data) config = data PlayerData = GetPlayerData() isLoggedIn = true displayOwnerText = Config.UseVehicleOwnerText end)
-RegisterNetEvent("mh-parkingV2:client:refreshVehicles", function(vehicles) Parking.Functions.RefreshVehicles(vehicles) end)
-RegisterNetEvent("mh-parkingV2:client:addVehicle", function(vehicle, playerId) Parking.Functions.AddVehicle(vehicle, playerId) end)
-RegisterNetEvent("mh-parkingV2:client:deleteVehicle", function(vehicle) Parking.Functions.DeleteLocalVehicle(vehicle) end)
+AddEventHandler('onResourceStart', function(resource) if resource == GetCurrentResourceName() then PlayerData = GetPlayerData() isLoggedIn = true end end)
+RegisterNetEvent(OnPlayerLoaded, function()	PlayerData = GetPlayerData() isLoggedIn = true end)
+RegisterNetEvent(OnPlayerUnload, function()	Parking.Functions.DeleteAllVehicles() PlayerData = {} isLoggedIn = false displayOwnerText = false end)
+RegisterNetEvent("mh-parkingV2:client:RefreshVehicles", function(vehicles) Parking.Functions.RefreshVehicles(vehicles) end)
+RegisterNetEvent("mh-parkingV2:client:AddVehicle", function(vehicle, playerId) Parking.Functions.AddVehicle(vehicle, playerId) end)
+RegisterNetEvent("mh-parkingV2:client:DeleteVehicle", function(vehicle) Parking.Functions.DeleteLocalVehicle(vehicle) end)
 RegisterNetEvent("mh-parkingV2:client:CreateOwnerVehicleBlip", function(data) Parking.Functions.CreateOwnerVehicleBlip(data) end)
-RegisterNetEvent("mh-parkingV2:client:unparking", function() Parking.Functions.TargetDrive() end)
-RegisterNetEvent("mh-parkingV2:client:parking", function() Parking.Functions.TargetPark() end)
+RegisterNetEvent("mh-parkingV2:client:Unparking", function() Parking.Functions.TargetDrive() end)
+RegisterNetEvent("mh-parkingV2:client:Parking", function() Parking.Functions.TargetPark() end)
 RegisterNetEvent('mh-parkingV2:client:GetVehicleMenu', function() Parking.Functions.GetVehicleMenu() end)
 RegisterCommand('toggleparktext', function() displayOwnerText = not displayOwnerText end, false)
 RegisterCommand('parkmenu', function() TriggerEvent('mh-parkingV2:client:GetVehicleMenu') end, false)
