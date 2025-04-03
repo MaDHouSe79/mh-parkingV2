@@ -431,6 +431,7 @@ function Parking.Functions.SpawnTrailer(vehicle, data)
 end
 
 function Parking.Functions.SpawnVehicles(vehicles)
+	while not isLoggedIn do Citizen.Wait(1000) end
 	while DeletingEntities do Citizen.Wait(100) end
 	for i = 1, #vehicles, 1 do
 		Parking.Functions.DeleteLocalVehicle(vehicles[i].vehicle)
@@ -474,6 +475,7 @@ function Parking.Functions.SpawnVehicles(vehicles)
 end
 
 function Parking.Functions.SpawnVehicle(vehicleData)
+	while not isLoggedIn do Citizen.Wait(1000) end
 	while DeletingEntities do Citizen.Wait(100) end
 	Parking.Functions.DeleteLocalVehicle(vehicleData.vehicle)
 	Parking.Functions.DeleteNearVehicle(vec3(vehicleData.location.x, vehicleData.location.y, vehicleData.location.z))
