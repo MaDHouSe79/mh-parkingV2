@@ -25,7 +25,7 @@ function Parking.Functions.CreateTargetEntityMenu(entity)
                 type = "client",
                 event = "mh-parkingV2:client:Unparking",
                 icon = "fas fa-car",
-                label = "Unpark Vehicle"
+                label = "Unpark Vehicle",
             }
         },
         distance = Config.InteractDistance
@@ -338,6 +338,7 @@ function Parking.Functions.Save(vehicle)
 					DeleteVehicle(vehicle)
 					DisplayHelpText(callback.message)
 				else
+					FreezeEntityPosition(vehicle, false)
 					DisplayHelpText(callback.message)
 				end
 			end, {
@@ -425,7 +426,7 @@ function Parking.Functions.SpawnTrailer(vehicle, data)
 		while NetworkIsEntityFading(tempVeh) do Citizen.Wait(50) end
 		Wait(2000)
 		if not IsEntityPositionFrozen(tempVeh) then FreezeEntityPosition(tempVeh, true) end
-		if not IsEntityPositionFrozen(vehicle) then FreezeEntityPosition(vehicle, true) end
+		--if not IsEntityPositionFrozen(vehicle) then FreezeEntityPosition(vehicle, true) end
 	end
     return tempVeh
 end
@@ -460,36 +461,11 @@ function Parking.Functions.SpawnVehicles(vehicles)
 		if Config.ParkVehiclesWithTrailers then
 			if vehicles[i].trailerdata ~= nil then
 				vehicles[i].trailerEntity = Parking.Functions.SpawnTrailer(tempVeh, vehicles[i])
-			else
-				if not IsEntityPositionFrozen(tempVeh) then FreezeEntityPosition(tempVeh, true) end
 			end
 		end
 		Wait(50)
 		Parking.Functions.AddToTable(tempVeh, vehicles[i])
 		Wait(50)
-
-		if Config.ParkVehiclesWithTrailers then
-			local vehiclebone = -1
-			if GetEntityBoneIndexByName(vehicle, 'attach_female') ~= -1 then
-				vehiclebone = GetEntityBoneIndexByName(vehicle, 'attach_female')
-			elseif GetEntityBoneIndexByName(vehicle, 'attach_male') then
-				vehiclebone = GetEntityBoneIndexByName(vehicle, 'attach_male')
-			end
-
-			local trailerbone = -1
-			if GetEntityBoneIndexByName(vehicles[i].trailerEntity, 'attach_female') ~= -1 then
-				trailerbone = GetEntityBoneIndexByName(vehicle, 'attach_female')
-			elseif GetEntityBoneIndexByName(vehicles[i].trailerEntity, 'attach_male') then
-				trailerbone = GetEntityBoneIndexByName(vehicles[i].trailerEntity, 'attach_male')
-			end
-			if vehiclebone ~= -1 and trailerbone ~= -1 then
-				AttachEntityBoneToEntityBone(vehicle, vehicles[i].trailerEntity, vehiclebone, trailerbone, false, false)
-				AttachEntityToEntity(trailerbone, vehiclebone, 1, 0.0, -1.0, 0.25, 0.0, 0.0, 0.0, false, false, true, false, 20, true)
-				SetTrailerLegsRaised(vehicles[i].trailerEntity)
-			end
-		end
-
-
 
 		SetVehicleSteeringAngle(tempVeh, vehicles[i].steerangle + 0.0)
 		if PlayerData.citizenid == vehicles[i].owner then
@@ -528,36 +504,11 @@ function Parking.Functions.SpawnVehicle(vehicleData)
 	if Config.ParkVehiclesWithTrailers then
 		if vehicleData.trailerdata ~= nil then
 			vehicleData.trailerEntity = Parking.Functions.SpawnTrailer(tempVeh, vehicleData)
-		else
-			if not IsEntityPositionFrozen(tempVeh) then FreezeEntityPosition(tempVeh, true) end
 		end
 	end
 	Wait(50)
 	Parking.Functions.AddToTable(tempVeh, vehicleData)
 	Wait(50)
-
-
-	if Config.ParkVehiclesWithTrailers then
-		local vehiclebone = -1
-		if GetEntityBoneIndexByName(vehicle, 'attach_female') ~= -1 then
-			vehiclebone = GetEntityBoneIndexByName(vehicle, 'attach_female')
-		elseif GetEntityBoneIndexByName(vehicle, 'attach_male') then
-			vehiclebone = GetEntityBoneIndexByName(vehicle, 'attach_male')
-		end
-
-		local trailerbone = -1
-		if GetEntityBoneIndexByName(vehicles[i].trailerEntity, 'attach_female') ~= -1 then
-			trailerbone = GetEntityBoneIndexByName(vehicle, 'attach_female')
-		elseif GetEntityBoneIndexByName(vehicles[i].trailerEntity, 'attach_male') then
-			trailerbone = GetEntityBoneIndexByName(vehicles[i].trailerEntity, 'attach_male')
-		end
-		if vehiclebone ~= -1 and trailerbone ~= -1 then
-			AttachEntityBoneToEntityBone(vehicle, vehicles[i].trailerEntity, vehiclebone, trailerbone, false, false)
-			AttachEntityToEntity(trailerbone, vehiclebone, 1, 0.0, -1.0, 0.25, 0.0, 0.0, 0.0, false, false, true, false, 20, true)
-			SetTrailerLegsRaised(vehicles[i].trailerEntity)
-		end
-	end
-
 
 	SetVehicleSteeringAngle(tempVeh, vehicleData.steerangle + 0.0)
 	if PlayerData.citizenid == vehicleData.owner then
