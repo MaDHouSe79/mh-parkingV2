@@ -33,13 +33,13 @@ function Parking.Functions.CreateTargetEntityMenu(entity)
                 label = "Park Vehicle"
             }
         },
-        distance = config.InteractDistance
+        distance = Config.InteractDistance
     })
 end
 
 function Parking.Functions.TargetDrive()
 	local vehicle, distance = GetClosestVehicle(GetEntityCoords(PlayerPedId()))
-    if distance <= config.InteractDistance then
+    if distance <= Config.InteractDistance then
         Parking.Functions.Drive(Parking.Functions.GetParkeddCar(vehicle), false)
     else
         Notify("to far from vehicle", "error", 2000)
@@ -48,7 +48,7 @@ end
 
 function Parking.Functions.TargetPark()
     local vehicle, distance = GetClosestVehicle(GetEntityCoords(PlayerPedId()))
-    if distance <= config.InteractDistance then
+    if distance <= Config.InteractDistance then
         Parking.Functions.Save(vehicle)
     else
         Notify(Lang:t("system.to_far_from_vehicle"), "error", 2000)
@@ -72,7 +72,7 @@ function Parking.Functions.AddToTable(entity, data)
 end
 
 function Parking.Functions.MakeVehiclesVisable()
-    if isLoggedIn and config.ViewDistance and #LocalVehicles > 0 then
+    if isLoggedIn and Config.ViewDistance and #LocalVehicles > 0 then
         local playerCoords = GetEntityCoords(PlayerPedId())
         for k, v in pairs(LocalVehicles) do
             if GetDistance(playerCoords, v.location) < 150 and not IsEntityVisible(v.entity) then
@@ -87,7 +87,7 @@ function Parking.Functions.MakeVehiclesVisable()
 end
 
 function Parking.Functions.CheckDistanceToForceGrounded()
-    if isLoggedIn and config.ForceVehicleOnGound and #LocalVehicles > 0 then
+    if isLoggedIn and Config.ForceVehicleOnGound and #LocalVehicles > 0 then
         for i = 1, #LocalVehicles do
             local playerCoords = GetEntityCoords(PlayerPedId())
             if type(LocalVehicles[i]) == 'table' and LocalVehicles[i].entity ~= nil and DoesEntityExist(LocalVehicles[i].entity) and not LocalVehicles[i].isGrounded then
@@ -172,7 +172,7 @@ function Parking.Functions.DriveVehicle(data)
 	while not DoesEntityExist(tempVeh) do Citizen.Wait(500) end
 	SetVehicleProperties(tempVeh, data.mods)
 	DoVehicleDamage(tempVeh, data.body, data.engine)
-	exports[config.FuelScript]:SetFuel(tempVeh, data.fuel)
+	exports[Config.FuelScript]:SetFuel(tempVeh, data.fuel)
 	SetVehicleOnGroundProperly(tempVeh)
 	SetVehRadioStation(tempVeh, 'OFF')
     SetVehicleDirtLevel(tempVeh, 0)
@@ -274,7 +274,7 @@ function Parking.Functions.Drive(vehicle)
 end
 
 function Parking.Functions.IsCloseByStationPump(coords)
-    for hash in pairs(config.DisableNeedByPumpModels) do
+    for hash in pairs(Config.DisableNeedByPumpModels) do
         local pump = GetClosestObjectOfType(coords.x, coords.y, coords.z, 10.0, hash, false, true, true)
         if pump ~= 0 then return true end
     end
@@ -282,7 +282,7 @@ function Parking.Functions.IsCloseByStationPump(coords)
 end
 
 function Parking.Functions.IsCloseByCoords(coords)
-    for k, v in pairs(config.NoParkingLocations) do
+    for k, v in pairs(Config.NoParkingLocations) do
         if GetDistance(coords, v.coords) < v.radius then
             if v.job == nil then
                 return true
@@ -295,7 +295,7 @@ function Parking.Functions.IsCloseByCoords(coords)
 end
 
 function Parking.Functions.IsCloseByParkingLot(coords)
-    for k, v in pairs(config.AllowedParkingLots) do
+    for k, v in pairs(Config.AllowedParkingLots) do
         if GetDistance(coords, v.coords) < v.radius then return true end
     end
     return false
@@ -303,9 +303,9 @@ end
 
 function Parking.Functions.AllowToPark(coords)
     local isAllowd = false
-    if config.UseParkingLotsOnly then
+    if Config.UseParkingLotsOnly then
         if Parking.Functions.IsCloseByParkingLot(coords) and not Parking.Functions.IsCloseByStationPump(coords) then isAllowd = true end
-    elseif not config.UseParkingLotsOnly then
+    elseif not Config.UseParkingLotsOnly then
         if not Parking.Functions.IsCloseByCoords(coords) and not Parking.Functions.IsCloseByStationPump(coords) then isAllowd = true end
     end
     return isAllowd
@@ -324,7 +324,7 @@ function Parking.Functions.Save(vehicle)
 			if hasTrailer then
 				local hashkey = GetEntityModel(trailer)
 				local trailerProps = GetVehicleProperties(trailer)
-				if config.Trailers[hashkey] then
+				if Config.Trailers[hashkey] then
 					trailerdata = {hash = hashkey, coords = GetEntityCoords(trailer), heading = GetEntityHeading(trailer), mods = trailerProps}
 				end
 			end
@@ -343,7 +343,7 @@ function Parking.Functions.Save(vehicle)
 			end, {
 				trailerdata = trailerdata,
 				mods = GetVehicleProperties(vehicle),
-				fuel = exports[config.FuelScript]:GetFuel(vehicle),
+				fuel = exports[Config.FuelScript]:GetFuel(vehicle),
 				engine = GetVehicleEngineHealth(vehicle),
 				body = GetVehicleBodyHealth(vehicle),
 				street = GetStreetName(vehicle),
@@ -355,8 +355,8 @@ function Parking.Functions.Save(vehicle)
 end
 
 function Parking.Functions.CreateParkedBlip(data)
-    local name = config.Vehicles[GetHashKey(data.vehicle)].name or "unknow"
-    local brand = config.Vehicles[GetHashKey(data.vehicle)].brand or "unknow"
+    local name = Config.Vehicles[GetHashKey(data.vehicle)].name or "unknow"
+    local brand = Config.Vehicles[GetHashKey(data.vehicle)].brand or "unknow"
     local blip = AddBlipForCoord(data.location.x, data.location.y, data.location.z)
     SetBlipSprite(blip, 545)
     SetBlipDisplay(blip, 4)
@@ -389,7 +389,7 @@ end
 function Parking.Functions.LockDoors(entity, data)
 	TriggerServerEvent('mh-parkingV2:server:SetVehLockState', VehToNet(entity), 2)
 	SetVehicleDoorsLocked(entity, 2)
-	if config.VehicleDoorsUnlockedForOwners and PlayerData.citizenid == data.owner then
+	if Config.VehicleDoorsUnlockedForOwners and PlayerData.citizenid == data.owner then
 		TriggerServerEvent('mh-parkingV2:server:SetVehLockState', VehToNet(entity), 1)
 		SetVehicleDoorsLocked(entity, 1)
 	end
@@ -399,13 +399,13 @@ function Parking.Functions.SpawnTrailer(vehicle, data)
     local offset, posX, posY = -5.0, 0.0, 0.0
     local heading = GetEntityHeading(vehicle)
     local vehicleCoords = GetEntityCoords(vehicle)
-    if config.Trailers[data.trailerdata.hash] then
-        if config.Trailers[data.trailerdata.hash].offset ~= nil then
-            offset = config.Trailers[data.trailerdata.hash].offset.backwards
-            if config.Trailers[data.trailerdata.hash].offset.heading ~= nil then
-                heading -= config.Trailers[data.trailerdata.hash].offset.heading
-                posX -= config.Trailers[data.trailerdata.hash].offset.posX
-                posY -= config.Trailers[data.trailerdata.hash].offset.posY
+    if Config.Trailers[data.trailerdata.hash] then
+        if Config.Trailers[data.trailerdata.hash].offset ~= nil then
+            offset = Config.Trailers[data.trailerdata.hash].offset.backwards
+            if Config.Trailers[data.trailerdata.hash].offset.heading ~= nil then
+                heading -= Config.Trailers[data.trailerdata.hash].offset.heading
+                posX -= Config.Trailers[data.trailerdata.hash].offset.posX
+                posY -= Config.Trailers[data.trailerdata.hash].offset.posY
             end
         end
     end
@@ -449,9 +449,7 @@ function Parking.Functions.SpawnVehicles(vehicles)
 		SetEntityInvincible(tempVeh, true)
 		SetVehicleLivery(tempVeh, vehicles[i].mods.livery)
 		DoVehicleDamage(tempVeh, vehicles[i].body, vehicles[i].engine)
-
-		SetVehicleFuelLevel(tempVeh, vehicles[i].fuel + 0.0)
-
+		exports[Config.FuelScript]:SetFuel(tempVeh, vehicles[i].fuel)
 		SetVehRadioStation(tempVeh, 'OFF')
 		SetVehicleDirtLevel(tempVeh, 0)
 		Parking.Functions.LockDoors(tempVeh, vehicles[i])
@@ -493,9 +491,7 @@ function Parking.Functions.SpawnVehicle(vehicleData)
 	SetEntityInvincible(tempVeh, true)
 	SetVehicleLivery(tempVeh, vehicleData.mods.livery)
 	DoVehicleDamage(tempVeh, vehicleData.body, vehicleData.engine)
-
-	SetVehicleFuelLevel(tempVeh, vehicleData.fuel + 0.0)
-
+	exports[Config.FuelScript]:SetFuel(tempVeh, vehicleData.fuel)
 	SetVehRadioStation(tempVeh, 'OFF')
 	SetVehicleDirtLevel(tempVeh, 0)
 	Parking.Functions.LockDoors(tempVeh, vehicleData)
@@ -551,9 +547,9 @@ function Parking.Functions.DisplayVehicleOwnerText()
 			if fd then
 				fd = false
 				for k, v in pairs(LocalVehicles) do
-					if GetDistance(playerCoords, v.location) < config.VehicleOwnerTextDisplayDistance then
+					if GetDistance(playerCoords, v.location) < Config.VehicleOwnerTextDisplayDistance then
 						local owner, plate, model, brand = v.fullname, v.plate, "", ""
-						for k, vehicle in pairs(config.Vehicles) do
+						for k, vehicle in pairs(Config.Vehicles) do
 							if vehicle.model:lower() == vehicle.model:lower() then
 								model, brand = vehicle.name, vehicle.brand
 								break
@@ -687,7 +683,7 @@ function Parking.Functions.SetVehicleWaypoit(coords)
 end
 
 function Parking.Functions.RadialMenu()
-    if config.Framework == 'qb' then
+    if Config.Framework == 'qb' then
         RegisterNetEvent('qb-radialmenu:client:onRadialmenuOpen', function()
             if parkMenu ~= nil then
                 exports['qb-radialmenu']:RemoveOption(parkMenu)
@@ -702,7 +698,7 @@ function Parking.Functions.RadialMenu()
                 shouldClose = true
             }, parkMenu)
         end)
-    elseif config.Framework == 'esx' then
+    elseif Config.Framework == 'esx' then
         lib.addRadialItem({
             {
                 id = 'park_vehicles_menu',
@@ -725,7 +721,7 @@ end
 
 function Parking.Functions.CreateBlipCircle(coords, text, radius, color, sprite)
     local blip = nil
-    if config.DebugBlipForRadius then
+    if Config.DebugBlipForRadius then
         blip = AddBlipForRadius(coords, radius)
         SetBlipHighDetail(blip, true)
         SetBlipColour(blip, color)
@@ -744,14 +740,14 @@ function Parking.Functions.CreateBlipCircle(coords, text, radius, color, sprite)
 end
 
 function Parking.Functions.CreateBlips()
-    if config.UseUnableParkingBlips then
-        for k, zone in pairs(config.NoParkingLocations) do
+    if Config.UseUnableParkingBlips then
+        for k, zone in pairs(Config.NoParkingLocations) do
             Parking.Functions.CreateBlipCircle(zone.coords, "Unable to park", zone.radius, zone.color, zone.sprite)
         end
     end
-    if config.UseParkingLotsOnly then
-        for k, zone in pairs(config.AllowedParkingLots) do
-            if config.UseParkingLotsBlips then
+    if Config.UseParkingLotsOnly then
+        for k, zone in pairs(Config.AllowedParkingLots) do
+            if Config.UseParkingLotsBlips then
                 Parking.Functions.CreateBlipCircle(zone.coords, "Parking Lot", zone.radius, zone.color, zone.sprite)
             end
         end

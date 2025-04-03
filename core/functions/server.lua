@@ -9,9 +9,9 @@ function Parking.Functions.GetVehicles(src)
 	local citizenid = GetCitizenId(src)
     if xPlayer then
 		local result = nil
-		if SV_Config.Framework == 'esx' then
+		if Config.Framework == 'esx' then
 			result = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE owner = ? AND stored = ?", {citizenid, 3})
-		elseif SV_Config.Framework == 'qb' then
+		elseif Config.Framework == 'qb' then
 			result = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE citizenid = ? AND state = ?", {citizenid, 3})
 		end
         if result then return result else return nil end
@@ -22,21 +22,21 @@ function Parking.Functions.RefreshVehicles(src)
 	if src == nil then src = -1 end
 	local vehicles = {}
 	local result = nil
-	if SV_Config.Framework == 'esx' then
+	if Config.Framework == 'esx' then
 		result = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE stored = ?", {3})
-	elseif SV_Config.Framework == 'qb' then
+	elseif Config.Framework == 'qb' then
 		result = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE state = ?", {3})
 	end
 	for k, v in pairs(result) do
-		if SV_Config.Framework == 'esx' then
+		if Config.Framework == 'esx' then
 			local char = MySQL.Sync.fetchAll("SELECT * FROM users WHERE owner = ?", {v.citizenid})[1]
             if char and v.fullname == nil then v.fullname = char.firstname.. ' ' ..char.lastname end
-		elseif SV_Config.Framework == 'qb' then
+		elseif Config.Framework == 'qb' then
 			local target = GetPlayerDataByCitizenId(v.citizenid)
 			if v.fullname == nil then v.fullname = target.PlayerData.charinfo.firstname .. ' ' .. target.PlayerData.charinfo.lastname end
 		end
 		vehicles[#vehicles + 1] = {fullname = v.fullname, owner = v.citizenid, vehicle = v.vehicle, plate = v.plate, fuel = v.fuel, body = v.body, engine = v.engine, street = v.street, mods = json.decode(v.mods), location = json.decode(v.location), trailerdata = json.decode(v.trailerdata), steerangle = v.steerangle}
-		if SV_Config.Framework == 'qb' then
+		if Config.Framework == 'qb' then
 			local target = GetPlayerDataByCitizenId(v.citizenid)
 			if target.PlayerData.citizenid == v.citizenid and target.PlayerData.source ~= nil then
 				if DoesEntityExist(GetPlayerPed(target.PlayerData.source)) then
@@ -53,12 +53,12 @@ end
 function Parking.Functions.IfPlayerIsVIPGetMaxParking(src)
     local Player = GetPlayer(src)
 	local citizenid = GetCitizenId(src)
-    local max = SV_Config.Maxparking
+    local max = Config.Maxparking
     if Player then
         local data = nil
-        if SV_Config.Framework == 'esx' then
+        if Config.Framework == 'esx' then
             data = MySQL.Sync.fetchAll("SELECT * FROM users WHERE identifier = ?", {citizenid})[1]
-        elseif SV_Config.Framework == 'qb' then
+        elseif Config.Framework == 'qb' then
             data = MySQL.Sync.fetchAll("SELECT * FROM players WHERE citizenid = ?", {citizenid})[1]
         end
         if data ~= nil and data.parkvip == 1 then
@@ -72,37 +72,37 @@ function Parking.Functions.Save(src, data)
 	local xPlayer = GetPlayer(src)
 	local citizenid = GetCitizenId(src)
 	local totalParked = nil
-	if SV_Config.Framework == 'esx' then
+	if Config.Framework == 'esx' then
 		totalParked = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE owner = ? AND stored = ?", { citizenid, 3 })
-	elseif SV_Config.Framework == 'qb' then
+	elseif Config.Framework == 'qb' then
 		totalParked = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE citizenid = ? AND state = ?", { citizenid, 3 })
 	end
-	local defaultMax = SV_Config.Maxparking
-	if SV_Config.UseAsVip then defaultMax = Parking.Functions.IfPlayerIsVIPGetMaxParking(src) end
+	local defaultMax = Config.Maxparking
+	if Config.UseAsVip then defaultMax = Parking.Functions.IfPlayerIsVIPGetMaxParking(src) end
 	if type(totalParked) == 'table' and #totalParked < defaultMax then
 		local fullname = GetCitizenFullname(src)
 		local plate = data.mods.plate
 		local isParked = nil
-		if SV_Config.Framework == 'esx' then
+		if Config.Framework == 'esx' then
 			isParked = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE owner = ? AND plate = ? AND stored = ?", { citizenid, plate, 3 })[1]
-		elseif SV_Config.Framework == 'qb' then
+		elseif Config.Framework == 'qb' then
 			isParked = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE citizenid = ? AND plate = ? AND state = ?", { citizenid, plate, 3 })[1]
 		end
 		if isParked ~= nil then
 			return { status = false, message = "already parking" }
 		else
 			local result = nil
-			if SV_Config.Framework == 'esx' then
+			if Config.Framework == 'esx' then
 				result = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE owner = ? AND plate = ?", { citizenid, plate })[1]
-			elseif SV_Config.Framework == 'qb' then
+			elseif Config.Framework == 'qb' then
 				result = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE citizenid = ? AND plate = ?", { citizenid, plate })[1]
 			end
 			local location = json.encode(data.location)
 			local trailerdata = nil
 			if data.trailerdata ~= nil then trailerdata = json.encode(data.trailerdata) end
-			if SV_Config.Framework == 'esx' then
+			if Config.Framework == 'esx' then
 				MySQL.Async.execute('UPDATE owned_vehicles SET stored = ?, location = ?, street = ?, trailerdata = ?, steerangle = ? WHERE plate = ? AND stored = ?',{3, location, data.street, trailerdata, data.steerangle, plate, citizenid})
-			elseif SV_Config.Framework == 'qb' then
+			elseif Config.Framework == 'qb' then
 				MySQL.Async.execute('UPDATE player_vehicles SET state = ?, location = ?, street = ?, trailerdata = ?, steerangle = ?, engine = ?, fuel = ?, body = ? WHERE plate = ? AND citizenid = ?',{3, location, data.street, trailerdata, data.steerangle, data.engine, data.fuel, data.body, plate, citizenid})
 			end
 			Wait(100)
@@ -116,17 +116,17 @@ function Parking.Functions.Drive(src, data)
 	local xPlayer = GetPlayer(src)
 	local plate = data.plate
 	local result = nil
-	if SV_Config.Framework == 'esx' then
+	if Config.Framework == 'esx' then
 		result = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE owner = ? AND plate = ? AND stored = ?", { xPlayer.identifier, plate, 3 })[1]
-	elseif SV_Config.Framework == 'qb' then
+	elseif Config.Framework == 'qb' then
 		result = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE citizenid = ? AND plate = ? AND state = ?", { xPlayer.PlayerData.citizenid, plate, 3 })[1]
 	end
 	if result then
 		local mods = json.decode(result.mods)
 		local location = json.decode(result.location)
-		if SV_Config.Framework == 'esx' then
+		if Config.Framework == 'esx' then
 			MySQL.Async.execute('UPDATE owned_vehicles SET stored = ?, location = ? WHERE plate = ?', { 0, nil, plate })
-		elseif SV_Config.Framework == 'qb' then
+		elseif Config.Framework == 'qb' then
 			MySQL.Async.execute('UPDATE player_vehicles SET state = ?, location = ? WHERE plate = ?', { 0, nil, plate })
 		end
 		Wait(50)
@@ -145,7 +145,7 @@ end
 
 function Parking.Functions.Init()
 	Wait(3000)
-    if SV_Config.Framework == 'esx' then
+    if Config.Framework == 'esx' then
         -- ESX Database
         MySQL.Async.execute('ALTER TABLE users ADD COLUMN IF NOT EXISTS parkvip INT NULL DEFAULT 0')
         MySQL.Async.execute('ALTER TABLE users ADD COLUMN IF NOT EXISTS parkmax INT NULL DEFAULT 0')
@@ -153,7 +153,7 @@ function Parking.Functions.Init()
         MySQL.Async.execute('ALTER TABLE owned_vehicles ADD COLUMN IF NOT EXISTS location TEXT NULL DEFAULT NULL')
         MySQL.Async.execute('ALTER TABLE owned_vehicles ADD COLUMN IF NOT EXISTS street TEXT NULL DEFAULT NULL')
         MySQL.Async.execute('ALTER TABLE owned_vehicles ADD COLUMN IF NOT EXISTS trailerdata LONGTEXT NULL DEFAULT NULL')
-    elseif SV_Config.Framework == 'qb' then
+    elseif Config.Framework == 'qb' then
         --- QBCore Database
         MySQL.Async.execute('ALTER TABLE players ADD COLUMN IF NOT EXISTS parkvip INT NULL DEFAULT 0')
         MySQL.Async.execute('ALTER TABLE players ADD COLUMN IF NOT EXISTS parkmax INT NULL DEFAULT 0')
@@ -165,17 +165,17 @@ function Parking.Functions.Init()
 end
 
 AddCommand("addvip", Lang:t('commands.addvip'), {{ name = 'ID', help = Lang:t('commands.addvip_info') }, { name = 'Amount', help = Lang:t('commands.addvip_info_amount')}}, true, function(source, args)
-    local src, amount, targetID = source, SV_Config.Maxparking, -1
+    local src, amount, targetID = source, Config.Maxparking, -1
     if args[1] and tonumber(args[1]) > 0 then targetID = tonumber(args[1]) end
     if args[2] and tonumber(args[2]) > 0 then amount = tonumber(args[2]) end
     if targetID ~= -1 then
         local Player = GetPlayer(targetID)
         if Player then
-            if SV_Config.Framework == 'esx' then
+            if Config.Framework == 'esx' then
                 MySQL.Async.execute("UPDATE users SET parkvip = ?, parkmax = ? WHERE owner = ?", {1, amount, Player.identifier})
                 if targetID ~= src then Notify(targetID, Lang:t('info.playeraddasvip'), "success", 10000) end
                 Notify(src, Lang:t('info.isaddedasvip'), "success", 10000)
-            elseif SV_Config.Framework == 'qb' or SV_Config.Framework == 'qbx' then
+            elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
                 MySQL.Async.execute("UPDATE players SET parkvip = ?, parkmax = ? WHERE citizenid = ?", {1, amount, Player.PlayerData.citizenid})
                 if targetID ~= src then Notify(targetID, Lang:t('info.playeraddasvip'), "success", 10000) end
                 Notify(src, Lang:t('info.isaddedasvip'), "success", 10000)
@@ -190,10 +190,10 @@ AddCommand("removevip", Lang:t('commands.removevip'), {{ name = 'ID', help = Lan
     if targetID ~= -1 then
         local Player = GetPlayer(targetID)
         if Player then
-            if SV_Config.Framework == 'esx' then
+            if Config.Framework == 'esx' then
                 MySQL.Async.execute("UPDATE users SET parkvip = ?, parkmax = ? WHERE owner = ?", {0, 0, Player.identifier})
                 Notify(src, Lang:t('info.playerremovedasvip'), "success", 10000)
-            elseif SV_Config.Framework == 'qb' or SV_Config.Framework == 'qbx' then
+            elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
                 MySQL.Async.execute("UPDATE players SET parkvip = ?, parkmax = ? WHERE citizenid = ?", {0, 0, Player.PlayerData.citizenid})
                 Notify(src, Lang:t('info.playerremovedasvip'), "success", 10000)
             end

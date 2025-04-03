@@ -1,47 +1,47 @@
 --[[ ===================================================== ]] --
 --[[          MH Realistic Parking V2 by MaDHouSe79        ]] --
 --[[ ===================================================== ]] --
-SV_Config = {}                                -- Placeholder don't edit or change or remove this.
-SV_Config.Debug = false                       -- Default false, if true this will show prints in the server console.
+Config = {}                                -- Placeholder don't edit or change or remove this.
+Config.Debug = false                       -- Default false, if true this will show prints in the server console.
 ----------------------------------------------------------------------------
 -- Framework (Do not change this)
-SV_Config.Framework = nil
+Config.Framework = nil
 if GetResourceState("es_extended") ~= 'missing' then
-    SV_Config.Framework = 'esx'
+    Config.Framework = 'esx'
 elseif GetResourceState("qb-core") ~= 'missing' then
-    SV_Config.Framework = 'qb'
+    Config.Framework = 'qb'
 elseif GetResourceState("qbx-core") ~= 'missing' then
-    SV_Config.Framework = 'qbx'
+    Config.Framework = 'qbx'
 end
 ----------------------------------------------------------------------------
 -- Fuel Script
-SV_Config.FuelScript = 'LegacyFuel'           -- Default is LegacyFuel, if you use a other fuel script, for example ox_fuel
+Config.FuelScript = 'LegacyFuel'           -- Default is LegacyFuel, if you use a other fuel script, for example ox_fuel
 ----------------------------------------------------------------------------
 -- Notify Script
-SV_Config.DisableParkNotify = false           -- Default true, if false you get many notifications when you enter or leave the vehicle, all other notify massages are stil enable.
-SV_Config.NotifyScript = "ox_lib"             -- Default qb, you can use (qb, ox_lib, k5_notify, okokNotify, Roda_Notifications)
+Config.DisableParkNotify = false           -- Default true, if false you get many notifications when you enter or leave the vehicle, all other notify massages are stil enable.
+Config.NotifyScript = "ox_lib"             -- Default qb, you can use (qb, ox_lib, k5_notify, okokNotify, Roda_Notifications)
 ----------------------------------------------------------------------------
-SV_Config.OnlyAutoParkWhenEngineIsOff = true  -- Default true, if true auto park only when vehicle engine is off.
+Config.OnlyAutoParkWhenEngineIsOff = true  -- Default true, if true auto park only when vehicle engine is off.
 ----------------------------------------------------------------------------
-SV_Config.ForceVehicleOnGound = true          -- If true this will force parked vehicles on the ground, sometimes the vehicles are in the air and by enable this is force the vehicle to the ground
+Config.ForceVehicleOnGound = true          -- If true this will force parked vehicles on the ground, sometimes the vehicles are in the air and by enable this is force the vehicle to the ground
 ----------------------------------------------------------------------------
 -- For performance
-SV_Config.ViewDistance = true                 -- If true vehicles are only visable in 100 meters around the players.
-SV_Config.ParkedViewDistance = 100            -- Default 100 if your distance is over 100 meters the vehicles in that area will not render on screen.
-SV_Config.UseParkedBlips = true               -- if true players can see a blip of the parked vehicle on the map
+Config.ViewDistance = true                 -- If true vehicles are only visable in 100 meters around the players.
+Config.ParkedViewDistance = 100            -- Default 100 if your distance is over 100 meters the vehicles in that area will not render on screen.
+Config.UseParkedBlips = true               -- if true players can see a blip of the parked vehicle on the map
 ----------------------------------------------------------------------------
 -- VIP Access
-SV_Config.UseAsVip = true                     -- if true `SV_Config.Maxparking` does not work on vip players and you need to add a amount per player.
-SV_Config.Maxparking = 1                      -- Default 1, this is max parked allowed per player, don't go to high with this...
+Config.UseAsVip = true                     -- if true `Config.Maxparking` does not work on vip players and you need to add a amount per player.
+Config.Maxparking = 1                      -- Default 1, this is max parked allowed per player, don't go to high with this...
 ----------------------------------------------------------------------------
-SV_Config.UseVehicleOwnerText = true          -- If true show the owner and vehicle text above vehicles when parked.
-SV_Config.VehicleOwnerTextDisplayDistance = 15
+Config.UseVehicleOwnerText = true          -- If true show the owner and vehicle text above vehicles when parked.
+Config.VehicleOwnerTextDisplayDistance = 15
 ----------------------------------------------------------------------------
 -- Stuff to automatic disable the auto parking system.
 
 -- This is when you close to a gasstation, you can't use the auto park system.
 -- This goes automatic so leave it as it is.
-SV_Config.DisableNeedByPumpModels = {
+Config.DisableNeedByPumpModels = {
     ['prop_vintage_pump'] = true,
     ['prop_gas_pump_1a'] = true,
     ['prop_gas_pump_1b'] = true,
@@ -51,14 +51,14 @@ SV_Config.DisableNeedByPumpModels = {
     ['prop_gas_pump_old3'] = true
 }
 ----------------------------------------------------------------------------
-SV_Config.DebugBlipForRadius = true -- If true you see a circle aera on the map, use this for debug only.
+Config.DebugBlipForRadius = true -- If true you see a circle aera on the map, use this for debug only.
 
 -- This are locations where you can't use the auto park system.
 -- the reason for this is it can be that you need to use the vehicle on that point.
 -- So if you want that, you can't use the park system cause you can't use the vehicle when parked.
--- If you want to see the radius on the map you need to set SV_Config.DebugBlipForRadius to true
-SV_Config.UseUnableParkingBlips = true -- If this you see blip for radius in the map.
-SV_Config.NoParkingLocations = {
+-- If you want to see the radius on the map you need to set Config.DebugBlipForRadius to true
+Config.UseUnableParkingBlips = true -- If this you see blip for radius in the map.
+Config.NoParkingLocations = {
     -- Default locations
     {coords = vector3(-333.0179, -135.5331, 38.3735), radius = 15.0, color = 1, sprite = 163, job = 'mechanic'},   -- ls costum 1
     {coords = vector3(731.7255, -1088.9088, 21.30), radius = 10.0, color = 1, sprite = 163, job = 'mechanic'},     -- ls costum 2
@@ -82,11 +82,11 @@ SV_Config.NoParkingLocations = {
 ---------------------------------------Parking lots-------------------------------------
 -- Parking lots
 -- If false players can park anyware, if true they can park only on parkinglots.
--- Players are not allwed to park close by -> (SV_Config.DisableNeedByLocations or SV_Config.DisableNeedByPumpModels)
--- If you want to see the radius in the map you need to set SV_Config.DebugBlipForRadius to true
-SV_Config.UseParkingLotsOnly = false
-SV_Config.UseParkingLotsBlips = true  --If true players see parking lot blips on the map
-SV_Config.AllowedParkingLots = {
+-- Players are not allwed to park close by -> (Config.DisableNeedByLocations or Config.DisableNeedByPumpModels)
+-- If you want to see the radius in the map you need to set Config.DebugBlipForRadius to true
+Config.UseParkingLotsOnly = false
+Config.UseParkingLotsBlips = true  --If true players see parking lot blips on the map
+Config.AllowedParkingLots = {
     {coords = vector3(96.9411, -1402.1882, 28.5636), radius = 10.0, color = 2, sprite = 237},   -- parkinglot 1
     {coords = vector3(228.7590, -786.5502, 30.0108), radius = 40.0, color = 2, sprite = 237},   -- parkinglot 2
     {coords = vector3(40.5961, -869.4373, 29.8342), radius = 30.0, color = 2, sprite = 237},    -- parkinglot 3
@@ -106,7 +106,7 @@ SV_Config.AllowedParkingLots = {
     {coords = vector3(131.8025, -712.3470, 32.4903), radius = 50.0, color = 2, sprite = 237},   -- parkinglot 17
 }
 
-SV_Config.Trailers = {
+Config.Trailers = {
     [712162987] = {model = "trailersmall", name = "trailersmall", offset = {backwards = -5.80, posX = -0.85, posY = 1.0, heading = 70.20} },
     [524108981] = {model = "boattrailer", name = "boattrailer", offset = {backwards = -7.25, posX = -1.23, posY = 0.9, heading = 35.25} },
     [1835260592] = {model = "boattrailer2", name = "boattrailer2", offset = {backwards = -8.79, posX = -1.910, posY = 1.90, heading = 81.00} },
@@ -121,7 +121,7 @@ SV_Config.Trailers = {
 
 ----------------------------------------------------------------------------
 -- Vehicle list, you can add more if the vehicle does not exist in this list.
-SV_Config.Vehicles = {
+Config.Vehicles = {
     [437538602] = { model = "speeder2", name = "Speeder Yacht", brand = "Pegassi", category = "boats" },
     [191916658] = { model = "streamer216", name = "Streamer216", brand = "Mammoth", category = "planes" },
     [-692292317] = { model = "chernobog", name = "Chernobog", brand = "HVY", category = "military" },

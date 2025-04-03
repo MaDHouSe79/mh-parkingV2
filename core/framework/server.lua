@@ -4,7 +4,7 @@
 Framework, CreateCallback, AddCommand = nil, nil, nil
 
 if GetResourceState("es_extended") ~= 'missing' then
-    SV_Config.Framework = 'esx'
+    Config.Framework = 'esx'
     Framework = exports['es_extended']:getSharedObject()
     CreateCallback = Framework.RegisterServerCallback
     AddCommand = Framework.RegisterCommand
@@ -16,7 +16,7 @@ if GetResourceState("es_extended") ~= 'missing' then
 
     function Notify(src, message, type, length) TriggerClientEvent("mh-parkingV2:client:Notify", src, message, type, length) end
 elseif GetResourceState("qb-core") ~= 'missing' then
-    SV_Config.Framework = 'qb'
+    Config.Framework = 'qb'
     Framework = exports['qb-core']:GetCoreObject()
     CreateCallback = Framework.Functions.CreateCallback
     AddCommand = Framework.Commands.Add

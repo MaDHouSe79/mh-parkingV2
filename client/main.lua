@@ -2,11 +2,11 @@
 --[[          MH Realistic Parking V2 by MaDHouSe79        ]] --
 --[[ ===================================================== ]] --
 LocalVehicles, GlobalVehicles, isLoggedIn, SpawnedVehicles, DeletingEntities, displayOwnerText = {}, {}, {}, false, false, false
-AddEventHandler('onResourceStop', function(resource) Parking.Functions.DeleteAllVehicles() PlayerData = {} config = nil isLoggedIn = false end)
+AddEventHandler('onResourceStop', function(resource) Parking.Functions.DeleteAllVehicles() PlayerData = {} isLoggedIn = false end)
 AddEventHandler('onResourceStart', function(resource) if resource == GetCurrentResourceName() then TriggerServerEvent('mh-parkingV2:server:onjoin') end end)
 RegisterNetEvent(OnPlayerLoaded, function()	TriggerServerEvent('mh-parkingV2:server:onjoin') end)
-RegisterNetEvent(OnPlayerUnload, function()	Parking.Functions.DeleteAllVehicles() PlayerData = {} config = nil isLoggedIn = false end)
-RegisterNetEvent("mh-parkingV2:client:onjoin", function(data) config = data PlayerData = GetPlayerData() isLoggedIn = true displayOwnerText = config.UseVehicleOwnerText end)
+RegisterNetEvent(OnPlayerUnload, function()	Parking.Functions.DeleteAllVehicles() PlayerData = {} isLoggedIn = false end)
+RegisterNetEvent("mh-parkingV2:client:onjoin", function(data) config = data PlayerData = GetPlayerData() isLoggedIn = true displayOwnerText = Config.UseVehicleOwnerText end)
 RegisterNetEvent("mh-parkingV2:client:refreshVehicles", function(vehicles) Parking.Functions.RefreshVehicles(vehicles) end)
 RegisterNetEvent("mh-parkingV2:client:addVehicle", function(vehicle, playerId) Parking.Functions.AddVehicle(vehicle, playerId) end)
 RegisterNetEvent("mh-parkingV2:client:deleteVehicle", function(vehicle) Parking.Functions.DeleteLocalVehicle(vehicle) end)

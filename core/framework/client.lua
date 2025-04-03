@@ -2,10 +2,10 @@
 --[[          MH Realistic Parking V2 by MaDHouSe79        ]] --
 --[[ ===================================================== ]] --
 Framework, TriggerCallback, OnPlayerLoaded, OnPlayerUnload = nil, nil, nil, nil
-OnJobUpdate, isLoggedIn, config, PlayerData = nil, false, {}, {}
+OnJobUpdate, isLoggedIn, PlayerData = nil, false, {}
 
 if GetResourceState("es_extended") ~= 'missing' then
-    config.Framework = 'esx'
+    Config.Framework = 'esx'
     Framework = exports['es_extended']:getSharedObject()
     TriggerCallback = Framework.TriggerServerCallback
     OnPlayerLoaded = 'esx:playerLoaded'
@@ -15,7 +15,7 @@ if GetResourceState("es_extended") ~= 'missing' then
     function IsDead() return (GetEntityHealth(PlayerPedId()) <= 0) end
     function SetJob(job) PlayerData.job = job end
 elseif GetResourceState("qb-core") ~= 'missing' then
-    config.Framework = 'qb'
+    Config.Framework = 'qb'
     Framework = exports['qb-core']:GetCoreObject()
     TriggerCallback = Framework.Functions.TriggerCallback
     OnPlayerLoaded = 'QBCore:Client:OnPlayerLoaded'
@@ -28,15 +28,15 @@ elseif GetResourceState("qb-core") ~= 'missing' then
 end
 
 function Notify(message, type, length)
-    if config.NotifyScript == "qb" then
+    if Config.NotifyScript == "qb" then
         Framework.Functions.Notify(message, type, length)
-    elseif config.NotifyScript == "ox_lib" and GetResourceState(config.NotifyScript) ~= 'missing' then
+    elseif Config.NotifyScript == "ox_lib" and GetResourceState(Config.NotifyScript) ~= 'missing' then
         lib.notify({title = "MH Parking V2", description = message, type = type})
-    elseif config.NotifyScript == "k5_notify" and GetResourceState(config.NotifyScript) ~= 'missing' then
+    elseif Config.NotifyScript == "k5_notify" and GetResourceState(Config.NotifyScript) ~= 'missing' then
         exports["k5_notify"]:notify("MH Parking V2", message, "k5style", length)
-    elseif config.NotifyScript == "okokNotify" and GetResourceState(config.NotifyScript) ~= 'missing' then
+    elseif Config.NotifyScript == "okokNotify" and GetResourceState(Config.NotifyScript) ~= 'missing' then
         exports['okokNotify']:Alert("MH Parking V2", message, length, type)
-    elseif config.NotifyScript == "Roda_Notifications" and GetResourceState(config.NotifyScript) ~= 'missing' then
+    elseif Config.NotifyScript == "Roda_Notifications" and GetResourceState(Config.NotifyScript) ~= 'missing' then
         exports['Roda_Notifications']:showNotify("MH Parking V2", message, type, length)
     end
 end
