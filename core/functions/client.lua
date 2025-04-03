@@ -89,14 +89,36 @@ end
 function Parking.Functions.CheckDistanceToForceGrounded()
     if isLoggedIn and Config.ForceVehicleOnGound and #LocalVehicles > 0 then
         for i = 1, #LocalVehicles do
-            local playerCoords = GetEntityCoords(PlayerPedId())
-            if type(LocalVehicles[i]) == 'table' and LocalVehicles[i].entity ~= nil and DoesEntityExist(LocalVehicles[i].entity) and not LocalVehicles[i].isGrounded then
-                if GetVehicleWheelSuspensionCompression(LocalVehicles[i].entity) == 0 or GetDistance(playerCoords, LocalVehicles[i].location) < 150 then
-                    SetEntityCoords(LocalVehicles[i].entity, LocalVehicles[i].location.x, LocalVehicles[i].location.y, LocalVehicles[i].location.z)
-                    SetVehicleOnGroundProperly(LocalVehicles[i].entity)
-                    LocalVehicles[i].isGrounded = true
-                end
-            end
+			if type(LocalVehicles[i]) == 'table' then
+				local playerCoords = GetEntityCoords(PlayerPedId())
+				if LocalVehicles[i].entity ~= nil and DoesEntityExist(LocalVehicles[i].entity) and not LocalVehicles[i].isGrounded then
+					if GetVehicleWheelSuspensionCompression(LocalVehicles[i].entity) == 0 or GetDistance(playerCoords, LocalVehicles[i].location) < 150 then
+						SetEntityCoords(LocalVehicles[i].entity, LocalVehicles[i].location.x, LocalVehicles[i].location.y, LocalVehicles[i].location.z)
+						SetVehicleOnGroundProperly(LocalVehicles[i].entity)
+						LocalVehicles[i].isGrounded = true
+					end
+				end
+				if LocalVehicles[i].trailerEntity ~= nil and DoesEntityExist(LocalVehicles[i].trailerEntity) and not LocalVehicles[i].trailerIsGrounded then
+					local hash = GetHashKey(GetEntityModel(LocalVehicles[i].trailerEntity))
+					local heading = GetEntityHeading(LocalVehicles[i].entity)
+					if Config.Trailers[hash] then
+						if Config.Trailers[hash].offset ~= nil then
+							offset = Config.Trailers[hash].offset.backwards
+							if Config.Trailers[hash].offset.heading ~= nil then
+								heading -= Config.Trailers[hash].offset.heading
+								posX -= Config.Trailers[hash].offset.posX
+							end
+						end
+					end
+					local trailerSpawnPos = GetOffsetFromEntityInWorldCoords(LocalVehicles[i].trailerEntity, posX, offset, 0.5)
+					if GetVehicleWheelSuspensionCompression(LocalVehicles[i].trailerEntity) == 0 or GetDistance(playerCoords, LocalVehicles[i].location) < 150 then
+						SetEntityCoords(LocalVehicles[i].trailerEntity, trailerSpawnPos.x, trailerSpawnPos.y, LocalVehicles[i].location.z)
+						SetEntityHeading(heading)
+						SetVehicleOnGroundProperly(LocalVehicles[i].trailerEntity)
+						LocalVehicles[i].trailerIsGrounded = true
+					end
+				end
+			end
         end
     end
 end
