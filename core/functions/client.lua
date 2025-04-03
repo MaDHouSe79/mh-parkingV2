@@ -411,10 +411,6 @@ function Parking.Functions.LockDoors(entity, data)
 	end
 end
 
-function Parking.Functions.SpawnTrailerLoad(vehicle, data)
-
-end
-
 function Parking.Functions.SpawnTrailer(vehicle, data)
     local offset, posX, posY = -5.0, 0.0, 0.0
     local heading = GetEntityHeading(vehicle)
