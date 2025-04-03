@@ -47,7 +47,7 @@
 - `/removevip [id]` Remove a vip player (admin only)
 
 # Save front wheels angle
-- Before you press `F` press the keys `A` or `D` to turn your wheels and it will save that angle on your parked vehicle.
+- Before you press `F` or `E` press the keys `A` or `D` to turn your wheels and it will save that angle on your parked vehicle.
 
 # Read Files
 [README FILES](https://github.com/MaDHouSe79/mh-parkingV2/tree/main/readme)
