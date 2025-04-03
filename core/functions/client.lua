@@ -454,6 +454,7 @@ function Parking.Functions.SpawnVehicles(vehicles)
 		Parking.Functions.LockDoors(tempVeh, vehicles[i])
 		NetworkFadeInEntity(tempVeh, true)
 		while NetworkIsEntityFading(tempVeh) do Citizen.Wait(50) end
+		Wait(500)
 		if vehicles[i].trailerdata ~= nil then
 			vehicles[i].trailerEntity = Parking.Functions.SpawnTrailer(tempVeh, vehicles[i])
 		else
@@ -495,6 +496,7 @@ function Parking.Functions.SpawnVehicle(vehicleData)
 	Parking.Functions.LockDoors(tempVeh, vehicleData)
 	NetworkFadeInEntity(tempVeh, true)
 	while NetworkIsEntityFading(tempVeh) do Citizen.Wait(50) end
+	Wait(500)
 	if vehicleData.trailerdata ~= nil then
 		vehicleData.trailerEntity = Parking.Functions.SpawnTrailer(tempVeh, vehicleData)
 	else

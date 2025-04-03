@@ -5,7 +5,7 @@ LocalVehicles, GlobalVehicles, isLoggedIn, SpawnedVehicles, DeletingEntities, di
 AddEventHandler('onResourceStop', function(resource) Parking.Functions.DeleteAllVehicles() PlayerData = {} isLoggedIn = false end)
 AddEventHandler('onResourceStart', function(resource) if resource == GetCurrentResourceName() then PlayerData = GetPlayerData() isLoggedIn = true end end)
 RegisterNetEvent(OnPlayerLoaded, function()	PlayerData = GetPlayerData() isLoggedIn = true end)
-RegisterNetEvent(OnPlayerUnload, function()	Parking.Functions.DeleteAllVehicles() PlayerData = {} isLoggedIn = false displayOwnerText = false end)
+RegisterNetEvent(OnPlayerUnload, function()	Parking.Functions.DeleteAllVehicles() PlayerData = {} isLoggedIn = false end)
 RegisterNetEvent("mh-parkingV2:client:RefreshVehicles", function(vehicles) Parking.Functions.RefreshVehicles(vehicles) end)
 RegisterNetEvent("mh-parkingV2:client:AddVehicle", function(vehicle, playerId) Parking.Functions.AddVehicle(vehicle, playerId) end)
 RegisterNetEvent("mh-parkingV2:client:DeleteVehicle", function(vehicle) Parking.Functions.DeleteLocalVehicle(vehicle) end)
