@@ -26,14 +26,6 @@
 - [Subscribe](https://www.youtube.com/c/@MaDHouSe79) 
 
 # MH Parking V2 (QB/ESX) by MaDHouSe79
-- I rewrote the mh-parking script and now your vehicles are automatically parked, this happens when you get out or get in the vehicle.
-- I removed the F5 park/unpark and everything else that was no longer needed.
-- The Impound should also work automatically and the vehicle should disappear when the police impound a vehicle.
-- Auto park only when your engine is off, you can change this in the `sv_config.lua` file,
-- when you press `F` sort it will park and when you hold the `F` it let the engine running and it will not park,
-- and yes your vehicle will be back at the park location after server restart.
-- Everybody can park but vip players can park more vehicles then the max default in `sv_config.lua`. (SV_Config.Maxparking)
-- You can access the park menu with the radial menu.
   
 # Dependencies (QB/ESX)
 - [oxmysql](https://github.com/overextended/oxmysql/releases/tag/v1.9.3)
