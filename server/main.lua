@@ -1,21 +1,10 @@
 --[[ ===================================================== ]] --
---[[       MH Realistic Parking V2 Script by MaDHouSe      ]] --
+--[[          MH Realistic Parking V2 by MaDHouSe79        ]] --
 --[[ ===================================================== ]] --
-CreateCallback('mh-parkingV2:server:IsVehicleParked', function(source, cb, plate, state) cb(Parking.Functions.IsVehicleParked(plate, state)) end)
-CreateCallback('mh-parkingV2:server:GetVehicleData', function(source, cb, plate) cb(Parking.Functions.GetVehicleData(source, plate)) end)
+CreateCallback("mh-parkingV2:server:saveCar", function(source, cb, data) cb(Parking.Functions.Save(source, data)) end)
+CreateCallback("mh-parkingV2:server:driveCar", function(source, cb, data) cb(Parking.Functions.Drive(source, data)) end)
 CreateCallback("mh-parkingV2:server:GetVehicles", function(source, cb) cb(Parking.Functions.GetVehicles(source)) end)
-CreateCallback("mh-parkingV2:server:Save", function(source, cb, data) cb(Parking.Functions.Save(source, data)) end)
-CreateCallback("mh-parkingV2:server:Drive", function(source, cb, data) cb(Parking.Functions.Drive(source, data)) end)
-AddEventHandler('onResourceStop', function(resource) if resource == GetCurrentResourceName() then fistjoin = true playerId = -1 end end)
-AddEventHandler('onResourceStart', function(resource) if resource == GetCurrentResourceName() then fistjoin = true playerId = -1 Parking.Functions.OnJoin(source) end end)
-RegisterNetEvent('mh-parkingV2:server:SetVehLockState', function(vehNetId, state) Parking.Functions.SetVehicleLockState(NetworkGetEntityFromNetworkId(vehNetId), state) end)
-RegisterNetEvent("mh-parkingV2:server:EnteringVehicle", function(currentVehicle, currentSeat, vehicleName, netId) Parking.Functions.EnteringVehicle(source, currentSeat, netId) end)
-RegisterNetEvent('mh-parkingV2:server:LeftVehicle', function(currentVehicle, currentSeat, vehicleName, netId) Parking.Functions.LeftVehicle(source, currentSeat, netId) end)
-RegisterNetEvent('mh-parkingV2:server:RefreshVehicles', function() Parking.Functions.RefreshVehicles(source, false) end)
-RegisterNetEvent('mh-parkingV2:server:LoadVehiclesOnStart', function() Parking.Functions.RefreshVehicles(source, true) end)
-RegisterNetEvent('mh-parkingV2:server:ClearAllSeats', function() Parking.Functions.ClearAllSeats(netid) end)
-RegisterNetEvent('mh-parkingV2:server:OnJoin', function() Parking.Functions.OnJoin(source) end)
-RegisterNetEvent('mh-parkingV2:server:TowVehicle', function(plate) Parking.Functions.TowVehicle(source, plate) end)
-RegisterNetEvent('mh-parkingV2:server:Impound', function(plate) Parking.Functions.Impound(source, plate) end)
-RegisterNetEvent('police:server:Impound', function(plate, fullImpound, price, body, engine, fuel) Parking.Functions.Impound(source, plate) end)
-CreateThread(function() Parking.Functions.Init() end)
+RegisterServerEvent('mh-parkingV2:server:CreateOwnerVehicleBlip', function(plate) Parking.Functions.CreateOwnerVehicleBlip(source, plate) end)
+RegisterServerEvent('mh-parkingV2:server:refreshVehicles', function() Parking.Functions.RefreshVehicles(source) end)
+RegisterServerEvent('mh-parkingV2:server:onjoin', function() TriggerClientEvent('mh-parkingV2:client:onjoin', source, SV_Config) end)
+CreateThread(function()	Parking.Functions.Init() end)

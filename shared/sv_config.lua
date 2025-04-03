@@ -3,7 +3,6 @@
 --[[ ===================================================== ]] --
 SV_Config = {}                                -- Placeholder don't edit or change or remove this.
 SV_Config.Debug = false                       -- Default false, if true this will show prints in the server console.
-SV_Config.DebugBlipForRadius = true           -- If true you see a circle aera on the map, use this for debug only.
 ----------------------------------------------------------------------------
 -- Framework (Do not change this)
 SV_Config.Framework = nil
@@ -38,11 +37,6 @@ SV_Config.Maxparking = 1                      -- Default 1, this is max parked a
 SV_Config.UseVehicleOwnerText = true          -- If true show the owner and vehicle text above vehicles when parked.
 SV_Config.VehicleOwnerTextDisplayDistance = 15
 ----------------------------------------------------------------------------
-SV_Config.VehicleDoorsUnlockedForOwners = false -- if true, owner vehicles does not lock for the owner when the vehicle spawns, if false the vehicle is locked after spawn.
-
-
-SV_Config.InteractDistance = 5.0 -- used for target
-----------------------------------------------------------------------------
 -- Stuff to automatic disable the auto parking system.
 
 -- This is when you close to a gasstation, you can't use the auto park system.
@@ -57,6 +51,8 @@ SV_Config.DisableNeedByPumpModels = {
     ['prop_gas_pump_old3'] = true
 }
 ----------------------------------------------------------------------------
+SV_Config.DebugBlipForRadius = true -- If true you see a circle aera on the map, use this for debug only.
+
 -- This are locations where you can't use the auto park system.
 -- the reason for this is it can be that you need to use the vehicle on that point.
 -- So if you want that, you can't use the park system cause you can't use the vehicle when parked.
