@@ -380,12 +380,6 @@ function Parking.Functions.DeleteVehicleAtcoords(coords)
     end
 end
 
-function Parking.Functions.SetVehicleOnTheGround(entity, data)
-	RequestCollisionAtCoord(data.location.x, data.location.y, data.location.z)
-	local retval, groundZ = GetGroundZFor_3dCoord(data.location.x, data.location.y, data.location.z, false)
-	if retval then SetEntityCoords(entity, data.location.x, data.location.y, groundZ) end
-end
-
 function Parking.Functions.LockDoors(entity, data)
 	TriggerServerEvent('mh-parkingV2:server:SetVehLockState', VehToNet(entity), 2)
 	SetVehicleDoorsLocked(entity, 2)
@@ -395,7 +389,7 @@ function Parking.Functions.LockDoors(entity, data)
 	end
 end
 
-function Parking.Functions.SpawnLoad(vehicle, data)
+function Parking.Functions.SpawnTrailerLoad(vehicle, data)
 
 end
 
@@ -469,7 +463,6 @@ function Parking.Functions.SpawnVehicles(vehicles)
 		Wait(50)
 		Parking.Functions.AddToTable(tempVeh, vehicles[i])
 		Wait(50)
-		Parking.Functions.SetVehicleOnTheGround(tempVeh, vehicles[i])
 		SetVehicleSteeringAngle(tempVeh, vehicles[i].steerangle + 0.0)
 		if PlayerData.citizenid == vehicles[i].owner then
 			Parking.Functions.CreateTargetEntityMenu(tempVeh)
@@ -511,7 +504,6 @@ function Parking.Functions.SpawnVehicle(vehicleData)
 	Wait(50)
 	Parking.Functions.AddToTable(tempVeh, vehicleData)
 	Wait(50)
-	Parking.Functions.SetVehicleOnTheGround(tempVeh, vehicleData)
 	SetVehicleSteeringAngle(tempVeh, vehicleData.steerangle + 0.0)
 	if PlayerData.citizenid == vehicleData.owner then
 		Parking.Functions.CreateTargetEntityMenu(tempVeh)
