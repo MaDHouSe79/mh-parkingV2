@@ -260,6 +260,7 @@ function Parking.Functions.Drive(vehicle)
 	TriggerCallback("mh-parkingV2:server:DriveCar", function(callback)
 		if callback.status then
 			SetEntityVisible(PlayerPedId(), false, 0)
+			Parking.Functions.DeteteParkedBlip(vehicle.entity)
 			DeleteVehicle(vehicle.entity)
 			DeleteVehicle(GetVehiclePedIsIn(GetPlayerPed(-1)))
 			vehicle = nil
@@ -436,6 +437,7 @@ function Parking.Functions.SpawnVehicles(vehicles)
 		Parking.Functions.DeleteLocalVehicle(vehicles[i].vehicle)
 		Parking.Functions.DeleteNearVehicle(vec3(vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z))
 		Parking.Functions.DeleteVehicleAtcoords(vehicles[i].location)
+		Wait(50)
 		LoadModel(vehicles[i].mods["model"])
 		local tempVeh = CreateVehicle(vehicles[i].mods["model"], vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z, vehicles[i].location.h, true)
 		while not DoesEntityExist(tempVeh) do Citizen.Wait(500) end
@@ -477,6 +479,7 @@ function Parking.Functions.SpawnVehicle(vehicleData)
 	Parking.Functions.DeleteLocalVehicle(vehicleData.vehicle)
 	Parking.Functions.DeleteNearVehicle(vec3(vehicleData.location.x, vehicleData.location.y, vehicleData.location.z))
 	Parking.Functions.DeleteVehicleAtcoords(vehicleData.location)
+	Wait(50)
 	LoadModel(vehicleData.mods["model"])
 	local tempVeh = CreateVehicle(vehicleData.mods["model"], vehicleData.location.x, vehicleData.location.y, vehicleData.location.z, vehicleData.location.h, true)
 	while not DoesEntityExist(tempVeh) do Citizen.Wait(500) end
