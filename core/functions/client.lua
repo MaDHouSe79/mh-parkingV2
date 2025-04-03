@@ -393,38 +393,40 @@ function Parking.Functions.LockDoors(entity, data)
 end
 
 function Parking.Functions.SpawnTrailer(vehicle, data)
-    local offset, posX, posY = -5.0, 0.0, 0.0
+    local offset, posX, posY = -8.0, 0.0, 0.0
     local heading = GetEntityHeading(vehicle)
     local vehicleCoords = GetEntityCoords(vehicle)
     if Config.Trailers[data.trailerdata.hash] then
         if Config.Trailers[data.trailerdata.hash].offset ~= nil then
-            offset = Config.Trailers[data.trailerdata.hash].offset.backwards
-            if Config.Trailers[data.trailerdata.hash].offset.heading ~= nil then
+			if Config.Trailers[data.trailerdata.hash].offset.backwards ~= nil then
+            	offset = Config.Trailers[data.trailerdata.hash].offset.backwards
+			end
+			if Config.Trailers[data.trailerdata.hash].offset.heading ~= nil then
                 heading -= Config.Trailers[data.trailerdata.hash].offset.heading
-                posX -= Config.Trailers[data.trailerdata.hash].offset.posX
-                posY -= Config.Trailers[data.trailerdata.hash].offset.posY
             end
+			if Config.Trailers[data.trailerdata.hash].offset.posX ~= nil then
+				posX -= Config.Trailers[data.trailerdata.hash].offset.posX
+			end
         end
     end
-    local trailerSpawnPos = GetOffsetFromEntityInWorldCoords(vehicle, posX, offset, 0.5)
+    local trailerSpawnPos = GetOffsetFromEntityInWorldCoords(vehicle, posX, offset, 1.0)
     Parking.Functions.DeleteVehicleAtcoords(coords)
     Wait(500)
     LoadModel(data.trailerdata.hash)
-	Wait(50)
     local tempVeh = CreateVehicle(data.trailerdata.hash, trailerSpawnPos.x, trailerSpawnPos.y, vehicleCoords.z, heading, true)
     while not DoesEntityExist(tempVeh) do Wait(500) end
     SetEntityAsMissionEntity(tempVeh, true, true)
 	local plate = GetPlate(vehicle)
 	SetVehicleNumberPlateText(tempVeh, plate.."1")
-	RequestCollisionAtCoord(trailerSpawnPos.x, trailerSpawnPos.y, vehicleCoords.z)
+	RequestCollisionAtCoord(trailerSpawnPos.x, trailerSpawnPos.y, trailerSpawnPos.y)
 	SetVehicleOnGroundProperly(tempVeh)
     SetVehicleProperties(tempVeh, data.trailerdata.mods)
 	SetVehicleDirtLevel(tempVeh, 0)
     NetworkFadeInEntity(tempVeh, true)
 	while NetworkIsEntityFading(tempVeh) do Citizen.Wait(50) end
     Wait(1500)
-    if not IsEntityPositionFrozen(tempVeh) then FreezeEntityPosition(tempVeh, true) end
-    if not IsEntityPositionFrozen(vehicle) then FreezeEntityPosition(vehicle, true) end
+    --if not IsEntityPositionFrozen(tempVeh) then FreezeEntityPosition(tempVeh, true) end
+    --if not IsEntityPositionFrozen(vehicle) then FreezeEntityPosition(vehicle, true) end
     return tempVeh
 end
 
@@ -434,7 +436,7 @@ function Parking.Functions.SpawnVehicles(vehicles)
 		Parking.Functions.DeleteLocalVehicle(vehicles[i].vehicle)
 		Parking.Functions.DeleteNearVehicle(vec3(vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z))
 		Parking.Functions.DeleteVehicleAtcoords(vehicles[i].location)
-		Wait(50)
+		Wait(500)
 		LoadModel(vehicles[i].mods["model"])
 		local tempVeh = CreateVehicle(vehicles[i].mods["model"], vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z, vehicles[i].location.h, true)
 		while not DoesEntityExist(tempVeh) do Citizen.Wait(500) end
