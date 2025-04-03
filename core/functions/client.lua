@@ -324,12 +324,14 @@ function Parking.Functions.Save(vehicle)
 			local vehHead = GetEntityHeading(vehicle)
 			local vehPlate = GetPlate(vehicle)
 			local trailerdata = nil
-			local hasTrailer, trailer = GetVehicleTrailerVehicle(vehicle)
-			if hasTrailer then
-				local hashkey = GetEntityModel(trailer)
-				local trailerProps = GetVehicleProperties(trailer)
-				if Config.Trailers[hashkey] then
-					trailerdata = {hash = hashkey, coords = GetEntityCoords(trailer), heading = GetEntityHeading(trailer), mods = trailerProps}
+			if Config.ParkVehiclesWithTrailers then
+				local hasTrailer, trailer = GetVehicleTrailerVehicle(vehicle)
+				if hasTrailer then
+					local hashkey = GetEntityModel(trailer)
+					local trailerProps = GetVehicleProperties(trailer)
+					if Config.Trailers[hashkey] then
+						trailerdata = {hash = hashkey, coords = GetEntityCoords(trailer), heading = GetEntityHeading(trailer), mods = trailerProps}
+					end
 				end
 			end
 			TaskLeaveVehicle(PlayerPedId(), vehicle, 1)
@@ -393,40 +395,43 @@ function Parking.Functions.LockDoors(entity, data)
 end
 
 function Parking.Functions.SpawnTrailer(vehicle, data)
-    local offset, posX, posY = -8.0, 0.0, 0.0
-    local heading = GetEntityHeading(vehicle)
-    local vehicleCoords = GetEntityCoords(vehicle)
-    if Config.Trailers[data.trailerdata.hash] then
-        if Config.Trailers[data.trailerdata.hash].offset ~= nil then
-			if Config.Trailers[data.trailerdata.hash].offset.backwards ~= nil then
-            	offset = Config.Trailers[data.trailerdata.hash].offset.backwards
+	local tempVeh = nil
+	if Config.ParkVehiclesWithTrailers then
+		local offset, posX, posY = -8.0, 0.0, 0.0
+		local heading = GetEntityHeading(vehicle)
+		local vehicleCoords = GetEntityCoords(vehicle)
+		if Config.Trailers[data.trailerdata.hash] then
+			if Config.Trailers[data.trailerdata.hash].offset ~= nil then
+				if Config.Trailers[data.trailerdata.hash].offset.backwards ~= nil then
+					offset = Config.Trailers[data.trailerdata.hash].offset.backwards
+				end
+				if Config.Trailers[data.trailerdata.hash].offset.heading ~= nil then
+					heading -= Config.Trailers[data.trailerdata.hash].offset.heading
+				end
+				if Config.Trailers[data.trailerdata.hash].offset.posX ~= nil then
+					posX -= Config.Trailers[data.trailerdata.hash].offset.posX
+				end
 			end
-			if Config.Trailers[data.trailerdata.hash].offset.heading ~= nil then
-                heading -= Config.Trailers[data.trailerdata.hash].offset.heading
-            end
-			if Config.Trailers[data.trailerdata.hash].offset.posX ~= nil then
-				posX -= Config.Trailers[data.trailerdata.hash].offset.posX
-			end
-        end
-    end
-    local trailerSpawnPos = GetOffsetFromEntityInWorldCoords(vehicle, posX, offset, 1.0)
-    Parking.Functions.DeleteVehicleAtcoords(coords)
-    Wait(500)
-    LoadModel(data.trailerdata.hash)
-    local tempVeh = CreateVehicle(data.trailerdata.hash, trailerSpawnPos.x, trailerSpawnPos.y, vehicleCoords.z, heading, true)
-    while not DoesEntityExist(tempVeh) do Wait(500) end
-    SetEntityAsMissionEntity(tempVeh, true, true)
-	local plate = GetPlate(vehicle)
-	SetVehicleNumberPlateText(tempVeh, plate.."1")
-	RequestCollisionAtCoord(trailerSpawnPos.x, trailerSpawnPos.y, trailerSpawnPos.y)
-	SetVehicleOnGroundProperly(tempVeh)
-    SetVehicleProperties(tempVeh, data.trailerdata.mods)
-	SetVehicleDirtLevel(tempVeh, 0)
-    NetworkFadeInEntity(tempVeh, true)
-	while NetworkIsEntityFading(tempVeh) do Citizen.Wait(50) end
-    Wait(2000)
-    if not IsEntityPositionFrozen(tempVeh) then FreezeEntityPosition(tempVeh, true) end
-    if not IsEntityPositionFrozen(vehicle) then FreezeEntityPosition(vehicle, true) end
+		end
+		local trailerSpawnPos = GetOffsetFromEntityInWorldCoords(vehicle, posX, offset, 1.0)
+		Parking.Functions.DeleteVehicleAtcoords(coords)
+		Wait(500)
+		LoadModel(data.trailerdata.hash)
+		tempVeh = CreateVehicle(data.trailerdata.hash, trailerSpawnPos.x, trailerSpawnPos.y, vehicleCoords.z, heading, true)
+		while not DoesEntityExist(tempVeh) do Wait(500) end
+		SetEntityAsMissionEntity(tempVeh, true, true)
+		local plate = GetPlate(vehicle)
+		SetVehicleNumberPlateText(tempVeh, plate.."1")
+		RequestCollisionAtCoord(trailerSpawnPos.x, trailerSpawnPos.y, trailerSpawnPos.y)
+		SetVehicleOnGroundProperly(tempVeh)
+		SetVehicleProperties(tempVeh, data.trailerdata.mods)
+		SetVehicleDirtLevel(tempVeh, 0)
+		NetworkFadeInEntity(tempVeh, true)
+		while NetworkIsEntityFading(tempVeh) do Citizen.Wait(50) end
+		Wait(2000)
+		if not IsEntityPositionFrozen(tempVeh) then FreezeEntityPosition(tempVeh, true) end
+		if not IsEntityPositionFrozen(vehicle) then FreezeEntityPosition(vehicle, true) end
+	end
     return tempVeh
 end
 
@@ -457,14 +462,40 @@ function Parking.Functions.SpawnVehicles(vehicles)
 		NetworkFadeInEntity(tempVeh, true)
 		while NetworkIsEntityFading(tempVeh) do Citizen.Wait(50) end
 		Wait(500)
-		if vehicles[i].trailerdata ~= nil then
-			vehicles[i].trailerEntity = Parking.Functions.SpawnTrailer(tempVeh, vehicles[i])
-		else
-			if not IsEntityPositionFrozen(tempVeh) then FreezeEntityPosition(tempVeh, true) end
+		if Config.ParkVehiclesWithTrailers then
+			if vehicles[i].trailerdata ~= nil then
+				vehicles[i].trailerEntity = Parking.Functions.SpawnTrailer(tempVeh, vehicles[i])
+			else
+				if not IsEntityPositionFrozen(tempVeh) then FreezeEntityPosition(tempVeh, true) end
+			end
 		end
 		Wait(50)
 		Parking.Functions.AddToTable(tempVeh, vehicles[i])
 		Wait(50)
+
+		if Config.ParkVehiclesWithTrailers then
+			local vehiclebone = -1
+			if GetEntityBoneIndexByName(vehicle, 'attach_female') ~= -1 then
+				vehiclebone = GetEntityBoneIndexByName(vehicle, 'attach_female')
+			elseif GetEntityBoneIndexByName(vehicle, 'attach_male') then
+				vehiclebone = GetEntityBoneIndexByName(vehicle, 'attach_male')
+			end
+
+			local trailerbone = -1
+			if GetEntityBoneIndexByName(vehicles[i].trailerEntity, 'attach_female') ~= -1 then
+				trailerbone = GetEntityBoneIndexByName(vehicle, 'attach_female')
+			elseif GetEntityBoneIndexByName(vehicles[i].trailerEntity, 'attach_male') then
+				trailerbone = GetEntityBoneIndexByName(vehicles[i].trailerEntity, 'attach_male')
+			end
+			if vehiclebone ~= -1 and trailerbone ~= -1 then
+				AttachEntityBoneToEntityBone(vehicle, vehicles[i].trailerEntity, vehiclebone, trailerbone, false, false)
+				AttachEntityToEntity(trailerbone, vehiclebone, 1, 0.0, -1.0, 0.25, 0.0, 0.0, 0.0, false, false, true, false, 20, true)
+				SetTrailerLegsRaised(vehicles[i].trailerEntity)
+			end
+		end
+
+
+
 		SetVehicleSteeringAngle(tempVeh, vehicles[i].steerangle + 0.0)
 		if PlayerData.citizenid == vehicles[i].owner then
 			Parking.Functions.CreateTargetEntityMenu(tempVeh)
@@ -499,14 +530,40 @@ function Parking.Functions.SpawnVehicle(vehicleData)
 	NetworkFadeInEntity(tempVeh, true)
 	while NetworkIsEntityFading(tempVeh) do Citizen.Wait(50) end
 	Wait(500)
-	if vehicleData.trailerdata ~= nil then
-		vehicleData.trailerEntity = Parking.Functions.SpawnTrailer(tempVeh, vehicleData)
-	else
-		if not IsEntityPositionFrozen(tempVeh) then FreezeEntityPosition(tempVeh, true) end
+	if Config.ParkVehiclesWithTrailers then
+		if vehicleData.trailerdata ~= nil then
+			vehicleData.trailerEntity = Parking.Functions.SpawnTrailer(tempVeh, vehicleData)
+		else
+			if not IsEntityPositionFrozen(tempVeh) then FreezeEntityPosition(tempVeh, true) end
+		end
 	end
 	Wait(50)
 	Parking.Functions.AddToTable(tempVeh, vehicleData)
 	Wait(50)
+
+
+	if Config.ParkVehiclesWithTrailers then
+		local vehiclebone = -1
+		if GetEntityBoneIndexByName(vehicle, 'attach_female') ~= -1 then
+			vehiclebone = GetEntityBoneIndexByName(vehicle, 'attach_female')
+		elseif GetEntityBoneIndexByName(vehicle, 'attach_male') then
+			vehiclebone = GetEntityBoneIndexByName(vehicle, 'attach_male')
+		end
+
+		local trailerbone = -1
+		if GetEntityBoneIndexByName(vehicles[i].trailerEntity, 'attach_female') ~= -1 then
+			trailerbone = GetEntityBoneIndexByName(vehicle, 'attach_female')
+		elseif GetEntityBoneIndexByName(vehicles[i].trailerEntity, 'attach_male') then
+			trailerbone = GetEntityBoneIndexByName(vehicles[i].trailerEntity, 'attach_male')
+		end
+		if vehiclebone ~= -1 and trailerbone ~= -1 then
+			AttachEntityBoneToEntityBone(vehicle, vehicles[i].trailerEntity, vehiclebone, trailerbone, false, false)
+			AttachEntityToEntity(trailerbone, vehiclebone, 1, 0.0, -1.0, 0.25, 0.0, 0.0, 0.0, false, false, true, false, 20, true)
+			SetTrailerLegsRaised(vehicles[i].trailerEntity)
+		end
+	end
+
+
 	SetVehicleSteeringAngle(tempVeh, vehicleData.steerangle + 0.0)
 	if PlayerData.citizenid == vehicleData.owner then
 		Parking.Functions.CreateTargetEntityMenu(tempVeh)

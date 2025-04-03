@@ -39,6 +39,10 @@ Config.VehicleOwnerTextDisplayDistance = 15
 ----------------------------------------------------------------------------
 Config.InteractDistance = 5.0
 ----------------------------------------------------------------------------
+
+Config.ParkVehiclesWithTrailers = false            -- Dont use this for now.....
+
+----------------------------------------------------------------------------
 -- Stuff to automatic disable the auto parking system.
 
 -- This is when you close to a gasstation, you can't use the auto park system.
