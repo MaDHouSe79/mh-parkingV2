@@ -16,7 +16,7 @@ shared_scripts {
 	'shared/configs/config.lua',
 	'shared/configs/vehicles.lua',
 	'shared/configs/trailers.lua',
-    'shared/functions.lua',	
+    'shared/functions.lua',
 }
 
 client_scripts {
