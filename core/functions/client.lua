@@ -431,7 +431,6 @@ function Parking.Functions.SpawnTrailer(vehicle, data)
 end
 
 function Parking.Functions.SpawnVehicles(vehicles)
-	while not isLoggedIn do Citizen.Wait(1000) end
 	while DeletingEntities do Citizen.Wait(100) end
 	for i = 1, #vehicles, 1 do
 		Parking.Functions.DeleteLocalVehicle(vehicles[i].vehicle)
@@ -450,7 +449,9 @@ function Parking.Functions.SpawnVehicles(vehicles)
 		SetEntityInvincible(tempVeh, true)
 		SetVehicleLivery(tempVeh, vehicles[i].mods.livery)
 		DoVehicleDamage(tempVeh, vehicles[i].body, vehicles[i].engine)
-		exports[config.FuelScript]:SetFuel(tempVeh, vehicles[i].fuel)
+
+		SetVehicleFuelLevel(tempVeh, vehicles[i].fuel + 0.0)
+
 		SetVehRadioStation(tempVeh, 'OFF')
 		SetVehicleDirtLevel(tempVeh, 0)
 		Parking.Functions.LockDoors(tempVeh, vehicles[i])
@@ -475,7 +476,6 @@ function Parking.Functions.SpawnVehicles(vehicles)
 end
 
 function Parking.Functions.SpawnVehicle(vehicleData)
-	while not isLoggedIn do Citizen.Wait(1000) end
 	while DeletingEntities do Citizen.Wait(100) end
 	Parking.Functions.DeleteLocalVehicle(vehicleData.vehicle)
 	Parking.Functions.DeleteNearVehicle(vec3(vehicleData.location.x, vehicleData.location.y, vehicleData.location.z))
@@ -493,7 +493,9 @@ function Parking.Functions.SpawnVehicle(vehicleData)
 	SetEntityInvincible(tempVeh, true)
 	SetVehicleLivery(tempVeh, vehicleData.mods.livery)
 	DoVehicleDamage(tempVeh, vehicleData.body, vehicleData.engine)
-	exports[config.FuelScript]:SetFuel(tempVeh, vehicleData.fuel)
+
+	SetVehicleFuelLevel(tempVeh, vehicleData.fuel + 0.0)
+
 	SetVehRadioStation(tempVeh, 'OFF')
 	SetVehicleDirtLevel(tempVeh, 0)
 	Parking.Functions.LockDoors(tempVeh, vehicleData)
