@@ -334,8 +334,8 @@ function Parking.Functions.Save(vehicle)
 			Parking.Functions.BlinkVehiclelights(vehicle, true)
 			TriggerCallback("mh-parkingV2:server:SaveCar", function(callback)
 				if callback.status then
-					DeleteVehicle(vehicle)
 					TriggerServerEvent('mh-parkingV2:server:CreateOwnerVehicleBlip', vehPlate)
+					DeleteVehicle(vehicle)
 					DisplayHelpText(callback.message)
 				else
 					DisplayHelpText(callback.message)
