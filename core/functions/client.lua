@@ -424,9 +424,9 @@ function Parking.Functions.SpawnTrailer(vehicle, data)
 	SetVehicleDirtLevel(tempVeh, 0)
     NetworkFadeInEntity(tempVeh, true)
 	while NetworkIsEntityFading(tempVeh) do Citizen.Wait(50) end
-    Wait(1500)
-    --if not IsEntityPositionFrozen(tempVeh) then FreezeEntityPosition(tempVeh, true) end
-    --if not IsEntityPositionFrozen(vehicle) then FreezeEntityPosition(vehicle, true) end
+    Wait(2000)
+    if not IsEntityPositionFrozen(tempVeh) then FreezeEntityPosition(tempVeh, true) end
+    if not IsEntityPositionFrozen(vehicle) then FreezeEntityPosition(vehicle, true) end
     return tempVeh
 end
 
