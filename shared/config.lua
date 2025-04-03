@@ -37,6 +37,8 @@ Config.Maxparking = 1                      -- Default 1, this is max parked allo
 Config.UseVehicleOwnerText = true          -- If true show the owner and vehicle text above vehicles when parked.
 Config.VehicleOwnerTextDisplayDistance = 15
 ----------------------------------------------------------------------------
+Config.InteractDistance = 5.0
+----------------------------------------------------------------------------
 -- Stuff to automatic disable the auto parking system.
 
 -- This is when you close to a gasstation, you can't use the auto park system.

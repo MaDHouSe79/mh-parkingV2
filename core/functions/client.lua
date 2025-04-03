@@ -415,7 +415,6 @@ function Parking.Functions.SpawnTrailer(vehicle, data)
 	Wait(50)
     local tempVeh = CreateVehicle(data.trailerdata.hash, trailerSpawnPos.x, trailerSpawnPos.y, vehicleCoords.z, heading, true)
     while not DoesEntityExist(tempVeh) do Wait(500) end
-
     SetEntityAsMissionEntity(tempVeh, true, true)
 	local plate = GetPlate(vehicle)
 	SetVehicleNumberPlateText(tempVeh, plate.."1")
@@ -461,7 +460,6 @@ function Parking.Functions.SpawnVehicles(vehicles)
 		else
 			if not IsEntityPositionFrozen(tempVeh) then FreezeEntityPosition(tempVeh, true) end
 		end
-
 		Wait(50)
 		Parking.Functions.AddToTable(tempVeh, vehicles[i])
 		Wait(50)
