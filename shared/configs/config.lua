@@ -21,8 +21,6 @@ Config.FuelScript = 'LegacyFuel'           -- Default is LegacyFuel, if you use 
 Config.DisableParkNotify = false           -- Default true, if false you get many notifications when you enter or leave the vehicle, all other notify massages are stil enable.
 Config.NotifyScript = "ox_lib"             -- Default qb, you can use (qb, ox_lib, k5_notify, okokNotify, Roda_Notifications)
 ----------------------------------------------------------------------------
-Config.OnlyAutoParkWhenEngineIsOff = true  -- Default true, if true auto park only when vehicle engine is off.
-----------------------------------------------------------------------------
 Config.ForceVehicleOnGound = true          -- If true this will force parked vehicles on the ground, sometimes the vehicles are in the air and by enable this is force the vehicle to the ground
 ----------------------------------------------------------------------------
 -- For performance
