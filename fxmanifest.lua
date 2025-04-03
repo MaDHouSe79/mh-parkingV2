@@ -5,9 +5,9 @@ fx_version 'cerulean'
 game 'gta5'
 
 author 'MaDHouSe79'
-description 'MH Parking.'
+description 'MH Parking V2.'
 version '1.0.12'
-repository 'https://github.com/MaDHouSe79/mh-parking'
+repository 'https://github.com/MaDHouSe79/mh-parkingV2'
 
 shared_scripts {
     '@ox_lib/init.lua',
