@@ -26,7 +26,8 @@
 - [Subscribe](https://www.youtube.com/c/@MaDHouSe79) 
 
 # MH Parking V2 (QB/ESX) by MaDHouSe79
-  
+- Auto park and unpark when you press `F`
+
 # Dependencies (QB/ESX)
 - [oxmysql](https://github.com/overextended/oxmysql/releases/tag/v1.9.3)
 - [ox_lib](https://github.com/overextended/ox_lib/releases)
