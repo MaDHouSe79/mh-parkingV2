@@ -109,10 +109,10 @@ function Parking.Functions.Save(src, data)
 			end
 			Wait(100)
 			TriggerClientEvent("mh-parkingV2:client:AddVehicle", -1, {vehicle = result.vehicle, plate = plate, owner = citizenid, fullname = fullname, location = data.location, mods = data.mods, trailerdata = data.trailerdata, steerangle = data.steerangle, street = data.street, engine = data.engine, fuel = data.fuel, body = data.body }, src)
-			return { status = true, message = "car saved" }
+			return { status = true, message = "" }
 		end
 	else
-		return { status = false, message = "to many car parked..." }
+		return { status = false, message = "You have to many cars parked, Default:"..defaultMax.." Parked:"..totalParked }
 	end
 end
 

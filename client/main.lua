@@ -1,7 +1,10 @@
 --[[ ===================================================== ]] --
 --[[          MH Realistic Parking V2 by MaDHouSe79        ]] --
 --[[ ===================================================== ]] --
-LocalVehicles, GlobalVehicles, isLoggedIn, SpawnedVehicles, DeletingEntities, displayOwnerText = {}, {}, {}, false, false, Config.UseVehicleOwnerText
+LocalVehicles, GlobalVehicles= {}, {}
+isLoggedIn, IsUsingParkCommand = false, false
+SpawnedVehicles, DeletingEntities = false, false
+displayOwnerText = Config.UseVehicleOwnerText
 AddEventHandler('onResourceStop', function(resource) Parking.Functions.DeleteAllVehicles() PlayerData = {} isLoggedIn = false end)
 AddEventHandler('onResourceStart', function(resource) if resource == GetCurrentResourceName() then PlayerData = GetPlayerData() isLoggedIn = true end end)
 RegisterNetEvent(OnPlayerLoaded, function()	TriggerServerEvent('mh-parkingV2:server:OnJoin') end)
@@ -10,8 +13,6 @@ RegisterNetEvent("mh-parkingV2:client:RefreshVehicles", function(vehicles) Parki
 RegisterNetEvent("mh-parkingV2:client:AddVehicle", function(vehicle, playerId) Parking.Functions.AddVehicle(vehicle, playerId) end)
 RegisterNetEvent("mh-parkingV2:client:DeleteVehicle", function(vehicle) Parking.Functions.DeleteLocalVehicle(vehicle) end)
 RegisterNetEvent("mh-parkingV2:client:CreateOwnerVehicleBlip", function(data) Parking.Functions.CreateOwnerVehicleBlip(data) end)
-RegisterNetEvent("mh-parkingV2:client:Unparking", function() Parking.Functions.TargetDrive() end)
-RegisterNetEvent("mh-parkingV2:client:Parking", function() Parking.Functions.TargetPark() end)
 RegisterNetEvent('mh-parkingV2:client:GetVehicleMenu', function() Parking.Functions.GetVehicleMenu() end)
 RegisterNetEvent('mh-parkingV2:client:OnJoin', function() Parking.Functions.OnJoin() end)
 RegisterCommand('toggleparktext', function() displayOwnerText = not displayOwnerText end, false)
@@ -25,3 +26,5 @@ CreateThread(function() Parking.Functions.DriveOrPark() end)
 CreateThread(function() Parking.Functions.CheckSteeringAngle() end)
 CreateThread(function() Parking.Functions.RadialMenu() end)
 CreateThread(function() Parking.Functions.CreateBlips() end)
+RegisterKeyMapping('park', 'Park or Drive', 'keyboard', Config.KeyParkBindButton)
+RegisterCommand('park', function() IsUsingParkCommand = true end, false)
