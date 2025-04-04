@@ -540,42 +540,6 @@ function Parking.Functions.SpawnVehicleChecker()
 	end
 end
 
-function Parking.Functions.DriveOrPark()
-	while true do
-		Wait(0)
-		if isLoggedIn then
-			if IsPedInAnyVehicle(GetPlayerPed(-1)) then
-				local storedVehicle = Parking.Functions.GetPedInStoredCar(GetPlayerPed(-1))
-				if storedVehicle ~= false then
-					DisplayHelpText("Press [E] to drive.")
-					if IsControlJustReleased(0, Config.ParkingButton) then
-						IsUsingParkCommand = true
-					end
-				end
-				if IsUsingParkCommand then
-					IsUsingParkCommand = false
-					-- if storedVehicle ~= false then
-					-- 	Parking.Functions.Drive(storedVehicle)
-					-- else
-					-- 	local vehicle = GetVehiclePedIsIn(GetPlayerPed(-1))
-					-- 	if vehicle ~= 0 then
-					-- 		local speed = GetEntitySpeed(vehicle)
-					-- 		if GetEntitySpeed(vehicle) > 0.1 then
-					-- 			DisplayHelpText("Stop the vehicle")
-					-- 		elseif IsThisModelACar(GetEntityModel(vehicle)) or IsThisModelABike(GetEntityModel(vehicle)) or IsThisModelABicycle(GetEntityModel(vehicle)) or IsThisModelAPlane(GetEntityModel(vehicle)) or IsThisModelABoat(GetEntityModel(vehicle)) or IsThisModelAHeli(GetEntityModel(vehicle)) then
-					-- 			Parking.Functions.Save(vehicle)
-					-- 		end
-					-- 	end
-					-- end
-				end
-			else
-				IsUsingParkCommand = false
-				Wait(500)
-			end
-		end
-	end
-end
-
 function Parking.Functions.DisplayVehicleOwnerText()
 	while true do
 		Wait(0)

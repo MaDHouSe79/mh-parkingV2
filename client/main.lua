@@ -23,7 +23,6 @@ CreateThread(function() while true do Wait(1000) if isLoggedIn then if #LocalVeh
 CreateThread(function() while true do Wait(0) if isLoggedIn then Parking.Functions.GetInAndOutVehicle() Wait(50) end end end)
 CreateThread(function() while true do Wait(0) if isLoggedIn then Parking.Functions.KeepEngineRunning() end end end)
 CreateThread(function() Parking.Functions.SpawnVehicleChecker() end)
---CreateThread(function() Parking.Functions.DriveOrPark() end)
 CreateThread(function() Parking.Functions.CheckSteeringAngle() end)
 CreateThread(function() Parking.Functions.RadialMenu() end)
 CreateThread(function() Parking.Functions.CreateBlips() end)
