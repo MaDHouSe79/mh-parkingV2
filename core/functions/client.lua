@@ -124,10 +124,10 @@ function Parking.Functions.BlinkVehiclelights(vehicle, state)
     end
     Wait(1000)
     if state then
-        FreezeEntityPosition(vehicle, true)
+        --FreezeEntityPosition(vehicle, true)
         SetEntityInvincible(vehicle, true)
     else
-        FreezeEntityPosition(vehicle, false)
+        --FreezeEntityPosition(vehicle, false)
         SetEntityInvincible(vehicle, false)
     end
 end
@@ -302,6 +302,15 @@ function Parking.Functions.DeleteVehicleAtcoords(coords)
     end
 end
 
+function Parking.Functions.LockDoors(entity, data)
+	TriggerServerEvent('mh-parkingV2:server:SetVehLockState', VehToNet(entity), 2)
+	SetVehicleDoorsLocked(entity, 2)
+	if Config.VehicleDoorsUnlockedForOwners and PlayerData.citizenid == data.owner then
+		TriggerServerEvent('mh-parkingV2:server:SetVehLockState', VehToNet(entity), 1)
+		SetVehicleDoorsLocked(entity, 1)
+	end
+end
+
 function Parking.Functions.Drive(vehicle)
 	TriggerCallback("mh-parkingV2:server:DriveCar", function(callback)
 		if callback.status then
@@ -342,36 +351,30 @@ function Parking.Functions.Save(vehicle)
 			end
 			TaskLeaveVehicle(PlayerPedId(), vehicle, 1)
 			Wait(2500)
-			Parking.Functions.BlinkVehiclelights(vehicle, true)
-			TriggerCallback("mh-parkingV2:server:SaveCar", function(callback)
-				if callback.status then
-					TriggerServerEvent('mh-parkingV2:server:CreateOwnerVehicleBlip', vehPlate)
-					DeleteVehicle(vehicle)
-					DisplayHelpText(callback.message)
-				else
-					FreezeEntityPosition(vehicle, false)
-					DisplayHelpText(callback.message)
-				end
-			end, {
-				mods = GetVehicleProperties(vehicle),
-				fuel = exports[Config.FuelScript]:GetFuel(vehicle),
-				engine = GetVehicleEngineHealth(vehicle),
-				body = GetVehicleBodyHealth(vehicle),
-				street = GetStreetName(vehicle),
-				steerangle = GetVehicleSteeringAngle(vehicle),
-				location = {x = vehPos.x, y = vehPos.y, z = vehPos.z, h = vehHead},
-				trailerdata = trailerdata,
-			})
+			if Config.OnlyAutoParkWhenEngineIsOff and GetIsVehicleEngineRunning(vehicle) then canSave = false end
+            if canSave then
+				Parking.Functions.BlinkVehiclelights(vehicle, true)
+				TriggerCallback("mh-parkingV2:server:SaveCar", function(callback)
+					if callback.status then
+						TriggerServerEvent('mh-parkingV2:server:CreateOwnerVehicleBlip', vehPlate)
+						DeleteVehicle(vehicle)
+						DisplayHelpText(callback.message)
+					else
+						FreezeEntityPosition(vehicle, false)
+						DisplayHelpText(callback.message)
+					end
+				end, {
+					mods = GetVehicleProperties(vehicle),
+					fuel = exports[Config.FuelScript]:GetFuel(vehicle),
+					engine = GetVehicleEngineHealth(vehicle),
+					body = GetVehicleBodyHealth(vehicle),
+					street = GetStreetName(vehicle),
+					steerangle = GetVehicleSteeringAngle(vehicle),
+					location = {x = vehPos.x, y = vehPos.y, z = vehPos.z, h = vehHead},
+					trailerdata = trailerdata,
+				})
+			end
 		end
-	end
-end
-
-function Parking.Functions.LockDoors(entity, data)
-	TriggerServerEvent('mh-parkingV2:server:SetVehLockState', VehToNet(entity), 2)
-	SetVehicleDoorsLocked(entity, 2)
-	if Config.VehicleDoorsUnlockedForOwners and PlayerData.citizenid == data.owner then
-		TriggerServerEvent('mh-parkingV2:server:SetVehLockState', VehToNet(entity), 1)
-		SetVehicleDoorsLocked(entity, 1)
 	end
 end
 
@@ -456,14 +459,6 @@ function Parking.Functions.SpawnTrailer(vehicle, data)
     return tempVeh
 end
 
-function LockVehicles(data)
-	Wait(10000)
-	for k, v in pairs(data) do
-		if v.entity ~= nil then FreezeEntityPosition(v.entity, true) end
-		if v.trailerEntity ~= nil then FreezeEntityPosition(v.trailerEntity, true) end
-	end
-end
-
 function Parking.Functions.SpawnVehicles(vehicles)
 	while DeletingEntities do Wait(500) end
 	for i = 1, #vehicles, 1 do
@@ -502,8 +497,11 @@ function Parking.Functions.SpawnVehicles(vehicles)
 			TriggerServerEvent('mh-parkingV2:server:CreateOwnerVehicleBlip', vehicles[i].plate)
 		end
 	end
-	Wait(5000)
-	LockVehicles(vehicles)
+	Wait(15000)
+	for i = 1, #vehicles, 1 do
+		if vehicles[i] and vehicles[i].entity ~= nil then FreezeEntityPosition(vehicles[i].entity, true) end
+		if vehicles[i] and vehicles[i].trailerEntity ~= nil then FreezeEntityPosition(vehicles[i].trailerEntity, true) end
+	end
 end
 
 function Parking.Functions.SpawnVehicle(vehicleData)
@@ -542,8 +540,9 @@ function Parking.Functions.SpawnVehicle(vehicleData)
 		Parking.Functions.CreateTargetEntityMenu(tempVeh)
 		TriggerServerEvent('mh-parkingV2:server:CreateOwnerVehicleBlip', vehicleData.plate)
 	end
-	Wait(5000)
-	LockVehicles(vehicleData)
+	Wait(15000)
+	if tempVeh ~= nil then FreezeEntityPosition(tempVeh, true) end
+	if vehicleData.trailerEntity ~= nil then FreezeEntityPosition(vehicles[i].trailerEntity, true) end
 end
 
 function Parking.Functions.SpawnVehicleChecker()
@@ -565,36 +564,6 @@ function Parking.Functions.SpawnVehicleChecker()
 					Parking.Functions.RemoveVehicles(GlobalVehicles)
 					SpawnedVehicles = false
 				end
-			end
-		end
-	end
-end
-
-function Parking.Functions.DisplayVehicleOwnerText()
-	while true do
-		Wait(0)
-		if isLoggedIn and displayOwnerText then
-			local fd = true
-			local playerCoords = GetEntityCoords(GetPlayerPed(-1))
-			if fd then
-				fd = false
-				for k, v in pairs(LocalVehicles) do
-					if GetDistance(playerCoords, v.location) < Config.VehicleOwnerTextDisplayDistance then
-						local owner, plate, model, brand = v.fullname, v.plate, "", ""
-						for k, vehicle in pairs(Config.Vehicles) do
-							if vehicle.model:lower() == vehicle.model:lower() then
-								model, brand = vehicle.name, vehicle.brand
-								break
-							end
-						end
-						if model ~= nil and brand ~= nil then
-							Draw3DText(v.location.x, v.location.y, v.location.z, "Model: ~b~"..model.."~s~" .. '\n' .. "Brand: ~o~"..brand.."~s~" .. '\n' .. "Plate: ~g~"..plate.."~s~" .. '\n' .. "Owner: ~y~"..owner.."~s~" , 0, 0.04, 0.04)
-							fd = true
-						end
-					end
-				end
-			else
-				Wait(100)
 			end
 		end
 	end
@@ -625,6 +594,36 @@ function Parking.Functions.DriveOrPark()
 				end
 			else
 				Wait(500)
+			end
+		end
+	end
+end
+
+function Parking.Functions.DisplayVehicleOwnerText()
+	while true do
+		Wait(0)
+		if isLoggedIn and displayOwnerText then
+			local fd = true
+			local playerCoords = GetEntityCoords(GetPlayerPed(-1))
+			if fd then
+				fd = false
+				for k, v in pairs(LocalVehicles) do
+					if GetDistance(playerCoords, v.location) < Config.VehicleOwnerTextDisplayDistance then
+						local owner, plate, model, brand = v.fullname, v.plate, "", ""
+						for k, vehicle in pairs(Config.Vehicles) do
+							if vehicle.model:lower() == vehicle.model:lower() then
+								model, brand = vehicle.name, vehicle.brand
+								break
+							end
+						end
+						if model ~= nil and brand ~= nil then
+							Draw3DText(v.location.x, v.location.y, v.location.z, "Model: ~b~"..model.."~s~" .. '\n' .. "Brand: ~o~"..brand.."~s~" .. '\n' .. "Plate: ~g~"..plate.."~s~" .. '\n' .. "Owner: ~y~"..owner.."~s~" , 0, 0.04, 0.04)
+							fd = true
+						end
+					end
+				end
+			else
+				Wait(100)
 			end
 		end
 	end

@@ -16,7 +16,7 @@ RegisterNetEvent('mh-parkingV2:client:GetVehicleMenu', function() Parking.Functi
 RegisterNetEvent('mh-parkingV2:client:OnJoin', function() Parking.Functions.OnJoin() end)
 RegisterCommand('toggleparktext', function() displayOwnerText = not displayOwnerText end, false)
 RegisterCommand('parkmenu', function() TriggerEvent('mh-parkingV2:client:GetVehicleMenu') end, false)
-CreateThread(function() while true do Wait(0) if isLoggedIn and displayOwnerText then Parking.Functions.DisplayVehicleOwnerText() end  end end)
+CreateThread(function() while true do Wait(0) if isLoggedIn and displayOwnerText then Parking.Functions.DisplayVehicleOwnerText() end end end)
 CreateThread(function() while true do Wait(2000) if isLoggedIn then if #LocalVehicles ~= 0 then Parking.Functions.MakeVehiclesVisable() end end end end)
 CreateThread(function() while true do Wait(3000) if isLoggedIn then if #LocalVehicles ~= 0 then Parking.Functions.CheckDistanceToForceGrounded() end end end end)
 CreateThread(function()	while true do Wait(1000) if isLoggedIn then if #LocalVehicles ~= 0 then Parking.Functions.UpdateVehicleStatus() end collectgarbage("collect") end end end)
