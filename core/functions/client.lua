@@ -456,6 +456,14 @@ function Parking.Functions.SpawnTrailer(vehicle, data)
     return tempVeh
 end
 
+function LockVehicles(data)
+	Wait(10000)
+	for k, v in pairs(data) do
+		if v.entity ~= nil then FreezeEntityPosition(v.entity, true) end
+		if v.trailerEntity ~= nil then FreezeEntityPosition(v.trailerEntity, true) end
+	end
+end
+
 function Parking.Functions.SpawnVehicles(vehicles)
 	while DeletingEntities do Wait(500) end
 	for i = 1, #vehicles, 1 do
@@ -493,10 +501,9 @@ function Parking.Functions.SpawnVehicles(vehicles)
 			Parking.Functions.CreateTargetEntityMenu(tempVeh)
 			TriggerServerEvent('mh-parkingV2:server:CreateOwnerVehicleBlip', vehicles[i].plate)
 		end
-		--Wait(1500)
-		--if not IsEntityPositionFrozen(tempVeh) then FreezeEntityPosition(tempVeh, true) end
-		--if vehicles[i].trailerEntity ~= nil and not IsEntityPositionFrozen(vehicles[i].trailerEntity) then FreezeEntityPosition(vehicles[i].trailerEntity, true) end
 	end
+	Wait(1000)
+	LockVehicles(vehicles)
 end
 
 function Parking.Functions.SpawnVehicle(vehicleData)
@@ -535,9 +542,8 @@ function Parking.Functions.SpawnVehicle(vehicleData)
 		Parking.Functions.CreateTargetEntityMenu(tempVeh)
 		TriggerServerEvent('mh-parkingV2:server:CreateOwnerVehicleBlip', vehicleData.plate)
 	end
-	--Wait(1500)
-	--if not IsEntityPositionFrozen(tempVeh) then FreezeEntityPosition(tempVeh, true) end
-	--if vehicles[i].trailerEntity ~= nil and not IsEntityPositionFrozen(vehicles[i].trailerEntity) then FreezeEntityPosition(vehicles[i].trailerEntity, true) end
+	Wait(1000)
+	LockVehicles(vehicleData)
 end
 
 function Parking.Functions.SpawnVehicleChecker()
