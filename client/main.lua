@@ -3,7 +3,7 @@
 --[[ ===================================================== ]] --
 LocalVehicles, GlobalVehicles, isLoggedIn, IsUsingParkCommand, SpawnedVehicles, DeletingEntities, displayOwnerText = {}, {}, false, false, false, false, Config.UseVehicleOwnerText
 AddEventHandler('onResourceStop', function(resource) Parking.Functions.DeleteAllVehicles() PlayerData = {} isLoggedIn = false end)
-AddEventHandler('onResourceStart', function(resource) if resource == GetCurrentResourceName() then PlayerData = GetPlayerData() isLoggedIn = true end end)
+AddEventHandler('onResourceStart', function(resource) if resource == GetCurrentResourceName() then TriggerServerEvent('mh-parkingV2:server:OnJoin') PlayerData = GetPlayerData() isLoggedIn = true end end)
 RegisterNetEvent(OnPlayerLoaded, function() TriggerServerEvent('mh-parkingV2:server:OnJoin') end)
 RegisterNetEvent(OnPlayerUnload, function() Parking.Functions.DeleteAllVehicles() PlayerData = {} isLoggedIn = false end)
 RegisterNetEvent("mh-parkingV2:client:RefreshVehicles", function(vehicles) Parking.Functions.RefreshVehicles(vehicles) end)

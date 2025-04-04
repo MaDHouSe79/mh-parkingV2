@@ -425,6 +425,20 @@ function Parking.Functions.ConnectVehicleToTrailer(vehicle, trailer, data)
 	end
 end
 
+function Parking.Functions.LockAllParkedVehicles()
+	Wait(15000)
+	if isLoggedIn then
+		if #LocalVehicles > 0 then
+			print("Freeze All PAkerd vehicles..")
+			for i = 1, #LocalVehicles, 1 do
+				if LocalVehicles[i].entity ~= nil then FreezeEntityPosition(LocalVehicles[i].entity, true) end
+				if LocalVehicles[i].trailerEntity ~= nil then FreezeEntityPosition(LocalVehicles[i].trailerEntity, true) end
+			end
+		end
+	end
+	Parking.Functions.LockAllParkedVehicles()
+end
+
 function Parking.Functions.SpawnVehicles(vehicles)
 	while DeletingEntities do Wait(500) end
 	for i = 1, #vehicles, 1 do
@@ -441,6 +455,7 @@ function Parking.Functions.SpawnVehicles(vehicles)
 			end
 		end
 		SetEntityAsMissionEntity(tempVeh, true, true)
+		vehicles[i].entity = tempVeh
 		SetVehicleEngineOn(tempVeh, false, false, true)
 		SetVehicleProperties(tempVeh, vehicles[i].mods)
 		RequestCollisionAtCoord(vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z)
@@ -461,11 +476,6 @@ function Parking.Functions.SpawnVehicles(vehicles)
 			TriggerServerEvent('mh-parkingV2:server:CreateOwnerVehicleBlip', vehicles[i].plate)
 		end
 	end
-	Wait(15000)
-	for i = 1, #vehicles, 1 do
-		if vehicles[i] and vehicles[i].entity ~= nil then FreezeEntityPosition(vehicles[i].entity, true) end
-		if vehicles[i] and vehicles[i].trailerEntity ~= nil then FreezeEntityPosition(vehicles[i].trailerEntity, true) end
-	end
 end
 
 function Parking.Functions.SpawnVehicle(vehicleData)
@@ -483,6 +493,7 @@ function Parking.Functions.SpawnVehicle(vehicleData)
 		end
 	end
 	SetEntityAsMissionEntity(tempVeh, true, true)
+	vehicleData.entity = tempVeh
 	SetVehicleEngineOn(tempVeh, false, false, true)
 	SetVehicleProperties(tempVeh, vehicleData.mods)
 	RequestCollisionAtCoord(vehicleData.location.x, vehicleData.location.y, vehicleData.location.z)
@@ -502,9 +513,6 @@ function Parking.Functions.SpawnVehicle(vehicleData)
 	if PlayerData.citizenid == vehicleData.owner then
 		TriggerServerEvent('mh-parkingV2:server:CreateOwnerVehicleBlip', vehicleData.plate)
 	end
-	Wait(15000)
-	if tempVeh ~= nil then FreezeEntityPosition(tempVeh, true) end
-	if vehicleData.trailerEntity ~= nil then FreezeEntityPosition(vehicleData.trailerEntity, true) end
 end
 
 function Parking.Functions.SpawnVehicleChecker()
@@ -632,6 +640,7 @@ function Parking.Functions.OnJoin()
 	Wait(5000)
 	PlayerData = GetPlayerData()
 	isLoggedIn = true
+	Parking.Functions.LockAllParkedVehicles()
 end
 
 function Parking.Functions.RefreshVehicles(vehicles)
