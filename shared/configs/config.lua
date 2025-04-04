@@ -30,18 +30,21 @@ Config.UseParkedBlips = true               -- if true players can see a blip of 
 ----------------------------------------------------------------------------
 -- VIP Access
 Config.UseAsVip = false                    -- if true `Config.Maxparking` does not work on vip players and you need to add a amount per player.
-Config.Maxparking = 1                      -- Default 1, this is max parked allowed per player, don't go to high with this...
+Config.Maxparking = 3                      -- Default 1, this is max parked allowed per player, don't go to high with this...
 ----------------------------------------------------------------------------
 Config.UseVehicleOwnerText = true          -- If true show the owner and vehicle text above vehicles when parked.
 Config.VehicleOwnerTextDisplayDistance = 15
 ----------------------------------------------------------------------------
 Config.InteractDistance = 5.0
 ----------------------------------------------------------------------------
-Config.ParkVehiclesWithTrailers = false    -- Keep it false, don't use this for now.....
+Config.ParkVehiclesWithTrailers = true     -- Keep it false, don't use this for now.....
 ----------------------------------------------------------------------------
--- Stuff to automatic disable the auto parking system.
 
--- This is when you close to a gasstation, you can't use the auto park system.
+
+
+-- Stuff below this is to automatic disable the parking system.
+
+-- This is when you close to a gasstation, you can't use the park system.
 -- This goes automatic so leave it as it is.
 Config.DisableNeedByPumpModels = {
     ['prop_vintage_pump'] = true,
@@ -55,7 +58,7 @@ Config.DisableNeedByPumpModels = {
 ----------------------------------------------------------------------------
 Config.DebugBlipForRadius = true -- If true you see a circle aera on the map, use this for debug only.
 
--- This are locations where you can't use the auto park system.
+-- This are locations where you can't use the park system.
 -- the reason for this is it can be that you need to use the vehicle on that point.
 -- So if you want that, you can't use the park system cause you can't use the vehicle when parked.
 -- If you want to see the radius on the map you need to set Config.DebugBlipForRadius to true

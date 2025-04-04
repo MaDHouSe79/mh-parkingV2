@@ -148,6 +148,10 @@ function Parking.Functions.CreateOwnerVehicleBlip(src, plate)
 	if result then TriggerClientEvent("mh-parkingV2:client:CreateOwnerVehicleBlip", src, { vehicle = result.vehicle, location = json.decode(result.location), plate = result.plate }) end
 end
 
+function Parking.Functions.OnJoin(src)
+	TriggerClientEvent('mh-parkingV2:client:OnJoin', src)
+end
+
 function Parking.Functions.Init()
 	Wait(3000)
 	if Config.Framework == 'esx' then
