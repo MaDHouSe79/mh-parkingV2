@@ -434,6 +434,12 @@ function Parking.Functions.ConnectVehicleToTrailer(vehicle, trailer, data)
 	Wait(50)
 	SetEntityVisible(vehicle, true, 0)
 	SetEntityVisible(trailer, true, 0)
+	Wait(100)
+
+	if IsEntityAttached(trailer) then
+		FreezeEntityPosition(trailer, false)
+		DetachEntity(trailer, true, true)
+	end
 end
 
 function Parking.Functions.SpawnTrailer(vehicle, data)
