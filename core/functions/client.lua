@@ -335,6 +335,7 @@ function Parking.Functions.Save(vehicle)
 						trailerdata = {hash = hashkey, coords = GetEntityCoords(trailer), heading = GetEntityHeading(trailer), mods = trailerProps}
 					end
 				end
+				Wait(50)
 			end
 			TaskLeaveVehicle(PlayerPedId(), vehicle, 1)
 			Wait(2500)
