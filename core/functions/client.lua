@@ -399,28 +399,14 @@ function Parking.Functions.DriveVehicle(data)
 end
 
 function Parking.Functions.ConnectVehicleToTrailer(vehicle, trailer, data)
+	local vehiclebone, trailerbone  = GetVehicleAndTrailerBones(vehicle, trailer)
 	SetEntityAsMissionEntity(vehicle, true, true)
 	SetEntityAsMissionEntity(trailer, true, true)
 	SetEntityVisible(vehicle, false, 0)
 	SetEntityVisible(trailer, false, 0)
-	local vehiclebone = -1
-	if GetEntityBoneIndexByName(vehicle, 'attach_male') ~= -1 then
-		vehiclebone = GetEntityBoneIndexByName(vehicle, 'attach_male')
-	elseif GetEntityBoneIndexByName(vehicle, 'attach_female') ~= -1 then
-		vehiclebone = GetEntityBoneIndexByName(vehicle, 'attach_female')
-	end
-
-	local trailerbone = -1
-	if GetEntityBoneIndexByName(trailer, 'attach_male') ~= -1 then
-		trailerbone = GetEntityBoneIndexByName(trailer, 'attach_male')
-	elseif GetEntityBoneIndexByName(trailer, 'attach_female') ~= -1 then
-		trailerbone = GetEntityBoneIndexByName(trailer, 'attach_female')
-	end
-
 	AttachEntityBoneToEntityBone(trailer, vehicle, trailerbone, vehiclebone, false, false)
 	SetTrailerLegsRaised(trailer)
 	SetVehicleOnGroundProperly(vehicle)
-
 	local relocate = (Config.Vehicles[GetEntityModel(vehicle)].category ~= "commercial")
 	local retval, groundZ = GetGroundZFor_3dCoord(data.location.x, data.location.y, data.location.z, false)
 	if retval then SetEntityCoords(vehicle, data.location.x, data.location.y, groundZ - 1) end

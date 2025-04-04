@@ -22,6 +22,23 @@ function GetPlate(vehicle)
     return GetVehicleNumberPlateText(vehicle)
 end
 
+function GetVehicleAndTrailerBones(vehicle, trailer)
+	local vehiclebone = -1
+	if GetEntityBoneIndexByName(vehicle, 'attach_male') ~= -1 then
+		vehiclebone = GetEntityBoneIndexByName(vehicle, 'attach_male')
+	elseif GetEntityBoneIndexByName(vehicle, 'attach_female') ~= -1 then
+		vehiclebone = GetEntityBoneIndexByName(vehicle, 'attach_female')
+	end
+
+	local trailerbone = -1
+	if GetEntityBoneIndexByName(trailer, 'attach_male') ~= -1 then
+		trailerbone = GetEntityBoneIndexByName(trailer, 'attach_male')
+	elseif GetEntityBoneIndexByName(trailer, 'attach_female') ~= -1 then
+		trailerbone = GetEntityBoneIndexByName(trailer, 'attach_female')
+	end
+    return vehiclebone, trailerbone
+end
+
 function GetClosestVehicle(coords)
     local ped = PlayerPedId()
     local vehicles = GetGamePool('CVehicle')
