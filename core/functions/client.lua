@@ -502,7 +502,7 @@ function Parking.Functions.SpawnVehicles(vehicles)
 			TriggerServerEvent('mh-parkingV2:server:CreateOwnerVehicleBlip', vehicles[i].plate)
 		end
 	end
-	Wait(1000)
+	Wait(5000)
 	LockVehicles(vehicles)
 end
 
@@ -542,7 +542,7 @@ function Parking.Functions.SpawnVehicle(vehicleData)
 		Parking.Functions.CreateTargetEntityMenu(tempVeh)
 		TriggerServerEvent('mh-parkingV2:server:CreateOwnerVehicleBlip', vehicleData.plate)
 	end
-	Wait(1000)
+	Wait(5000)
 	LockVehicles(vehicleData)
 end
 
