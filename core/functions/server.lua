@@ -44,10 +44,10 @@ function Parking.Functions.RefreshVehicles(src)
 			body = v.body,
 			engine = v.engine,
 			street = v.street,
+			steerangle = v.steerangle,
 			mods = json.decode(v.mods),
 			location = json.decode(v.location),
 			trailerdata = json.decode(v.trailerdata),
-			steerangle = v.steerangle
 		}
 		if Config.Framework == 'qb' then
 			local target = GetPlayerDataByCitizenId(v.citizenid)
@@ -119,7 +119,20 @@ function Parking.Functions.Save(src, data)
 				MySQL.Async.execute('UPDATE player_vehicles SET state = ?, location = ?, street = ?, trailerdata = ?, steerangle = ?, engine = ?, fuel = ?, body = ? WHERE plate = ? AND citizenid = ?', { 3, location, data.street, trailerdata, data.steerangle, data.engine, data.fuel, data.body, plate, citizenid })
 			end
 			Wait(100)
-			TriggerClientEvent("mh-parkingV2:client:AddVehicle", -1, { vehicle = result.vehicle, plate = plate, owner = citizenid, fullname = fullname, location = data.location, mods = data.mods, trailerdata = data.trailerdata, steerangle = data.steerangle, street = data.street, engine = data.engine, fuel = data.fuel, body = data.body }, src)
+			TriggerClientEvent("mh-parkingV2:client:AddVehicle", -1, {
+				vehicle = result.vehicle,
+				plate = plate,
+				owner = citizenid,
+				fullname = fullname,
+				location = data.location,
+				mods = data.mods,
+				trailerdata = data.trailerdata,
+				steerangle = data.steerangle,
+				street = data.street,
+				engine = data.engine,
+				fuel = data.fuel,
+				body = data.body
+			}, src)
 			return { status = true, message = "" }
 		end
 	else
@@ -146,8 +159,7 @@ function Parking.Functions.Drive(src, data)
 		end
 		Wait(50)
 		TriggerClientEvent("mh-parkingV2:client:DeleteVehicle", -1, { plate = plate })
-		return { status = true, message = "success", vehicle = result.vehicle, mods = mods, location = location, fuel =
-		result.fuel, body = result.body, engine = result.engine, trailerdata = json.decode(result.trailerdata) }
+		return { status = true, message = "success", vehicle = result.vehicle, mods = mods, plate = result.plate, location = location, fuel = result.fuel, body = result.body, engine = result.engine, trailerdata = json.decode(result.trailerdata) }
 	else
 		return { status = false, message = "not parked" }
 	end
