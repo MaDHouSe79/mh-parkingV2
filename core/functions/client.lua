@@ -410,8 +410,6 @@ function Parking.Functions.ConnectVehicleToTrailer(vehicle, trailer, data)
 	local relocate = (Config.Vehicles[GetEntityModel(vehicle)].category ~= "commercial")
 	local retval, groundZ = GetGroundZFor_3dCoord(data.location.x, data.location.y, data.location.z, false)
 	if retval then SetEntityCoords(vehicle, data.location.x, data.location.y, groundZ - 1) end
-	if not IsEntityPositionFrozen(vehicle) then FreezeEntityPosition(vehicle, true) end
-	if not IsEntityPositionFrozen(trailer) then FreezeEntityPosition(trailer, true) end
 	Wait(50)
 	SetEntityVisible(vehicle, true, 0)
 	SetEntityVisible(trailer, true, 0)
@@ -421,8 +419,6 @@ function Parking.Functions.ConnectVehicleToTrailer(vehicle, trailer, data)
 		DetachEntity(trailer, true, true)
 		Wait(100)
 	end
-	Wait(500)
-	FreezeEntityPosition(trailer, true)
 end
 
 function Parking.Functions.SpawnTrailer(vehicle, data)
@@ -444,14 +440,14 @@ function Parking.Functions.SpawnTrailer(vehicle, data)
 				end
 			end
 		end
-		local trailerSpawnPos = GetOffsetFromEntityInWorldCoords(vehicle, posX, offset, 1.0)
+		local trailerSpawnPos = GetOffsetFromEntityInWorldCoords(vehicle, posX, offset, 0.0)
 		Parking.Functions.DeleteVehicleAtcoords(trailerSpawnPos)
 		LoadModel(data.trailerdata.hash)
-		tempVeh = CreateVehicle(data.trailerdata.hash, trailerSpawnPos.x, trailerSpawnPos.y, vehicleCoords.z, heading, true, false)
+		tempVeh = CreateVehicle(data.trailerdata.hash, trailerSpawnPos.x, trailerSpawnPos.y, vehicleCoords.z - 1.5, heading, true, false)
 		while not DoesEntityExist(tempVeh) do Wait(1) end
 		SetEntityAsMissionEntity(tempVeh, true, true)
 		SetVehicleNumberPlateText(tempVeh, GetPlate(vehicle).."1")
-		RequestCollisionAtCoord(trailerSpawnPos.x, trailerSpawnPos.y, trailerSpawnPos.y)
+		RequestCollisionAtCoord(trailerSpawnPos.x, trailerSpawnPos.y, trailerSpawnPos.z)
 		SetVehicleOnGroundProperly(tempVeh)
 		SetVehicleProperties(tempVeh, data.trailerdata.mods)
 		SetVehicleDirtLevel(tempVeh, 0)
@@ -491,13 +487,15 @@ function Parking.Functions.SpawnVehicles(vehicles)
 		SetModelAsNoLongerNeeded(vehicles[i].mods["model"])
 		SetVehicleSteeringAngle(tempVeh, vehicles[i].steerangle + 0.0)
 		Wait(500)
-		FreezeEntityPosition(tempVeh, true)
 		Parking.Functions.AddToTable(tempVeh, vehicles[i])
 		Parking.Functions.LockDoors(tempVeh, vehicles[i])
 		if PlayerData.citizenid == vehicles[i].owner then
 			Parking.Functions.CreateTargetEntityMenu(tempVeh)
 			TriggerServerEvent('mh-parkingV2:server:CreateOwnerVehicleBlip', vehicles[i].plate)
 		end
+		--Wait(1500)
+		--if not IsEntityPositionFrozen(tempVeh) then FreezeEntityPosition(tempVeh, true) end
+		--if vehicles[i].trailerEntity ~= nil and not IsEntityPositionFrozen(vehicles[i].trailerEntity) then FreezeEntityPosition(vehicles[i].trailerEntity, true) end
 	end
 end
 
@@ -531,13 +529,15 @@ function Parking.Functions.SpawnVehicle(vehicleData)
 	NetworkAllowLocalEntityAttachment(tempVeh, true)
 	SetModelAsNoLongerNeeded(vehicleData.mods["model"])
 	Wait(500)
-	FreezeEntityPosition(tempVeh, true)
 	Parking.Functions.AddToTable(tempVeh, vehicleData)
 	Parking.Functions.LockDoors(tempVeh, vehicleData)
 	if PlayerData.citizenid == vehicleData.owner then
 		Parking.Functions.CreateTargetEntityMenu(tempVeh)
 		TriggerServerEvent('mh-parkingV2:server:CreateOwnerVehicleBlip', vehicleData.plate)
 	end
+	--Wait(1500)
+	--if not IsEntityPositionFrozen(tempVeh) then FreezeEntityPosition(tempVeh, true) end
+	--if vehicles[i].trailerEntity ~= nil and not IsEntityPositionFrozen(vehicles[i].trailerEntity) then FreezeEntityPosition(vehicles[i].trailerEntity, true) end
 end
 
 function Parking.Functions.SpawnVehicleChecker()
