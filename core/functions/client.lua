@@ -646,7 +646,7 @@ end
 
 function Parking.Functions.CreateOwnerVehicleBlip(data)
 	for i = 1, #LocalVehicles do
-		if Trim(LocalVehicles[i].plate) == Trim(data.plate) then
+		if LocalVehicles[i] and LocalVehicles[i].plate ~= nil and Trim(LocalVehicles[i].plate) == Trim(data.plate) then
 			LocalVehicles[i].blip = Parking.Functions.CreateParkedBlip(data)
 			break
 		end

@@ -112,7 +112,7 @@ function Parking.Functions.Save(src, data)
 			return { status = true, message = "" }
 		end
 	else
-		return { status = false, message = "You have to many cars parked, Default:"..defaultMax.." Parked:"..totalParked }
+		return { status = false, message = "You have to many cars parked" }
 	end
 end
 
