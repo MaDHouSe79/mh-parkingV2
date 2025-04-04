@@ -165,7 +165,7 @@ function Parking.Functions.Drive(src, data)
 		TriggerClientEvent("mh-parkingV2:client:DeleteVehicle", -1, { plate = plate })
 		return { status = true, message = Lang:t('info.remove_vehicle_zone'), vehicle = result.vehicle, mods = mods, plate = result.plate, location = location, fuel = result.fuel, body = result.body, engine = result.engine, trailerdata = json.decode(result.trailerdata) }
 	else
-		return { status = false, message = Lang:t('info.not_the_owner') }
+		return { status = false, message = Lang:t('info.no_vehicles_parked') }
 	end
 end
 
