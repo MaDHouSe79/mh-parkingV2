@@ -172,6 +172,9 @@ function Parking.Functions.DriveVehicle(data)
 		if data.trailerdata ~= nil then
 			data.trailerEntity = Parking.Functions.SpawnTrailer(tempVeh, data)
 			FreezeEntityPosition(data.trailerEntity, false)
+			if IsEntityAttached(data.trailerEntity) then
+				DetachEntity(data.trailerEntity, true, true)
+			end
 		end
 	end
 	SetVehicleProperties(tempVeh, data.mods)
@@ -183,6 +186,12 @@ function Parking.Functions.DriveVehicle(data)
 	TaskWarpPedIntoVehicle(GetPlayerPed(-1), tempVeh, -1)
 	SetEntityVisible(PlayerPedId(), true, 0)
 	FreezeEntityPosition(tempVeh, false)
+	if data.trailerEntity ~= nil then
+		FreezeEntityPosition(data.trailerEntity, false)
+		if IsEntityAttached(data.trailerEntity) then
+			DetachEntity(data.trailerEntity, true, true)
+		end
+	end
 end
 
 function Parking.Functions.RemoveVehicles(vehicles)
