@@ -427,13 +427,17 @@ end
 
 function Parking.Functions.LockAllParkedVehicles()
 	Wait(15000)
-	if isLoggedIn and #LocalVehicles > 0 then
-		for i = 1, #LocalVehicles, 1 do
-			if LocalVehicles[i].entity ~= nil and DoesEntityExist(LocalVehicles[i].entity) then
-				FreezeEntityPosition(LocalVehicles[i].entity, true)				
-			end
-			if LocalVehicles[i].trailerEntity ~= nil  and DoesEntityExist(LocalVehicles[i].trailerEntity)  then
-				FreezeEntityPosition(LocalVehicles[i].trailerEntity, true)
+	if isLoggedIn then
+		if type(LocalVehicles) == 'table' and #LocalVehicles >= 1 then
+			for i = 1, #LocalVehicles, 1 do
+				if LocalVehicles[i] ~= nil and type(LocalVehicles[i]) == 'table' then
+					if LocalVehicles[i].entity ~= nil and DoesEntityExist(LocalVehicles[i].entity) then
+						FreezeEntityPosition(LocalVehicles[i].entity, true)				
+					end
+					if LocalVehicles[i].trailerEntity ~= nil  and DoesEntityExist(LocalVehicles[i].trailerEntity)  then
+						FreezeEntityPosition(LocalVehicles[i].trailerEntity, true)
+					end
+				end
 			end
 		end
 	end
@@ -777,7 +781,12 @@ function Parking.Functions.AutoPark(driver)
 		if player == driver then
 			print(player, driver)
 			local vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), true)
-			if vehicle ~= 0 and DoesEntityExist(vehicle) then Parking.Functions.Save(vehicle) end
+			if vehicle ~= 0 and DoesEntityExist(vehicle) then 
+				Parking.Functions.Save(vehicle)
+				isInVehicle = false
+				currentVehicle = 0
+				currentSeat = 0
+			end
         elseif player ~= driver then
             TaskLeaveVehicle(PlayerPedId(), vehicle, 1)
         end
