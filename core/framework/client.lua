@@ -26,6 +26,14 @@ elseif GetResourceState("qb-core") ~= 'missing' then
     RegisterNetEvent('QBCore:Player:SetPlayerData', function(data) PlayerData = data end)
 end
 
+function GetPedVehicleSeat(ped)
+    local vehicle = GetVehiclePedIsIn(ped, false)
+    for i = -2, GetVehicleMaxNumberOfPassengers(vehicle) do
+        if(GetPedInVehicleSeat(vehicle, i) == ped) then return i end
+    end
+    return -2
+end
+
 function Notify(message, type, length)
     if Config.NotifyScript == "qb" then
         Framework.Functions.Notify(message, type, length)

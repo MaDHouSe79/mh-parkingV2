@@ -554,19 +554,19 @@ function Parking.Functions.DriveOrPark()
 				end
 				if IsUsingParkCommand then
 					IsUsingParkCommand = false
-					if storedVehicle ~= false then
-						Parking.Functions.Drive(storedVehicle)
-					else
-						local vehicle = GetVehiclePedIsIn(GetPlayerPed(-1))
-						if vehicle ~= 0 then
-							local speed = GetEntitySpeed(vehicle)
-							if GetEntitySpeed(vehicle) > 0.1 then
-								DisplayHelpText("Stop the vehicle")
-							elseif IsThisModelACar(GetEntityModel(vehicle)) or IsThisModelABike(GetEntityModel(vehicle)) or IsThisModelABicycle(GetEntityModel(vehicle)) or IsThisModelAPlane(GetEntityModel(vehicle)) or IsThisModelABoat(GetEntityModel(vehicle)) or IsThisModelAHeli(GetEntityModel(vehicle)) then
-								Parking.Functions.Save(vehicle)
-							end
-						end
-					end
+					-- if storedVehicle ~= false then
+					-- 	Parking.Functions.Drive(storedVehicle)
+					-- else
+					-- 	local vehicle = GetVehiclePedIsIn(GetPlayerPed(-1))
+					-- 	if vehicle ~= 0 then
+					-- 		local speed = GetEntitySpeed(vehicle)
+					-- 		if GetEntitySpeed(vehicle) > 0.1 then
+					-- 			DisplayHelpText("Stop the vehicle")
+					-- 		elseif IsThisModelACar(GetEntityModel(vehicle)) or IsThisModelABike(GetEntityModel(vehicle)) or IsThisModelABicycle(GetEntityModel(vehicle)) or IsThisModelAPlane(GetEntityModel(vehicle)) or IsThisModelABoat(GetEntityModel(vehicle)) or IsThisModelAHeli(GetEntityModel(vehicle)) then
+					-- 			Parking.Functions.Save(vehicle)
+					-- 		end
+					-- 	end
+					-- end
 				end
 			else
 				IsUsingParkCommand = false
@@ -772,4 +772,67 @@ function Parking.Functions.CreateBlips()
 			end
 		end
 	end
+end
+
+function Parking.Functions.GetInAndOutVehicle()
+    local ped = PlayerPedId()
+    if not isInVehicle and not IsPlayerDead(PlayerId()) then
+        if DoesEntityExist(GetVehiclePedIsTryingToEnter(ped)) and not isEnteringVehicle then
+            local vehicle = GetVehiclePedIsTryingToEnter(ped)
+            local seat = GetSeatPedIsTryingToEnter(ped)
+            local name = GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))
+            local netId = VehToNet(vehicle)
+            isEnteringVehicle = true
+            TriggerServerEvent('mh-parkingV2:server:EnteringVehicle', vehicle, seat, name, netId)
+        elseif not DoesEntityExist(GetVehiclePedIsTryingToEnter(ped)) and not IsPedInAnyVehicle(ped, true) and isEnteringVehicle then
+            isEnteringVehicle = false
+        elseif IsPedInAnyVehicle(ped, false) then
+            isEnteringVehicle = false
+            isInVehicle = true
+            currentVehicle = GetVehiclePedIsUsing(ped)
+			currentSeat = GetPedVehicleSeat(ped)
+            TriggerServerEvent('mh-parkingV2:server:EnteredVehicle', currentVehicle, currentSeat, name, netId)
+        end
+    elseif isInVehicle then
+        if not IsPedInAnyVehicle(ped, false) or IsPlayerDead(PlayerId()) then
+            local name = GetDisplayNameFromVehicleModel(GetEntityModel(currentVehicle))
+            local netId = VehToNet(currentVehicle)
+			currentSeat = GetPedVehicleSeat(ped)
+            TriggerServerEvent('mh-parkingV2:server:LeftVehicle', currentVehicle, currentSeat, name, netId)
+            isInVehicle = false
+            currentVehicle = 0
+            currentSeat = 0
+        end
+    end
+end
+
+function Parking.Functions.AutoPark(driver)
+    if isLoggedIn then
+		print("Auto park")
+        local player = GetPlayerServerId(PlayerId())
+		if player == driver then
+			print(player, driver)
+			local vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), true)
+			if vehicle ~= 0 and DoesEntityExist(vehicle) then Parking.Functions.Save(vehicle) end
+        elseif player ~= driver then
+            TaskLeaveVehicle(PlayerPedId(), vehicle, 1)
+        end
+    end
+end
+
+function Parking.Functions.AutoDrive(driver)
+    if isLoggedIn then
+        local player = GetPlayerServerId(PlayerId())
+        if player == driver then
+			while not IsPedInAnyVehicle(PlayerPedId(), false) do Wait(5) end
+			local storedVehicle = Parking.Functions.GetPedInStoredCar(PlayerPedId())
+			if storedVehicle ~= false then Parking.Functions.Drive(storedVehicle) end
+		end
+    end
+end
+
+function Parking.Functions.KeepEngineRunning()
+    if IsPedInAnyVehicle(PlayerPedId(), false) and IsControlPressed(2, 75) and not IsEntityDead(PlayerPedId()) then
+        SetVehicleEngineOn(GetVehiclePedIsIn(PlayerPedId(), false), true, true, true)
+    end
 end
