@@ -238,7 +238,6 @@ function Parking.Functions.DeleteAllVehicles()
     end
 end
 
-
 function Parking.Functions.IsCloseByStationPump(coords)
     for hash in pairs(Config.DisableNeedByPumpModels) do
         local pump = GetClosestObjectOfType(coords.x, coords.y, coords.z, 10.0, hash, false, true, true)
@@ -312,7 +311,6 @@ function Parking.Functions.LockDoors(entity, data)
 	end
 end
 
-
 function Parking.Functions.DriveVehicle(data)
 	SetEntityVisible(PlayerPedId(), false, 0)
 	Parking.Functions.DeleteNearVehicle(vector3(data.location.x, data.location.y, data.location.z))
@@ -340,7 +338,6 @@ function Parking.Functions.DriveVehicle(data)
 		end
 	end
 end
-
 
 function Parking.Functions.Drive(vehicle)
 	TriggerCallback("mh-parkingV2:server:DriveCar", function(callback)
@@ -406,27 +403,6 @@ function Parking.Functions.Save(vehicle)
 	end
 end
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 function Parking.Functions.ConnectVehicleToTrailer(vehicle, trailer, data)
 	SetEntityAsMissionEntity(vehicle, true, true)
 	SetEntityAsMissionEntity(trailer, true, true)
@@ -446,13 +422,10 @@ function Parking.Functions.ConnectVehicleToTrailer(vehicle, trailer, data)
 		trailerbone = GetEntityBoneIndexByName(trailer, 'attach_female')
 	end
 
-	--AttachEntityBoneToEntityBonePhysically(trailer, vehicle, trailerbone, vehiclebone, true, true)
 	AttachEntityBoneToEntityBone(trailer, vehicle, trailerbone, vehiclebone, false, false)
 	SetTrailerLegsRaised(trailer)
 	SetVehicleOnGroundProperly(vehicle)
 
-	local rot = GetEntityRotation(vehicle, 2)
-    local roll, pitch, yaw = rot.x, rot.y, rot.z
 	local relocate = (Config.Vehicles[GetEntityModel(vehicle)].category ~= "commercial")
 	local retval, groundZ = GetGroundZFor_3dCoord(data.location.x, data.location.y, data.location.z, false)
 	if retval then SetEntityCoords(vehicle, data.location.x, data.location.y, groundZ - 1) end
