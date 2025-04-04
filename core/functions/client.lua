@@ -427,12 +427,13 @@ end
 
 function Parking.Functions.LockAllParkedVehicles()
 	Wait(15000)
-	if isLoggedIn then
-		if #LocalVehicles > 0 then
-			print("Freeze All PAkerd vehicles..")
-			for i = 1, #LocalVehicles, 1 do
-				if LocalVehicles[i].entity ~= nil then FreezeEntityPosition(LocalVehicles[i].entity, true) end
-				if LocalVehicles[i].trailerEntity ~= nil then FreezeEntityPosition(LocalVehicles[i].trailerEntity, true) end
+	if isLoggedIn and #LocalVehicles > 0 then
+		for i = 1, #LocalVehicles, 1 do
+			if LocalVehicles[i].entity ~= nil and DoesEntityExist(LocalVehicles[i].entity) then
+				FreezeEntityPosition(LocalVehicles[i].entity, true)				
+			end
+			if LocalVehicles[i].trailerEntity ~= nil  and DoesEntityExist(LocalVehicles[i].trailerEntity)  then
+				FreezeEntityPosition(LocalVehicles[i].trailerEntity, true)
 			end
 		end
 	end
