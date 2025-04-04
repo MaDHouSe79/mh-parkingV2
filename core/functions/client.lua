@@ -162,38 +162,6 @@ function Parking.Functions.DeleteNearVehicle(location)
 	end
 end
 
-function Parking.Functions.DriveVehicle(data)
-	SetEntityVisible(PlayerPedId(), false, 0)
-	Parking.Functions.DeleteNearVehicle(vector3(data.location.x, data.location.y, data.location.z))
-	LoadModel(data.mods["model"])
-	local tempVeh = CreateVehicle(data.mods["model"], data.location.x, data.location.y, data.location.z, data.location.h, true)
-	while not DoesEntityExist(tempVeh) do Wait(1) end
-	if Config.ParkVehiclesWithTrailers then
-		if data.trailerdata ~= nil then
-			data.trailerEntity = Parking.Functions.SpawnTrailer(tempVeh, data)
-			FreezeEntityPosition(data.trailerEntity, false)
-			if IsEntityAttached(data.trailerEntity) then
-				DetachEntity(data.trailerEntity, true, true)
-			end
-		end
-	end
-	SetVehicleProperties(tempVeh, data.mods)
-	DoVehicleDamage(tempVeh, data.body, data.engine)
-	exports[Config.FuelScript]:SetFuel(tempVeh, data.fuel)
-	SetVehicleOnGroundProperly(tempVeh)
-	SetVehRadioStation(tempVeh, 'OFF')
-    SetVehicleDirtLevel(tempVeh, 0)
-	TaskWarpPedIntoVehicle(GetPlayerPed(-1), tempVeh, -1)
-	SetEntityVisible(PlayerPedId(), true, 0)
-	FreezeEntityPosition(tempVeh, false)
-	if data.trailerEntity ~= nil then
-		FreezeEntityPosition(data.trailerEntity, false)
-		if IsEntityAttached(data.trailerEntity) then
-			DetachEntity(data.trailerEntity, true, true)
-		end
-	end
-end
-
 function Parking.Functions.RemoveVehicles(vehicles)
 	DeletingEntities = true
 	for i = 1, #vehicles, 1 do
@@ -270,23 +238,6 @@ function Parking.Functions.DeleteAllVehicles()
     end
 end
 
-function Parking.Functions.Drive(vehicle)
-	TriggerCallback("mh-parkingV2:server:DriveCar", function(callback)
-		if callback.status then
-			SetEntityVisible(PlayerPedId(), false, 0)
-			Parking.Functions.DeteteParkedBlip(vehicle.entity)
-			DeleteVehicle(vehicle.entity)
-			DeleteVehicle(GetVehiclePedIsIn(GetPlayerPed(-1)))
-			vehicle = nil
-			Wait(500)
-			Parking.Functions.DriveVehicle(callback)
-			DisplayHelpText(callback.message)
-		else
-			DisplayHelpText(callback.message)
-		end
-		Wait(1000)
-	end, vehicle)
-end
 
 function Parking.Functions.IsCloseByStationPump(coords)
     for hash in pairs(Config.DisableNeedByPumpModels) do
@@ -324,6 +275,89 @@ function Parking.Functions.AllowToPark(coords)
         if not Parking.Functions.IsCloseByCoords(coords) and not Parking.Functions.IsCloseByStationPump(coords) then isAllowd = true end
     end
     return isAllowd
+end
+
+function Parking.Functions.CreateParkedBlip(data)
+    local name = Config.Vehicles[GetHashKey(data.vehicle)].name or "unknow"
+    local brand = Config.Vehicles[GetHashKey(data.vehicle)].brand or "unknow"
+    local blip = AddBlipForCoord(data.location.x, data.location.y, data.location.z)
+    SetBlipSprite(blip, 545)
+    SetBlipDisplay(blip, 4)
+    SetBlipScale(blip, 0.6)
+    SetBlipAsShortRange(blip, true)
+    SetBlipColour(blip, 25)
+    BeginTextCommandSetBlipName("STRING")
+    AddTextComponentSubstringPlayerName("Parked: "..name .." "..brand)
+    EndTextCommandSetBlipName(blip)
+    return blip
+end
+
+function Parking.Functions.DeleteVehicleAtcoords(coords)
+    local closestVehicle, closestDistance = GetClosestVehicle(coords)
+    if closestVehicle ~= -1 and closestDistance <= 1.5 then
+        DeleteEntity(closestVehicle)
+        while DoesEntityExist(closestVehicle) do
+            DeleteEntity(closestVehicle)
+            Wait(50)
+        end
+    end
+end
+
+function Parking.Functions.LockDoors(entity, data)
+	TriggerServerEvent('mh-parkingV2:server:SetVehLockState', VehToNet(entity), 2)
+	SetVehicleDoorsLocked(entity, 2)
+	if Config.VehicleDoorsUnlockedForOwners and PlayerData.citizenid == data.owner then
+		TriggerServerEvent('mh-parkingV2:server:SetVehLockState', VehToNet(entity), 1)
+		SetVehicleDoorsLocked(entity, 1)
+	end
+end
+
+
+function Parking.Functions.DriveVehicle(data)
+	SetEntityVisible(PlayerPedId(), false, 0)
+	Parking.Functions.DeleteNearVehicle(vector3(data.location.x, data.location.y, data.location.z))
+	LoadModel(data.mods["model"])
+	local tempVeh = CreateVehicle(data.mods["model"], data.location.x, data.location.y, data.location.z, data.location.h, true)
+	while not DoesEntityExist(tempVeh) do Wait(1) end
+	if Config.ParkVehiclesWithTrailers then
+		if data.trailerdata ~= nil then
+			data.trailerEntity = Parking.Functions.SpawnTrailer(tempVeh, data)
+		end
+	end
+	SetVehicleProperties(tempVeh, data.mods)
+	DoVehicleDamage(tempVeh, data.body, data.engine)
+	exports[Config.FuelScript]:SetFuel(tempVeh, data.fuel)
+	SetVehicleOnGroundProperly(tempVeh)
+	SetVehRadioStation(tempVeh, 'OFF')
+    SetVehicleDirtLevel(tempVeh, 0)
+	TaskWarpPedIntoVehicle(GetPlayerPed(-1), tempVeh, -1)
+	SetEntityVisible(PlayerPedId(), true, 0)
+	FreezeEntityPosition(tempVeh, false)
+	if data.trailerEntity ~= nil then
+		FreezeEntityPosition(data.trailerEntity, false)
+		if IsEntityAttached(data.trailerEntity) then
+			DetachEntity(data.trailerEntity, true, true)
+		end
+	end
+end
+
+
+function Parking.Functions.Drive(vehicle)
+	TriggerCallback("mh-parkingV2:server:DriveCar", function(callback)
+		if callback.status then
+			SetEntityVisible(PlayerPedId(), false, 0)
+			Parking.Functions.DeteteParkedBlip(vehicle.entity)
+			DeleteVehicle(vehicle.entity)
+			DeleteVehicle(GetVehiclePedIsIn(GetPlayerPed(-1)))
+			vehicle = nil
+			Wait(500)
+			Parking.Functions.DriveVehicle(callback)
+			DisplayHelpText(callback.message)
+		else
+			DisplayHelpText(callback.message)
+		end
+		Wait(1000)
+	end, vehicle)
 end
 
 function Parking.Functions.Save(vehicle)
@@ -372,40 +406,26 @@ function Parking.Functions.Save(vehicle)
 	end
 end
 
-function Parking.Functions.CreateParkedBlip(data)
-    local name = Config.Vehicles[GetHashKey(data.vehicle)].name or "unknow"
-    local brand = Config.Vehicles[GetHashKey(data.vehicle)].brand or "unknow"
-    local blip = AddBlipForCoord(data.location.x, data.location.y, data.location.z)
-    SetBlipSprite(blip, 545)
-    SetBlipDisplay(blip, 4)
-    SetBlipScale(blip, 0.6)
-    SetBlipAsShortRange(blip, true)
-    SetBlipColour(blip, 25)
-    BeginTextCommandSetBlipName("STRING")
-    AddTextComponentSubstringPlayerName("Parked: "..name .." "..brand)
-    EndTextCommandSetBlipName(blip)
-    return blip
-end
 
-function Parking.Functions.DeleteVehicleAtcoords(coords)
-    local closestVehicle, closestDistance = GetClosestVehicle(coords)
-    if closestVehicle ~= -1 and closestDistance <= 1.5 then
-        DeleteEntity(closestVehicle)
-        while DoesEntityExist(closestVehicle) do
-            DeleteEntity(closestVehicle)
-            Wait(50)
-        end
-    end
-end
 
-function Parking.Functions.LockDoors(entity, data)
-	TriggerServerEvent('mh-parkingV2:server:SetVehLockState', VehToNet(entity), 2)
-	SetVehicleDoorsLocked(entity, 2)
-	if Config.VehicleDoorsUnlockedForOwners and PlayerData.citizenid == data.owner then
-		TriggerServerEvent('mh-parkingV2:server:SetVehLockState', VehToNet(entity), 1)
-		SetVehicleDoorsLocked(entity, 1)
-	end
-end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function Parking.Functions.ConnectVehicleToTrailer(vehicle, trailer, data)
 	SetEntityAsMissionEntity(vehicle, true, true)
@@ -426,7 +446,8 @@ function Parking.Functions.ConnectVehicleToTrailer(vehicle, trailer, data)
 		trailerbone = GetEntityBoneIndexByName(trailer, 'attach_female')
 	end
 
-	AttachEntityBoneToEntityBonePhysically(trailer, vehicle, trailerbone, vehiclebone, true, true)
+	--AttachEntityBoneToEntityBonePhysically(trailer, vehicle, trailerbone, vehiclebone, true, true)
+	AttachEntityBoneToEntityBone(trailer, vehicle, trailerbone, vehiclebone, false, false)
 	SetTrailerLegsRaised(trailer)
 	SetVehicleOnGroundProperly(vehicle)
 
