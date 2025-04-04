@@ -562,36 +562,6 @@ function Parking.Functions.DriveOrPark()
 	end
 end
 
-function Parking.Functions.DriveOrPark_Old()
-	while true do
-		Wait(0)
-		if isLoggedIn then
-			if IsPedInAnyVehicle(GetPlayerPed(-1)) then
-				local storedVehicle = Parking.Functions.GetPedInStoredCar(GetPlayerPed(-1))
-				if IsControlJustReleased(0, 51) then -- E
-					if storedVehicle ~= false then
-						Parking.Functions.Drive(storedVehicle)
-					else
-						local veh = GetVehiclePedIsIn(GetPlayerPed(-1))
-						if veh ~= 0 then
-							local speed = GetEntitySpeed(veh)
-							if speed > 0.1 then
-								DisplayHelpText("stop the car")
-							elseif IsThisModelACar(GetEntityModel(veh)) or IsThisModelABike(GetEntityModel(veh)) or IsThisModelABicycle(GetEntityModel(veh)) then
-								Parking.Functions.Save(veh)
-							else
-								DisplayHelpText("only allow car")
-							end
-						end
-					end
-				end
-			else
-				Wait(500)
-			end
-		end
-	end
-end
-
 function Parking.Functions.DisplayVehicleOwnerText()
 	while true do
 		Wait(0)
