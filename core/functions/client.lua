@@ -776,10 +776,8 @@ end
 
 function Parking.Functions.AutoPark(driver)
     if isLoggedIn then
-		print("Auto park")
         local player = GetPlayerServerId(PlayerId())
 		if player == driver then
-			print(player, driver)
 			local vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), true)
 			if vehicle ~= 0 and DoesEntityExist(vehicle) then 
 				Parking.Functions.Save(vehicle)
