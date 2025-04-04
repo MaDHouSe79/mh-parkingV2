@@ -1,5 +1,5 @@
 --[[ ===================================================== ]] --
---[[          MH Realistic Parking V2 by MaDHouSe79        ]] --
+--[[               MH Parking V2 by MaDHouSe79             ]] --
 --[[ ===================================================== ]] --
 Config = {}                                -- Placeholder don't edit or change or remove this.
 Config.Debug = false                       -- Default false, if true this will show prints in the server console.

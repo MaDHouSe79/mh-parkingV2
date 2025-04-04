@@ -1,5 +1,5 @@
 --[[ ===================================================== ]] --
---[[          MH Realistic Parking V2 by MaDHouSe79        ]] --
+--[[               MH Parking V2 by MaDHouSe79             ]] --
 --[[ ===================================================== ]] --
 fx_version 'cerulean'
 game 'gta5'

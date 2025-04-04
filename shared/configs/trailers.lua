@@ -1,3 +1,6 @@
+--[[ ===================================================== ]] --
+--[[               MH Parking V2 by MaDHouSe79             ]] --
+--[[ ===================================================== ]] --
 -- Trailer list, you can add more if the trailer does not exist in this list.
 Config.Trailers = {
     [712162987] = {model = "trailersmall", name = "trailersmall", offset = {backwards = -5.80, posX = -0.85, posY = 1.0, heading = 70.20} },

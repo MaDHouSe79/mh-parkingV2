@@ -1,5 +1,5 @@
 --[[ ===================================================== ]] --
---[[          MH Realistic Parking V2 by MaDHouSe79        ]] --
+--[[               MH Parking V2 by MaDHouSe79             ]] --
 --[[ ===================================================== ]] --
 Parking = {}
 Parking.Functions = {}
@@ -102,7 +102,7 @@ function Parking.Functions.Save(src, data)
 			isParked = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE citizenid = ? AND plate = ? AND state = ?", { citizenid, plate, 3 })[1]
 		end
 		if isParked ~= nil then
-			return { status = false, message = "already parking" }
+			return { status = false, message = Lang:t('info.already_parked') }
 		else
 			local result = nil
 			if Config.Framework == 'esx' then
@@ -110,33 +110,37 @@ function Parking.Functions.Save(src, data)
 			elseif Config.Framework == 'qb' then
 				result = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE citizenid = ? AND plate = ?", { citizenid, plate })[1]
 			end
-			local location = json.encode(data.location)
-			local trailerdata = nil
-			if data.trailerdata ~= nil then trailerdata = json.encode(data.trailerdata) end
-			if Config.Framework == 'esx' then
-				MySQL.Async.execute('UPDATE owned_vehicles SET stored = ?, location = ?, street = ?, trailerdata = ?, steerangle = ? WHERE plate = ? AND stored = ?', { 3, location, data.street, trailerdata, data.steerangle, plate, citizenid })
-			elseif Config.Framework == 'qb' then
-				MySQL.Async.execute('UPDATE player_vehicles SET state = ?, location = ?, street = ?, trailerdata = ?, steerangle = ?, engine = ?, fuel = ?, body = ? WHERE plate = ? AND citizenid = ?', { 3, location, data.street, trailerdata, data.steerangle, data.engine, data.fuel, data.body, plate, citizenid })
+			if result ~= nil then
+				local location = json.encode(data.location)
+				local trailerdata = nil
+				if data.trailerdata ~= nil then trailerdata = json.encode(data.trailerdata) end
+				if Config.Framework == 'esx' then
+					MySQL.Async.execute('UPDATE owned_vehicles SET stored = ?, location = ?, street = ?, trailerdata = ?, steerangle = ? WHERE plate = ? AND stored = ?', { 3, location, data.street, trailerdata, data.steerangle, plate, citizenid })
+				elseif Config.Framework == 'qb' then
+					MySQL.Async.execute('UPDATE player_vehicles SET state = ?, location = ?, street = ?, trailerdata = ?, steerangle = ?, engine = ?, fuel = ?, body = ? WHERE plate = ? AND citizenid = ?', { 3, location, data.street, trailerdata, data.steerangle, data.engine, data.fuel, data.body, plate, citizenid })
+				end
+				Wait(100)
+				TriggerClientEvent("mh-parkingV2:client:AddVehicle", -1, {
+					vehicle = result.vehicle,
+					plate = plate,
+					owner = citizenid,
+					fullname = fullname,
+					location = data.location,
+					mods = data.mods,
+					trailerdata = data.trailerdata,
+					steerangle = data.steerangle,
+					street = data.street,
+					engine = data.engine,
+					fuel = data.fuel,
+					body = data.body
+				}, src)
+				return { status = true, message = Lang:t('info.vehicle_parked') }
+			else
+				return {status = false, message = Lang:t('info.not_the_owner')}
 			end
-			Wait(100)
-			TriggerClientEvent("mh-parkingV2:client:AddVehicle", -1, {
-				vehicle = result.vehicle,
-				plate = plate,
-				owner = citizenid,
-				fullname = fullname,
-				location = data.location,
-				mods = data.mods,
-				trailerdata = data.trailerdata,
-				steerangle = data.steerangle,
-				street = data.street,
-				engine = data.engine,
-				fuel = data.fuel,
-				body = data.body
-			}, src)
-			return { status = true, message = "" }
 		end
 	else
-		return { status = false, message = "You have to many cars parked" }
+		return { status = false, message = Lang:t('info.limit_parking', {limit=defaultMax}) }
 	end
 end
 
@@ -159,9 +163,9 @@ function Parking.Functions.Drive(src, data)
 		end
 		Wait(50)
 		TriggerClientEvent("mh-parkingV2:client:DeleteVehicle", -1, { plate = plate })
-		return { status = true, message = "success", vehicle = result.vehicle, mods = mods, plate = result.plate, location = location, fuel = result.fuel, body = result.body, engine = result.engine, trailerdata = json.decode(result.trailerdata) }
+		return { status = true, message = Lang:t('info.remove_vehicle_zone'), vehicle = result.vehicle, mods = mods, plate = result.plate, location = location, fuel = result.fuel, body = result.body, engine = result.engine, trailerdata = json.decode(result.trailerdata) }
 	else
-		return { status = false, message = "not parked" }
+		return { status = false, message = Lang:t('info.not_the_owner') }
 	end
 end
 

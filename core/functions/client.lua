@@ -1,16 +1,14 @@
 --[[ ===================================================== ]] --
---[[          MH Realistic Parking V2 by MaDHouSe79        ]] --
+--[[               MH Parking V2 by MaDHouSe79             ]] --
 --[[ ===================================================== ]] --
 Parking = {}
 Parking.Functions = {}
 Parking.TrailerData = {}
-
 diableParkedBlips = {}
 parkMenu = nil
 currentTrailer = nil
 currentBoat = nil
 trailerLoad = {}
-
 
 function Parking.Functions.AddToTable(entity, data)
 	LocalVehicles[#LocalVehicles + 1] = {
@@ -252,7 +250,7 @@ function Parking.Functions.CreateParkedBlip(data)
 	SetBlipAsShortRange(blip, true)
 	SetBlipColour(blip, 25)
 	BeginTextCommandSetBlipName("STRING")
-	AddTextComponentSubstringPlayerName("Parked: " .. name .. " " .. brand)
+	AddTextComponentSubstringPlayerName(Lang:t('info.parked_blip', {model = name .. " " .. brand}))
 	EndTextCommandSetBlipName(blip)
 	return blip
 end
@@ -397,7 +395,7 @@ function Parking.Functions.SpawnTrailer(vehicle, data)
 					type = "client",
 					event = "mh-trailers:client:GetInVehicle",
 					icon = "fas fa-car",
-					label = 'Get In Vehicle',
+					label = Lang:t('info.get_in_vehicle'),
 					action = function(entity)
 						Parking.Functions.GetIn(entity)
 					end,
@@ -444,7 +442,6 @@ function Parking.Functions.ConnectVehicleToTrailer(vehicle, trailer, data)
 	AttachEntityBoneToEntityBone(trailer, vehicle, trailerbone, vehiclebone, false, false)
 	SetTrailerLegsRaised(trailer)
 	SetVehicleOnGroundProperly(vehicle)
-	local relocate = (Config.Vehicles[GetEntityModel(vehicle)].category ~= "commercial")
 	local retval, groundZ = GetGroundZFor_3dCoord(data.location.x, data.location.y, data.location.z, false)
 	if retval then SetEntityCoords(vehicle, data.location.x, data.location.y, groundZ - 1) end
 	Wait(50)
@@ -498,9 +495,7 @@ function Parking.Functions.SpawnVehicles(vehicles)
 		SetVehicleProperties(tempVeh, vehicles[i].mods)
 		RequestCollisionAtCoord(vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z)
 		SetVehicleOnGroundProperly(tempVeh)
-
 		SetVehicleNumberPlateText(tempVeh, vehicles[i].plate)
-
 		SetVehicleLivery(tempVeh, vehicles[i].mods.livery)
 		DoVehicleDamage(tempVeh, vehicles[i].body, vehicles[i].engine)
 		SetEntityInvincible(tempVeh, true)
@@ -598,7 +593,7 @@ function Parking.Functions.DisplayVehicleOwnerText()
 							end
 						end
 						if model ~= nil and brand ~= nil then
-							Draw3DText(v.location.x, v.location.y, v.location.z, "Model: ~b~" .. model .. "~s~" .. '\n' .. "Brand: ~o~" .. brand .. "~s~" .. '\n' .. "Plate: ~g~" .. plate .. "~s~" .. '\n' .. "Owner: ~y~" .. owner .. "~s~", 0, 0.04, 0.04)
+							Draw3DText(v.location.x, v.location.y, v.location.z, Lang:t('info.model',{model = model}).. '\n' .. Lang:t('info.brand',{brand = brand}).. '\n' .. Lang:t('info.plate',{plate = plate}).. '\n' .. Lang:t('info.owner',{owner = owner}) , 0, 0.04, 0.04)
 							fd = true
 						end
 					end
@@ -668,7 +663,7 @@ function Parking.Functions.GetVehicleMenu()
 				local coords = json.decode(v.location)
 				options[#options + 1] = {
 					title = v.vehicle:upper() .. " " .. v.plate .. " is parked",
-					description = "Steet: " .. v.street .. "\nFuel: " .. v.fuel .. "\nEngine: " .. v.engine .. "\nBody: " .. v.body .. "\nClick to set waypoint",
+					description = Lang:t('info.steet', {steet = v.steet}) .. '\n'.. Lang:t('info.fuel', {fuel = v.fuel}) .. '\n'.. Lang:t('info.engine', {engine = v.engine}) .. '\n'.. Lang:t('info.body', {body = v.body}) .. '\n'..Lang:t('info.click_to_set_waypoint'),
 					arrow = false,
 					onSelect = function()
 						Parking.Functions.SetVehicleWaypoit(coords)
@@ -676,7 +671,7 @@ function Parking.Functions.GetVehicleMenu()
 				}
 			end
 			options[#options + 1] = {
-				title = "Close",
+				title = Lang:t('info.close'),
 				icon = "fa-solid fa-stop",
 				description = '',
 				arrow = false,
@@ -715,7 +710,7 @@ function Parking.Functions.RadialMenu()
 			end
 			parkMenu = exports['qb-radialmenu']:AddOption({
 				id = 'park_vehicles_menu',
-				title = 'Parked Menu',
+				title = Lang:t('info.park_menu'),
 				icon = "square-parking",
 				type = 'client',
 				event = "mh-parkingV2:client:GetVehicleMenu",
@@ -726,7 +721,7 @@ function Parking.Functions.RadialMenu()
 		lib.addRadialItem({
 			{
 				id = 'park_vehicles_menu',
-				label = 'Parked Menu',
+				label = Lang:t('info.park_menu'),
 				icon = 'square-parking',
 				onSelect = function()
 					TriggerEvent("mh-parkingV2:client:GetVehicleMenu")
@@ -766,13 +761,13 @@ end
 function Parking.Functions.CreateBlips()
 	if Config.UseUnableParkingBlips then
 		for k, zone in pairs(Config.NoParkingLocations) do
-			Parking.Functions.CreateBlipCircle(zone.coords, "Unable to park", zone.radius, zone.color, zone.sprite)
+			Parking.Functions.CreateBlipCircle(zone.coords, Lang:t('info.unable_to_park'), zone.radius, zone.color, zone.sprite)
 		end
 	end
 	if Config.UseParkingLotsOnly then
 		for k, zone in pairs(Config.AllowedParkingLots) do
 			if Config.UseParkingLotsBlips then
-				Parking.Functions.CreateBlipCircle(zone.coords, "Parking Lot", zone.radius, zone.color, zone.sprite)
+				Parking.Functions.CreateBlipCircle(zone.coords, Lang:t('info.parking_lot'), zone.radius, zone.color, zone.sprite)
 			end
 		end
 	end
@@ -874,7 +869,7 @@ function Parking.Functions.AddBoatToTrailer(boat, trailer)
 					type = "client",
 					event = "mh-trailers:client:GetInVehicle",
 					icon = "fas fa-car",
-					label = 'Get In Vehicle',
+					label = Lang:t('info.get_in_vehicle'),
 					action = function(entity)
 						Parking.Functions.GetIn(entity)
 					end,
@@ -899,7 +894,7 @@ function Parking.Functions.AttachedToTrailer()
 				if Config.TrailerBoats[GetEntityModel(currentBoat)] then
 					sleep = 0
 					if currentTrailer ~= currentBoat and currentTrailer ~= currentVehicle then
-						if IsEntityTouchingEntity(currentTrailer, currentBoat) then DisplayHelpText('Press E to attach the boat to trailer') end
+						if IsEntityTouchingEntity(currentTrailer, currentBoat) then DisplayHelpText(Lang:t('info.press_to_attach')) end
 						if not IsVehicleAttachedToTrailer(currentBoat) then
 							if IsControlJustPressed(0, Config.ParkingButton) then
 								Parking.Functions.AddBoatToTrailer(currentBoat, currentTrailer)

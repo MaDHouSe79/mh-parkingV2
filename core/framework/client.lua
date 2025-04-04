@@ -1,5 +1,5 @@
 --[[ ===================================================== ]] --
---[[          MH Realistic Parking V2 by MaDHouSe79        ]] --
+--[[               MH Parking V2 by MaDHouSe79             ]] --
 --[[ ===================================================== ]] --
 Framework, TriggerCallback, OnPlayerLoaded, OnPlayerUnload = nil, nil, nil, nil
 OnJobUpdate, isLoggedIn, PlayerData = nil, false, {}

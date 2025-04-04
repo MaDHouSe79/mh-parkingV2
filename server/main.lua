@@ -1,5 +1,5 @@
 --[[ ===================================================== ]] --
---[[          MH Realistic Parking V2 by MaDHouSe79        ]] --
+--[[               MH Parking V2 by MaDHouSe79             ]] --
 --[[ ===================================================== ]] --
 CreateCallback("mh-parkingV2:server:SaveCar", function(source, cb, data) cb(Parking.Functions.Save(source, data)) end)
 CreateCallback("mh-parkingV2:server:DriveCar", function(source, cb, data) cb(Parking.Functions.Drive(source, data)) end)

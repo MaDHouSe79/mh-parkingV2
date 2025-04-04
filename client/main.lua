@@ -1,5 +1,5 @@
 --[[ ===================================================== ]] --
---[[          MH Realistic Parking V2 by MaDHouSe79        ]] --
+--[[               MH Parking V2 by MaDHouSe79             ]] --
 --[[ ===================================================== ]] --
 LocalVehicles, GlobalVehicles, isLoggedIn, SpawnedVehicles, DeletingEntities, displayOwnerText = {}, {}, false, false, false, Config.UseVehicleOwnerText
 AddEventHandler('onResourceStop', function(resource) Parking.Functions.DeleteAllVehicles() PlayerData = {} isLoggedIn = false end)
