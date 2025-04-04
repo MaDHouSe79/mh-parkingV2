@@ -542,7 +542,7 @@ function Parking.Functions.SpawnVehicle(vehicleData)
 	end
 	Wait(15000)
 	if tempVeh ~= nil then FreezeEntityPosition(tempVeh, true) end
-	if vehicleData.trailerEntity ~= nil then FreezeEntityPosition(vehicles[i].trailerEntity, true) end
+	if vehicleData.trailerEntity ~= nil then FreezeEntityPosition(vehicleData.trailerEntity, true) end
 end
 
 function Parking.Functions.SpawnVehicleChecker()
