@@ -1,10 +1,7 @@
 --[[ ===================================================== ]] --
 --[[          MH Realistic Parking V2 by MaDHouSe79        ]] --
 --[[ ===================================================== ]] --
-LocalVehicles, GlobalVehicles= {}, {}
-isLoggedIn, IsUsingParkCommand = false, false
-SpawnedVehicles, DeletingEntities = false, false
-displayOwnerText = Config.UseVehicleOwnerText
+LocalVehicles, GlobalVehicles, isLoggedIn, IsUsingParkCommand, SpawnedVehicles, DeletingEntities, displayOwnerText = {}, {}, false, false, false, false, Config.UseVehicleOwnerText
 AddEventHandler('onResourceStop', function(resource) Parking.Functions.DeleteAllVehicles() PlayerData = {} isLoggedIn = false end)
 AddEventHandler('onResourceStart', function(resource) if resource == GetCurrentResourceName() then PlayerData = GetPlayerData() isLoggedIn = true end end)
 RegisterNetEvent(OnPlayerLoaded, function()	TriggerServerEvent('mh-parkingV2:server:OnJoin') end)
