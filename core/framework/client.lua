@@ -3,7 +3,6 @@
 --[[ ===================================================== ]] --
 Framework, TriggerCallback, OnPlayerLoaded, OnPlayerUnload = nil, nil, nil, nil
 OnJobUpdate, isLoggedIn, PlayerData = nil, false, {}
-
 if GetResourceState("es_extended") ~= 'missing' then
     Config.Framework = 'esx'
     Framework = exports['es_extended']:getSharedObject()
@@ -31,7 +30,7 @@ function Notify(message, type, length)
     if Config.NotifyScript == "qb" then
         Framework.Functions.Notify(message, type, length)
     elseif Config.NotifyScript == "ox_lib" and GetResourceState(Config.NotifyScript) ~= 'missing' then
-        lib.notify({title = "MH Parking V2", description = message, type = type})
+        lib.notify({ title = "MH Parking V2", description = message, type = type })
     elseif Config.NotifyScript == "k5_notify" and GetResourceState(Config.NotifyScript) ~= 'missing' then
         exports["k5_notify"]:notify("MH Parking V2", message, "k5style", length)
     elseif Config.NotifyScript == "okokNotify" and GetResourceState(Config.NotifyScript) ~= 'missing' then
@@ -64,16 +63,16 @@ function Draw3DText(x, y, z, textInput, fontId, scaleX, scaleY)
 end
 
 function DisplayHelpText(text)
-	SetTextComponentFormat('STRING')
-	AddTextComponentString(text)
-	DisplayHelpTextFromStringLabel(0, 0, 1, -1)
+    SetTextComponentFormat('STRING')
+    AddTextComponentString(text)
+    DisplayHelpTextFromStringLabel(0, 0, 1, -1)
 end
 
 function LoadModel(model)
-	while not HasModelLoaded(model) do
-		RequestModel(model)
-		Wait(1)
-	end
+    while not HasModelLoaded(model) do
+        RequestModel(model)
+        Wait(1)
+    end
 end
 
 function LoadAnimDict(dict)

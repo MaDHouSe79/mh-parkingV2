@@ -35,9 +35,20 @@ function Parking.Functions.RefreshVehicles(src)
 			local target = GetPlayerDataByCitizenId(v.citizenid)
 			if v.fullname == nil then v.fullname = target.PlayerData.charinfo.firstname ..' ' .. target.PlayerData.charinfo.lastname end
 		end
-		vehicles[#vehicles + 1] = { fullname = v.fullname, owner = v.citizenid, vehicle = v.vehicle, plate = v.plate, fuel =
-		v.fuel, body = v.body, engine = v.engine, street = v.street, mods = json.decode(v.mods), location = json.decode(
-		v.location), trailerdata = json.decode(v.trailerdata), steerangle = v.steerangle }
+		vehicles[#vehicles + 1] = {
+			fullname = v.fullname,
+			owner = v.citizenid,
+			vehicle = v.vehicle,
+			plate = v.plate,
+			fuel = v.fuel,
+			body = v.body,
+			engine = v.engine,
+			street = v.street,
+			mods = json.decode(v.mods),
+			location = json.decode(v.location),
+			trailerdata = json.decode(v.trailerdata),
+			steerangle = v.steerangle
+		}
 		if Config.Framework == 'qb' then
 			local target = GetPlayerDataByCitizenId(v.citizenid)
 			if target.PlayerData.citizenid == v.citizenid and target.PlayerData.source ~= nil then
@@ -108,7 +119,7 @@ function Parking.Functions.Save(src, data)
 				MySQL.Async.execute('UPDATE player_vehicles SET state = ?, location = ?, street = ?, trailerdata = ?, steerangle = ?, engine = ?, fuel = ?, body = ? WHERE plate = ? AND citizenid = ?', { 3, location, data.street, trailerdata, data.steerangle, data.engine, data.fuel, data.body, plate, citizenid })
 			end
 			Wait(100)
-			TriggerClientEvent("mh-parkingV2:client:AddVehicle", -1, {vehicle = result.vehicle, plate = plate, owner = citizenid, fullname = fullname, location = data.location, mods = data.mods, trailerdata = data.trailerdata, steerangle = data.steerangle, street = data.street, engine = data.engine, fuel = data.fuel, body = data.body }, src)
+			TriggerClientEvent("mh-parkingV2:client:AddVehicle", -1, { vehicle = result.vehicle, plate = plate, owner = citizenid, fullname = fullname, location = data.location, mods = data.mods, trailerdata = data.trailerdata, steerangle = data.steerangle, street = data.street, engine = data.engine, fuel = data.fuel, body = data.body }, src)
 			return { status = true, message = "" }
 		end
 	else
@@ -135,7 +146,8 @@ function Parking.Functions.Drive(src, data)
 		end
 		Wait(50)
 		TriggerClientEvent("mh-parkingV2:client:DeleteVehicle", -1, { plate = plate })
-		return { status = true, message = "success", vehicle = result.vehicle, mods = mods, location = location, fuel = result.fuel, body = result.body, engine = result.engine, trailerdata = json.decode(result.trailerdata) }
+		return { status = true, message = "success", vehicle = result.vehicle, mods = mods, location = location, fuel =
+		result.fuel, body = result.body, engine = result.engine, trailerdata = json.decode(result.trailerdata) }
 	else
 		return { status = false, message = "not parked" }
 	end
@@ -168,12 +180,11 @@ function Parking.Functions.Init()
 		MySQL.Async.execute('ALTER TABLE player_vehicles ADD COLUMN IF NOT EXISTS steerangle INT NULL DEFAULT 0')
 		MySQL.Async.execute('ALTER TABLE player_vehicles ADD COLUMN IF NOT EXISTS location TEXT NULL DEFAULT NULL')
 		MySQL.Async.execute('ALTER TABLE player_vehicles ADD COLUMN IF NOT EXISTS street TEXT NULL DEFAULT NULL')
-		MySQL.Async.execute(
-		'ALTER TABLE player_vehicles ADD COLUMN IF NOT EXISTS trailerdata LONGTEXT NULL DEFAULT NULL')
+		MySQL.Async.execute('ALTER TABLE player_vehicles ADD COLUMN IF NOT EXISTS trailerdata LONGTEXT NULL DEFAULT NULL')
 	end
 end
 
-AddCommand("addvip", Lang:t('commands.addvip'),{ { name = 'ID', help = Lang:t('commands.addvip_info') }, { name = 'Amount', help = Lang:t('commands.addvip_info_amount') } }, true, function(source, args)
+AddCommand("addvip", Lang:t('commands.addvip'), { { name = 'ID', help = Lang:t('commands.addvip_info') }, { name = 'Amount', help = Lang:t('commands.addvip_info_amount') } }, true, function(source, args)
 	local src, amount, targetID = source, Config.Maxparking, -1
 	if args[1] and tonumber(args[1]) > 0 then targetID = tonumber(args[1]) end
 	if args[2] and tonumber(args[2]) > 0 then amount = tonumber(args[2]) end
@@ -193,7 +204,7 @@ AddCommand("addvip", Lang:t('commands.addvip'),{ { name = 'ID', help = Lang:t('c
 	end
 end, 'admin')
 
-AddCommand("removevip", Lang:t('commands.removevip'), { { name = 'ID', help = Lang:t('commands.removevip_info') } }, true,function(source, args)
+AddCommand("removevip", Lang:t('commands.removevip'), { { name = 'ID', help = Lang:t('commands.removevip_info') } }, true, function(source, args)
 	local src, targetID = source, -1
 	if args[1] and tonumber(args[1]) > 0 then targetID = tonumber(args[1]) end
 	if targetID ~= -1 then

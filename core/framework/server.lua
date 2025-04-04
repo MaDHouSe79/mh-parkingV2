@@ -2,7 +2,6 @@
 --[[          MH Realistic Parking V2 by MaDHouSe79        ]] --
 --[[ ===================================================== ]] --
 Framework, CreateCallback, AddCommand = nil, nil, nil
-
 if GetResourceState("es_extended") ~= 'missing' then
     Config.Framework = 'esx'
     Framework = exports['es_extended']:getSharedObject()
@@ -13,7 +12,6 @@ if GetResourceState("es_extended") ~= 'missing' then
     function GetJob(source) return Framework.GetPlayerFromId(source).job end
     function GetCitizenId(src) local xPlayer = GetPlayer(src) return xPlayer.identifier end
     function GetCitizenFullname(src) local xPlayer = GetPlayer(src) return xPlayer.name end
-
     function Notify(src, message, type, length) TriggerClientEvent("mh-parkingV2:client:Notify", src, message, type, length) end
 elseif GetResourceState("qb-core") ~= 'missing' then
     Config.Framework = 'qb'

@@ -39,11 +39,9 @@ Config.InteractDistance = 5.0
 ----------------------------------------------------------------------------
 Config.ParkVehiclesWithTrailers = true     -- Keep it false, don't use this for now.....
 ----------------------------------------------------------------------------
-
 Config.KeyParkBindButton = "E"
 Config.ParkingButton = 51 -- E
-
-
+----------------------------------------------------------------------------
 -- Stuff below this is to automatic disable the parking system.
 
 -- This is when you close to a gasstation, you can't use the park system.
