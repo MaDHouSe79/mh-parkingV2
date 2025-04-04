@@ -125,7 +125,7 @@ function Parking.Functions.Drive(src, data)
 	elseif Config.Framework == 'qb' then
 		result = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE citizenid = ? AND plate = ? AND state = ?", { xPlayer.PlayerData.citizenid, plate, 3 })[1]
 	end
-	if result then
+	if result ~= nil then
 		local mods = json.decode(result.mods)
 		local location = json.decode(result.location)
 		if Config.Framework == 'esx' then
@@ -135,8 +135,7 @@ function Parking.Functions.Drive(src, data)
 		end
 		Wait(50)
 		TriggerClientEvent("mh-parkingV2:client:DeleteVehicle", -1, { plate = plate })
-		return { status = true, message = "success", vehicle = result.vehicle, mods = mods, location = location, fuel =
-		result.fuel, body = result.body, engine = result.engine }
+		return { status = true, message = "success", vehicle = result.vehicle, mods = mods, location = location, fuel = result.fuel, body = result.body, engine = result.engine, trailerdata = json.decode(result.trailerdata) }
 	else
 		return { status = false, message = "not parked" }
 	end

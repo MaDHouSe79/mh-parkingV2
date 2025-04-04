@@ -167,7 +167,13 @@ function Parking.Functions.DriveVehicle(data)
 	Parking.Functions.DeleteNearVehicle(vector3(data.location.x, data.location.y, data.location.z))
 	LoadModel(data.mods["model"])
 	local tempVeh = CreateVehicle(data.mods["model"], data.location.x, data.location.y, data.location.z, data.location.h, true)
-	while not DoesEntityExist(tempVeh) do Wait(500) end
+	while not DoesEntityExist(tempVeh) do Wait(1) end
+	if Config.ParkVehiclesWithTrailers then
+		if data.trailerdata ~= nil then
+			data.trailerEntity = Parking.Functions.SpawnTrailer(tempVeh, data)
+			FreezeEntityPosition(data.trailerEntity, false)
+		end
+	end
 	SetVehicleProperties(tempVeh, data.mods)
 	DoVehicleDamage(tempVeh, data.body, data.engine)
 	exports[Config.FuelScript]:SetFuel(tempVeh, data.fuel)
@@ -176,6 +182,7 @@ function Parking.Functions.DriveVehicle(data)
     SetVehicleDirtLevel(tempVeh, 0)
 	TaskWarpPedIntoVehicle(GetPlayerPed(-1), tempVeh, -1)
 	SetEntityVisible(PlayerPedId(), true, 0)
+	FreezeEntityPosition(tempVeh, false)
 end
 
 function Parking.Functions.RemoveVehicles(vehicles)
