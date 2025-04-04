@@ -29,8 +29,8 @@ Config.ParkedViewDistance = 100            -- Default 100 if your distance is ov
 Config.UseParkedBlips = true               -- if true players can see a blip of the parked vehicle on the map
 ----------------------------------------------------------------------------
 -- VIP Access
-Config.UseAsVip = false                    -- if true `Config.Maxparking` does not work on vip players and you need to add a amount per player.
-Config.Maxparking = 3                      -- Default 1, this is max parked allowed per player, don't go to high with this...
+Config.UseAsVip = true                     -- if true `Config.Maxparking` does not work on vip players and you need to add a amount per player.
+Config.Maxparking = 1                      -- Default 1, this is max parked allowed per player, don't go to high with this...
 ----------------------------------------------------------------------------
 Config.UseVehicleOwnerText = true          -- If true show the owner and vehicle text above vehicles when parked.
 Config.VehicleOwnerTextDisplayDistance = 15
