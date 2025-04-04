@@ -26,7 +26,8 @@
 - [Subscribe](https://www.youtube.com/c/@MaDHouSe79) 
 
 # MH Parking V2 (QB/ESX) by MaDHouSe79
-- Auto park and unpark when you press `F`
+- Auto park and unpark vehicles when you press `F` stort and press `F` long to iqnore the parking.
+- Before you press `F` press the keys `A` or `D` to turn your wheels this will save the wheel angle on your parked vehicle.
 
 # Dependencies (QB/ESX)
 - [oxmysql](https://github.com/overextended/oxmysql/releases/tag/v1.9.3)
@@ -47,8 +48,6 @@
 - `/addvip [id] [amount]` Add a player as vip (admin only)
 - `/removevip [id]` Remove a vip player (admin only)
 
-# Save front wheels angle
-- Before you press `E` press the keys `A` or `D` to turn your wheels and it will save that angle on your parked vehicle.
 
 # Read Files
 [README FILES](https://github.com/MaDHouSe79/mh-parkingV2/tree/main/readme)
