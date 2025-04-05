@@ -321,14 +321,12 @@ function Parking.Functions.Save(vehicle)
 			if Config.ParkVehiclesWithTrailers then
 				local hasTrailer, trailer = GetVehicleTrailerVehicle(vehicle)
 				if hasTrailer then
-					local hashkey = GetEntityModel(trailer)
-					local trailerProps = GetVehicleProperties(trailer)
-					if Config.Trailers[hashkey] then
+					if Config.Trailers[GetEntityModel(trailer)] then
 						trailerdata = {
-							hash = hashkey,
+							hash = GetEntityModel(trailer),
 							coords = GetEntityCoords(trailer),
 							heading = GetEntityHeading(trailer),
-							mods = trailerProps,
+							mods = GetVehicleProperties(trailer),
 							load = trailerLoad[vehPlate] or nil
 						}
 					end
@@ -374,11 +372,6 @@ function Parking.Functions.DriveVehicle(data)
 	LoadModel(data.mods["model"])
 	local tempVeh = CreateVehicle(data.mods["model"], data.location.x, data.location.y, data.location.z, data.location.h, true)
 	while not DoesEntityExist(tempVeh) do Wait(1) end
-	if Config.ParkVehiclesWithTrailers then
-		if data.trailerdata ~= nil then
-			data.trailerEntity = Parking.Functions.SpawnTrailer(tempVeh, data)
-		end
-	end
 	SetVehicleProperties(tempVeh, data.mods)
 	DoVehicleDamage(tempVeh, data.body, data.engine)
 	exports[Config.FuelScript]:SetFuel(tempVeh, data.fuel)
@@ -388,7 +381,12 @@ function Parking.Functions.DriveVehicle(data)
 	TaskWarpPedIntoVehicle(GetPlayerPed(-1), tempVeh, -1)
 	SetEntityVisible(PlayerPedId(), true, 0)
 	FreezeEntityPosition(tempVeh, false)
-	FreezeEntityPosition(data.trailerEntity, false)
+	if Config.ParkVehiclesWithTrailers then
+		if data.trailerdata ~= nil then
+			data.trailerEntity = Parking.Functions.SpawnTrailer(tempVeh, data)
+			FreezeEntityPosition(data.trailerEntity, false)
+		end
+	end
 end
 
 function Parking.Functions.ConnectVehicleToTrailer(vehicle, trailer, data)
