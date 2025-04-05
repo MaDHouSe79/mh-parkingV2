@@ -11,7 +11,7 @@ Config.Trailers = {
     [-2058878099] = {model = "trailers3", name = "trailers3", offset = {backwards = -6.1, posX = 0.0, posY = 0.0, rotX = 0.0, rotY = 0.0}},
     [-100548694] = {model = "trailers4", name = "trailers4", offset = {backwards = -6.1, posX = 0.0, posY = 0.0, rotX = 0.0, rotY = 0.0}},
     [-1352468814] = {model = "trflat", name = "trflat", offset = {backwards = -6.1, posX = 0.0, posY = 0.0, rotX = 0.0, rotY = 0.0}},
-    [2078290630] = {model = "tr2", name = "tr2", offset = {backwards = -7.8, posX = 0.0, posY = 0.0, rotX = 0.0, rotY = 0.0}},
+    [2078290630] = {model = "tr2", name = "tr2", offset = {backwards = -7.8, posX = 0.0, posY = 0.0, rotX = 0.0, rotY = 0.0},},
     [2091594960] = {model = "tr4", name = "tr4", offset = {backwards = -7.8, posX = 0.0, posY = 0.0, rotX = 0.0, rotY = 0.0}},
 }
 

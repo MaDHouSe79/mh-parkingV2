@@ -2,7 +2,7 @@
 --[[               MH Parking V2 by MaDHouSe79             ]] --
 --[[ ===================================================== ]] --
 LocalVehicles, GlobalVehicles, isLoggedIn, SpawnedVehicles, DeletingEntities, displayOwnerText = {}, {}, false, false, false, Config.UseVehicleOwnerText
-AddEventHandler('onResourceStop', function(resource) Parking.Functions.DeleteAllVehicles() PlayerData = {} isLoggedIn = false end)
+AddEventHandler('onResourceStop', function(resource) if resource == GetCurrentResourceName() then Parking.Functions.DeleteAllVehicles() PlayerData = {} isLoggedIn = false end end)
 AddEventHandler('onResourceStart', function(resource) if resource == GetCurrentResourceName() then TriggerServerEvent('mh-parkingV2:server:OnJoin') PlayerData = GetPlayerData() isLoggedIn = true end end)
 RegisterNetEvent(OnPlayerLoaded, function() TriggerServerEvent('mh-parkingV2:server:OnJoin') end)
 RegisterNetEvent(OnPlayerUnload, function() Parking.Functions.DeleteAllVehicles() PlayerData = {} isLoggedIn = false end)
@@ -27,3 +27,4 @@ CreateThread(function() Parking.Functions.CheckSteeringAngle() end)
 CreateThread(function() Parking.Functions.RadialMenu() end)
 CreateThread(function() Parking.Functions.CreateBlips() end)
 CreateThread(function() Parking.Functions.AttachedToTrailer() end)
+CreateThread(function() Parking.Functions.LoadTarget() end)

@@ -132,7 +132,7 @@ function Parking.Functions.Save(src, data)
 					steerangle = data.steerangle,
 					location = data.location,
 					mods = json.decode(result.mods),
-					trailerdata = json.decode(result.trailerdata),
+					trailerdata = json.decode(trailerdata),
 				}, src)
 				return { status = true, message = Lang:t('info.vehicle_parked') }
 			else
@@ -191,8 +191,12 @@ function Parking.Functions.GetTrailerLoad(src, data)
 	end
 	if result ~= nil then
 		local trailerdata = json.decode(result.trailerdata)
-		if trailerdata.load ~= nil then
-			return {status = true, load = trailerdata.load }
+		if trailerdata ~= nil then
+			if trailerdata.load ~= nil then
+				return {status = true, load = trailerdata.load }
+			else
+				return {status = false, load = nil }
+			end
 		else
 			return {status = false, load = nil }
 		end

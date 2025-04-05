@@ -10,6 +10,7 @@ local Translations = {
         ['no_waipoint'] = "Serieus heb je voor deze %{distance} meter een waypoint nodig?",
         ['no_vehicles_parked'] = "Je hebt geen voertuigen gepakeerd staan.",
         ['get_in_vehicle'] = "Get In Vehicle",
+        ['select_vehicle'] = "Select Vehicle",
         ["owner"] = "Eigenaar: ~y~%{owner}~s~",
         ["plate"] = "Kenteken: ~g~%{plate}~s~",
         ["model"] = "Model: ~b~%{model}~s~",

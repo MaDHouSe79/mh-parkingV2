@@ -6,9 +6,10 @@ Parking.Functions = {}
 Parking.TrailerData = {}
 diableParkedBlips = {}
 parkMenu = nil
-currentTrailer = nil
-currentBoat = nil
 trailerLoad = {}
+isInVehicle = false
+currentVehicle = 0
+currentSeat = 0
 
 function Parking.Functions.AddToTable(entity, data)
 	LocalVehicles[#LocalVehicles + 1] = {
@@ -40,12 +41,6 @@ function Parking.Functions.MakeVehiclesVisable()
 			end
 		end
 	end
-end
-
-function Parking.Functions.GetTrailerLoad(plate)
-	TriggerCallback("mh-parkingV2:server:GetTrailerLoad", function(callback)
-		return callback.load
-	end, {plate = plate})
 end
 
 function Parking.Functions.CheckDistanceToForceGrounded()
@@ -313,25 +308,21 @@ function Parking.Functions.Save(vehicle)
 	if allowToPark then
 		if DoesEntityExist(vehicle) then
 			local canSave = true
-			local load = nil
-			local trailerdata = nil
 			local vehPos = GetEntityCoords(vehicle)
 			local vehHead = GetEntityHeading(vehicle)
 			local vehPlate = GetPlate(vehicle)
+			local trailerdata = nil
 			if Config.ParkVehiclesWithTrailers then
 				local hasTrailer, trailer = GetVehicleTrailerVehicle(vehicle)
 				if hasTrailer then
-					if Config.Trailers[GetEntityModel(trailer)] then
-						trailerdata = {
-							hash = GetEntityModel(trailer),
-							coords = GetEntityCoords(trailer),
-							heading = GetEntityHeading(trailer),
-							mods = GetVehicleProperties(trailer),
-							load = trailerLoad[vehPlate] or nil
-						}
-					end
+					trailerdata = {
+						hash = GetEntityModel(trailer),
+						coords = GetEntityCoords(trailer),
+						heading = GetEntityHeading(trailer),
+						mods = GetVehicleProperties(trailer),
+						load = trailerLoad[vehPlate]
+					}
 				end
-				Wait(50)
 			end
 			TaskLeaveVehicle(PlayerPedId(), vehicle, 1)
 			Wait(2500)
@@ -342,6 +333,7 @@ function Parking.Functions.Save(vehicle)
 					if callback.status then
 						TriggerServerEvent('mh-parkingV2:server:CreateOwnerVehicleBlip', vehPlate)
 						DeleteVehicle(vehicle)
+						trailerLoad[vehPlate] = nil
 						DisplayHelpText(callback.message)
 					else
 						FreezeEntityPosition(vehicle, false)
@@ -461,32 +453,21 @@ function Parking.Functions.SpawnTrailer(vehicle, data)
 		SetVehicleDirtLevel(tempVeh, 0)
 		TriggerCallback("mh-parkingV2:server:GetTrailerLoad", function(callback)
 			if callback.status then
-				trailerLoad[data.plate] = callback.load
-				LoadModel(callback.load.hash)
-				local tempLoad = CreateVehicle(callback.load.hash, trailerSpawnPos.x, trailerSpawnPos.y, trailerSpawnPos.z, heading, true)
-				while not DoesEntityExist(tempLoad) do Wait(1) end
-				SetVehicleProperties(tempLoad, callback.load.mods)
-				exports[Config.FuelScript]:SetFuel(tempLoad, 100.0)
-				SetEntityInvincible(tempLoad, true)
-				SetVehRadioStation(tempLoad, 'OFF')
-				SetVehicleDirtLevel(tempLoad, 0)
-				AttachEntityToEntity(tempLoad, tempVeh, 20, 0.0, -1.0, 0.25, 0.0, 0.0, 0.0, false, false, true, false, 20, true)
-				TriggerEvent('vehiclekeys:client:SetOwner', data.plate)
-				exports['qb-target']:AddTargetEntity(tempLoad, {
-					options = {{
-						type = "client",
-						event = "mh-trailers:client:GetInVehicle",
-						icon = "fas fa-car",
-						label = Lang:t('info.get_in_vehicle'),
-						action = function(entity)
-							Parking.Functions.GetIn(entity)
-						end,
-						canInteract = function(entity, distance, data)
-							return true
-						end
-					}},
-					distance = 15.0
-				})
+				if callback.load ~= nil then
+					if GetEntityModel(tempVeh) == 524108981 then -- Boat trailer
+						trailerLoad[data.plate] = callback.load
+						LoadModel(callback.load.hash)
+						local tempLoad = CreateVehicle(callback.load.hash, trailerSpawnPos.x, trailerSpawnPos.y, trailerSpawnPos.z, heading, true)
+						while not DoesEntityExist(tempLoad) do Wait(1) end
+						AttachEntityToEntity(tempLoad, tempVeh, 20, 0.0, -1.0, 0.25, 0.0, 0.0, 0.0, false, false, true, false, 20, true)
+						SetVehicleProperties(tempLoad, callback.load.mods)
+						exports[Config.FuelScript]:SetFuel(tempLoad, 100.0)
+						SetEntityInvincible(tempLoad, true)
+						SetVehRadioStation(tempLoad, 'OFF')
+						SetVehicleDirtLevel(tempLoad, 0)
+						TriggerEvent('vehiclekeys:client:SetOwner', data.plate)
+					end
+				end
 			end
 		end, {plate = data.plate})
 		Parking.Functions.ConnectVehicleToTrailer(vehicle, tempVeh, data)
@@ -500,7 +481,7 @@ function Parking.Functions.SpawnVehicles(vehicles)
 		Parking.Functions.DeleteLocalVehicle(vehicles[i].vehicle)
 		Parking.Functions.DeleteNearVehicle(vec3(vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z))
 		Parking.Functions.DeleteVehicleAtcoords(vehicles[i].location)
-		Wait(100)
+		Wait(1000)
 		LoadModel(vehicles[i].mods["model"])
 		local tempVeh = CreateVehicle(vehicles[i].mods["model"], vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z, vehicles[i].location.h, true)
 		while not DoesEntityExist(tempVeh) do Wait(1) end
@@ -526,11 +507,10 @@ function Parking.Functions.SpawnVehicles(vehicles)
 		if Config.ParkVehiclesWithTrailers then
 			if vehicles[i].trailerdata ~= nil then
 				vehicles[i].trailerEntity = Parking.Functions.SpawnTrailer(tempVeh, vehicles[i])
-				Parking.Functions.AddToTable(tempVeh, vehicles[i])
 			end
-		else
-			Parking.Functions.AddToTable(tempVeh, vehicles[i])
 		end
+		Wait(500)
+		Parking.Functions.AddToTable(tempVeh, vehicles[i])
 		tempVeh = nil
 	end
 end
@@ -540,7 +520,7 @@ function Parking.Functions.SpawnVehicle(vehicleData)
 	Parking.Functions.DeleteLocalVehicle(vehicleData.vehicle)
 	Parking.Functions.DeleteNearVehicle(vec3(vehicleData.location.x, vehicleData.location.y, vehicleData.location.z))
 	Parking.Functions.DeleteVehicleAtcoords(vehicleData.location)
-	Wait(100)
+	Wait(1000)
 	LoadModel(vehicleData.mods["model"])
 	local tempVeh = CreateVehicle(vehicleData.mods["model"], vehicleData.location.x, vehicleData.location.y, vehicleData.location.z, vehicleData.location.h, true)
 	while not DoesEntityExist(tempVeh) do Wait(1) end
@@ -566,11 +546,10 @@ function Parking.Functions.SpawnVehicle(vehicleData)
 	if Config.ParkVehiclesWithTrailers then
 		if vehicleData.trailerdata ~= nil then
 			vehicleData.trailerEntity = Parking.Functions.SpawnTrailer(tempVeh, vehicleData)
-			Parking.Functions.AddToTable(tempVeh, vehicleData)
 		end
-	else
-		Parking.Functions.AddToTable(tempVeh, vehicleData)
 	end
+	Wait(500)
+	Parking.Functions.AddToTable(tempVeh, vehicleData)
 	tempVeh = nil
 end
 
@@ -870,6 +849,46 @@ function Parking.Functions.GetIn(entity)
     SetVehicleEngineOn(entity, true, true)
 end
 
+function Parking.Functions.AttachedToTrailer()
+	while true do
+        local sleep = 1000
+        if isLoggedIn then
+			local hasTrailer, trailer = GetVehicleTrailerVehicle(currentVehicle)
+			if hasTrailer then
+				local vehicle = GetVehiclePedIsIn(PlayerPedId(), false)
+				if vehicle ~= -1 and trailer ~= vehicle and trailer ~= currentVehicle then
+					sleep = 0
+					if IsEntityTouchingEntity(vehicle, trailer) then DisplayHelpText(Lang:t('info.press_to_attach')) end
+					if GetEntityModel(trailer) == 2078290630 then
+						if IsControlJustPressed(0, Config.ParkingButton) then Parking.Functions.AddVehicleOnTrailer(vehicle, trailer) end
+					elseif GetEntityModel(trailer) == 524108981 then
+						if IsControlJustPressed(0, Config.ParkingButton) then Parking.Functions.AddBoatToTrailer(vehicle, trailer) end
+					end
+				end
+			end
+        end
+        Wait(sleep)
+    end
+end
+
+function Parking.Functions.AddVehicleOnTrailer(vehicle, trailer)
+    if IsEntityTouchingEntity(trailer, vehicle) then
+        if not IsVehicleAttachedToTrailer(vehicle) then
+			if GetEntityModel(trailer) == 2078290630 then -- Tr2 trailer
+				SetVehicleEngineOn(vehicle, false, false, true)
+				local truck = GetEntityAttachedTo(trailer)
+				local plate = GetPlate(truck)
+				local vehRotation = GetEntityRotation(vehicle)
+				local localcoords = GetOffsetFromEntityGivenWorldCoords(trailer, GetEntityCoords(vehicle))
+				AttachVehicleOnToTrailer(vehicle, trailer, 0.0, 0.0, 0.0, localcoords.x + 0.0, localcoords.y + 0.0, localcoords.z + 0.05, vehRotation.x, vehRotation.y, 0.0, false)
+				SetEntityCanBeDamaged(vehicle, false)
+			end
+        else
+            Notify(Lang:t('notify.already_on_trailer'))
+        end
+    end
+end
+
 function Parking.Functions.AddBoatToTrailer(boat, trailer)
     if IsEntityTouchingEntity(trailer, boat) then
         if not IsVehicleAttachedToTrailer(boat) then
@@ -887,40 +906,31 @@ function Parking.Functions.AddBoatToTrailer(boat, trailer)
 			isInVehicle = false
 			currentVehicle = 0
 			currentSeat = 0
-			exports['qb-target']:AddTargetEntity(boat, {
-				options = {{
-					type = "client",
-					event = "mh-trailers:client:GetInVehicle",
-					icon = "fas fa-car",
-					label = Lang:t('info.get_in_vehicle'),
-					action = function(entity)
-						Parking.Functions.GetIn(entity)
-					end,
-					canInteract = function(entity, distance, data)
-						return true
-					end
-				}},
-				distance = 15.0
-			})
         end
     end
 end
+
+local currentTruck = -1
+local currentTrailer = -1
+local isRampDown = false
+local isPlatformDown = false
 
 function Parking.Functions.AttachedToTrailer()
 	while true do
         local sleep = 1000
         if isLoggedIn then
-			local hasTrailer, trailer = GetVehicleTrailerVehicle(currentVehicle)
-			if hasTrailer then currentTrailer = trailer end
-			currentBoat = GetVehiclePedIsIn(PlayerPedId(), false)
-			if currentBoat ~= -1 and currentTrailer ~= nil then
-				if Config.TrailerBoats[GetEntityModel(currentBoat)] then
+			local hasTrailer, trailer = GetVehicleTrailerVehicle(currentTruck)
+			if hasTrailer then
+				local vehicle = GetVehiclePedIsIn(PlayerPedId(), false)
+				if vehicle ~= -1 and trailer ~= vehicle and trailer ~= currentTruck then
 					sleep = 0
-					if currentTrailer ~= currentBoat and currentTrailer ~= currentVehicle then
-						if IsEntityTouchingEntity(currentTrailer, currentBoat) then DisplayHelpText(Lang:t('info.press_to_attach')) end
-						if not IsVehicleAttachedToTrailer(currentBoat) then
-							if IsControlJustPressed(0, Config.ParkingButton) then
-								Parking.Functions.AddBoatToTrailer(currentBoat, currentTrailer)
+					if IsEntityTouchingEntity(trailer, vehicle) then DisplayHelpText(Lang:t('info.press_to_attach')) end
+					if not IsVehicleAttachedToTrailer(vehicle) then
+						if IsControlJustPressed(0, Config.ParkingButton) then
+							if GetEntityModel(trailer) == 524108981 then -- boat trailer
+								Parking.Functions.AddBoatToTrailer(vehicle, trailer)
+							elseif GetEntityModel(trailer) == 2078290630 then -- tr2 trailer
+								Parking.Functions.AddVehicleOnTrailer(vehicle, trailer)
 							end
 						end
 					end
@@ -928,5 +938,120 @@ function Parking.Functions.AttachedToTrailer()
 			end
         end
         Wait(sleep)
+    end
+end
+
+function Parking.Functions.LoadTarget()
+	for k, v in pairs(Config.TrailerBoats) do
+        exports['qb-target']:AddTargetModel(v.model, {
+			options = {{
+				type = "client",
+				event = "mh-parkingV2:client:GetInVehicle",
+				icon = "fas fa-car",
+				label = Lang:t('info.get_in_vehicle'),
+				action = function(entity)
+					Parking.Functions.GetIn(entity)
+				end,
+				canInteract = function(entity, distance, data)
+					return true
+				end
+			}},
+			distance = 15.0
+		})
+    end
+	for k, v in pairs(Config.Trailers) do
+		exports['qb-target']:AddTargetModel(v.model, {
+			options = {
+			{
+				type = "client",
+				event = "",
+				icon = "fas fa-car",
+				label = 'Ramp Down',
+				action = function(entity)
+					currentTrailer = entity
+					SetVehicleDoorOpen(entity, 5, false)
+					isRampDown = true
+				end,
+				canInteract = function(entity, distance, data)
+					if isRampDown then return false end
+					return true
+				end
+			}, {
+				type = "client",
+				event = "",
+				icon = "fas fa-car",
+				label = 'Ramp Up',
+				action = function(entity)
+					SetVehicleDoorShut(entity, 5, true)
+					currentTrailer = entity
+					isRampDown = false
+				end,
+				canInteract = function(entity, distance, data)
+					if not isRampDown then return false end
+					if isPlatformDown then return false end
+					return true
+				end
+			},
+			{
+				type = "client",
+				event = "mh-parkingV2:client:togglePlatform",
+				icon = "fas fa-car",
+				label = "Platform Up",
+				action = function(entity)
+					currentTrailer = entity
+					SetVehicleDoorShut(entity, 4, false)
+					isPlatformDown = false
+				end,
+				canInteract = function(entity, distance, data)
+					if isRampDown then return false end
+					if not isPlatformDown then return false end
+					return true
+				end
+			}, {
+				type = "client",
+				event = "mh-parkingV2:client:togglePlatform",
+				icon = "fas fa-car",
+				label = 'Platform Down',
+				action = function(entity)
+					currentTrailer = entity
+					isPlatformDown = true
+					SetVehicleDoorOpen(entity, 4, false)
+				end,
+				canInteract = function(entity, distance, data)
+					if not isRampDown then return false end
+					if isPlatformDown then return false end
+					return true
+				end
+			}},
+			distance = 5.0
+		})
+	end
+	for k, v in pairs(Config.Vehicles) do
+        exports['qb-target']:AddTargetModel(v.model, {
+			options = {{
+				type = "client",
+				event = "",
+				icon = "fas fa-car",
+				label = Lang:t('info.get_in_vehicle'),
+				action = function(entity)
+					Parking.Functions.GetIn(entity)
+				end,
+				canInteract = function(entity, distance, data)
+					return true
+				end
+			},{
+				type = "client",
+				event = "",
+				icon = "fas fa-car",
+				label = Lang:t('info.select_vehicle'),
+				action = function(entity)
+					currentTruck = entity
+				end,
+				canInteract = function(entity, distance, data)
+					return true
+				end
+			}},
+			distance = 15.0
+		})
     end
 end
