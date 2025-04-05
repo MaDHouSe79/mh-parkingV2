@@ -383,7 +383,7 @@ function Parking.Functions.SpawnTrailer(vehicle, data)
 		SetVehicleProperties(tempVeh, data.trailerdata.mods)
 		SetVehicleDirtLevel(tempVeh, 0)
 		Parking.Functions.ConnectVehicleToTrailer(vehicle, tempVeh, data)
-		if data.trailerdata.load ~= nil and data.trailerdata.load.hash ~= nil then
+		if data.trailerdata.load ~= nil then
 			LoadModel(data.trailerdata.load.hash)
 			local tempLoad = CreateVehicle(data.trailerdata.load.hash, trailerSpawnPos.x, trailerSpawnPos.y, trailerSpawnPos.z, heading, true)
 			while not DoesEntityExist(tempLoad) do Wait(1) end
@@ -508,6 +508,7 @@ function Parking.Functions.SpawnVehicles(vehicles)
 			end
 		end
 		Parking.Functions.AddToTable(tempVeh, vehicles[i])
+		tempVeh = nil
 	end
 end
 
@@ -546,6 +547,7 @@ function Parking.Functions.SpawnVehicle(vehicleData)
 		end
 	end
 	Parking.Functions.AddToTable(tempVeh, vehicleData)
+	tempVeh = nil
 end
 
 function Parking.Functions.SpawnVehicleChecker()
