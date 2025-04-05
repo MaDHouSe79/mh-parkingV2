@@ -119,7 +119,6 @@ function Parking.Functions.Save(src, data)
 				elseif Config.Framework == 'qb' then
 					MySQL.Async.execute('UPDATE player_vehicles SET state = ?, location = ?, street = ?, trailerdata = ?, steerangle = ?, engine = ?, fuel = ?, body = ? WHERE plate = ? AND citizenid = ?', { 3, location, data.street, trailerdata, data.steerangle, data.engine, data.fuel, data.body, plate, citizenid })
 				end
-
 				Wait(100)
 				TriggerClientEvent("mh-parkingV2:client:AddVehicle", -1, {
 					vehicle = result.vehicle,

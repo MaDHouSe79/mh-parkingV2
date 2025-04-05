@@ -11,7 +11,6 @@ currentBoat = nil
 trailerLoad = {}
 
 function Parking.Functions.AddToTable(entity, data)
-	print(data.plate)
 	LocalVehicles[#LocalVehicles + 1] = {
 		entity = entity,
 		fuel = data.fuel,
@@ -379,7 +378,6 @@ function Parking.Functions.SpawnTrailer(vehicle, data)
 		tempVeh = CreateVehicle(data.trailerdata.hash, trailerSpawnPos.x, trailerSpawnPos.y, vehicleCoords.z - 1.5, heading, true, false)
 		while not DoesEntityExist(tempVeh) do Wait(1) end
 		SetEntityAsMissionEntity(tempVeh, true, true)
-		--SetVehicleNumberPlateText(tempVeh, GetPlate(vehicle) .. "1")
 		RequestCollisionAtCoord(trailerSpawnPos.x, trailerSpawnPos.y, trailerSpawnPos.z)
 		SetVehicleOnGroundProperly(tempVeh)
 		SetVehicleProperties(tempVeh, data.trailerdata.mods)
