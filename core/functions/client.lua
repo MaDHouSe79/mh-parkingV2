@@ -473,6 +473,7 @@ function Parking.Functions.SpawnTrailer(vehicle, data)
 				SetVehRadioStation(tempLoad, 'OFF')
 				SetVehicleDirtLevel(tempLoad, 0)
 				AttachEntityToEntity(tempLoad, tempVeh, 20, 0.0, -1.0, 0.25, 0.0, 0.0, 0.0, false, false, true, false, 20, true)
+				TriggerEvent('vehiclekeys:client:SetOwner', data.plate)
 				exports['qb-target']:AddTargetEntity(tempLoad, {
 					options = {{
 						type = "client",
