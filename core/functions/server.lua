@@ -191,7 +191,6 @@ function Parking.Functions.GetTrailerLoad(src, data)
 		result = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE plate = ?", { plate })[1]
 	end
 	if result ~= nil then
-		print(json.encode(result.trailerdata,{indent=true}))
 		local trailerdata = json.decode(result.trailerdata)
 		if trailerdata.load ~= nil then
 			return {status = true, load = trailerdata.load }
