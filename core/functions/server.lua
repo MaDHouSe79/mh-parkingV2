@@ -181,6 +181,28 @@ function Parking.Functions.OnJoin(src)
 	TriggerClientEvent('mh-parkingV2:client:OnJoin', src)
 end
 
+function Parking.Functions.GetTrailerLoad(src, data)
+	local xPlayer = GetPlayer(src)
+	local plate = data.plate
+	local result = nil
+	if Config.Framework == 'esx' then
+		result = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE plate = ?", { plate })[1]
+	elseif Config.Framework == 'qb' then
+		result = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE plate = ?", { plate })[1]
+	end
+	if result ~= nil then
+		print(json.encode(result.trailerdata,{indent=true}))
+		local trailerdata = json.decode(result.trailerdata)
+		if trailerdata.load ~= nil then
+			return {status = true, load = trailerdata.load }
+		else
+			return {status = false, load = nil }
+		end
+	else
+		return {status = false, load = nil }
+	end
+end
+
 function Parking.Functions.Init()
 	Wait(3000)
 	if Config.Framework == 'esx' then
