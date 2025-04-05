@@ -11,6 +11,7 @@ currentBoat = nil
 trailerLoad = {}
 
 function Parking.Functions.AddToTable(entity, data)
+	print(data.plate)
 	LocalVehicles[#LocalVehicles + 1] = {
 		entity = entity,
 		fuel = data.fuel,
@@ -378,13 +379,13 @@ function Parking.Functions.SpawnTrailer(vehicle, data)
 		tempVeh = CreateVehicle(data.trailerdata.hash, trailerSpawnPos.x, trailerSpawnPos.y, vehicleCoords.z - 1.5, heading, true, false)
 		while not DoesEntityExist(tempVeh) do Wait(1) end
 		SetEntityAsMissionEntity(tempVeh, true, true)
-		SetVehicleNumberPlateText(tempVeh, GetPlate(vehicle) .. "1")
+		--SetVehicleNumberPlateText(tempVeh, GetPlate(vehicle) .. "1")
 		RequestCollisionAtCoord(trailerSpawnPos.x, trailerSpawnPos.y, trailerSpawnPos.z)
 		SetVehicleOnGroundProperly(tempVeh)
 		SetVehicleProperties(tempVeh, data.trailerdata.mods)
 		SetVehicleDirtLevel(tempVeh, 0)
 		Parking.Functions.ConnectVehicleToTrailer(vehicle, tempVeh, data)
-		if data.trailerdata.load ~= nil then
+		if data.trailerdata.load ~= nil and data.trailerdata.load.hash ~= nil then
 			LoadModel(data.trailerdata.load.hash)
 			local tempLoad = CreateVehicle(data.trailerdata.load.hash, trailerSpawnPos.x, trailerSpawnPos.y, trailerSpawnPos.z, heading, true)
 			while not DoesEntityExist(tempLoad) do Wait(1) end
@@ -444,15 +445,14 @@ function Parking.Functions.ConnectVehicleToTrailer(vehicle, trailer, data)
 	SetVehicleOnGroundProperly(vehicle)
 	local retval, groundZ = GetGroundZFor_3dCoord(data.location.x, data.location.y, data.location.z, false)
 	if retval then SetEntityCoords(vehicle, data.location.x, data.location.y, groundZ - 1) end
-	Wait(50)
-	SetEntityVisible(vehicle, true, 0)
-	SetEntityVisible(trailer, true, 0)
 	Wait(100)
 	if IsEntityAttached(trailer) then
 		FreezeEntityPosition(trailer, false)
 		DetachEntity(trailer, true, true)
-		Wait(100)
 	end
+	Wait(100)
+	SetEntityVisible(vehicle, true, 0)
+	SetEntityVisible(trailer, true, 0)
 end
 
 function Parking.Functions.LockAllParkedVehicles()
@@ -484,33 +484,32 @@ function Parking.Functions.SpawnVehicles(vehicles)
 		LoadModel(vehicles[i].mods["model"])
 		local tempVeh = CreateVehicle(vehicles[i].mods["model"], vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z, vehicles[i].location.h, true)
 		while not DoesEntityExist(tempVeh) do Wait(1) end
-		if Config.ParkVehiclesWithTrailers then
-			if vehicles[i].trailerdata ~= nil and vehicles[i].trailerEntity == nil then
-				vehicles[i].trailerEntity = Parking.Functions.SpawnTrailer(tempVeh, vehicles[i])
-			end
-		end
-		SetEntityAsMissionEntity(tempVeh, true, true)
 		vehicles[i].entity = tempVeh
-		SetVehicleEngineOn(tempVeh, false, false, true)
+		SetEntityAsMissionEntity(tempVeh, true, true)
+		SetVehicleNumberPlateText(tempVeh, vehicles[i].plate)
 		SetVehicleProperties(tempVeh, vehicles[i].mods)
+		SetVehicleEngineOn(tempVeh, false, false, true)
 		RequestCollisionAtCoord(vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z)
 		SetVehicleOnGroundProperly(tempVeh)
-		SetVehicleNumberPlateText(tempVeh, vehicles[i].plate)
 		SetVehicleLivery(tempVeh, vehicles[i].mods.livery)
 		DoVehicleDamage(tempVeh, vehicles[i].body, vehicles[i].engine)
+		exports[Config.FuelScript]:SetFuel(tempVeh, vehicles[i].fuel)
 		SetEntityInvincible(tempVeh, true)
 		SetVehRadioStation(tempVeh, 'OFF')
-		SetVehicleDirtLevel(tempVeh, 0)
-		exports[Config.FuelScript]:SetFuel(tempVeh, vehicles[i].fuel)
+		SetVehicleDirtLevel(tempVeh, 0)		
 		NetworkAllowLocalEntityAttachment(tempVeh, true)
 		SetModelAsNoLongerNeeded(vehicles[i].mods["model"])
 		SetVehicleSteeringAngle(tempVeh, vehicles[i].steerangle + 0.0)
-		Wait(500)
-		Parking.Functions.AddToTable(tempVeh, vehicles[i])
 		Parking.Functions.LockDoors(tempVeh, vehicles[i])
 		if PlayerData.citizenid == vehicles[i].owner then
 			TriggerServerEvent('mh-parkingV2:server:CreateOwnerVehicleBlip', vehicles[i].plate)
 		end
+		if Config.ParkVehiclesWithTrailers then
+			if vehicles[i].trailerdata ~= nil then
+				vehicles[i].trailerEntity = Parking.Functions.SpawnTrailer(tempVeh, vehicles[i])
+			end
+		end
+		Parking.Functions.AddToTable(tempVeh, vehicles[i])
 	end
 end
 
@@ -523,15 +522,11 @@ function Parking.Functions.SpawnVehicle(vehicleData)
 	LoadModel(vehicleData.mods["model"])
 	local tempVeh = CreateVehicle(vehicleData.mods["model"], vehicleData.location.x, vehicleData.location.y, vehicleData.location.z, vehicleData.location.h, true)
 	while not DoesEntityExist(tempVeh) do Wait(1) end
-	if Config.ParkVehiclesWithTrailers then
-		if vehicleData.trailerdata ~= nil and vehicleData.trailerEntity == nil then
-			vehicleData.trailerEntity = Parking.Functions.SpawnTrailer(tempVeh, vehicleData)
-		end
-	end
-	SetEntityAsMissionEntity(tempVeh, true, true)
 	vehicleData.entity = tempVeh
-	SetVehicleEngineOn(tempVeh, false, false, true)
+	SetEntityAsMissionEntity(tempVeh, true, true)
+	SetVehicleNumberPlateText(tempVeh, vehicleData.plate)
 	SetVehicleProperties(tempVeh, vehicleData.mods)
+	SetVehicleEngineOn(tempVeh, false, false, true)
 	RequestCollisionAtCoord(vehicleData.location.x, vehicleData.location.y, vehicleData.location.z)
 	SetVehicleOnGroundProperly(tempVeh)
 	SetEntityInvincible(tempVeh, true)
@@ -543,12 +538,16 @@ function Parking.Functions.SpawnVehicle(vehicleData)
 	exports[Config.FuelScript]:SetFuel(tempVeh, vehicleData.fuel)
 	NetworkAllowLocalEntityAttachment(tempVeh, true)
 	SetModelAsNoLongerNeeded(vehicleData.mods["model"])
-	Wait(500)
-	Parking.Functions.AddToTable(tempVeh, vehicleData)
 	Parking.Functions.LockDoors(tempVeh, vehicleData)
 	if PlayerData.citizenid == vehicleData.owner then
 		TriggerServerEvent('mh-parkingV2:server:CreateOwnerVehicleBlip', vehicleData.plate)
 	end
+	if Config.ParkVehiclesWithTrailers then
+		if vehicleData.trailerdata ~= nil then
+			vehicleData.trailerEntity = Parking.Functions.SpawnTrailer(tempVeh, vehicleData)
+		end
+	end
+	Parking.Functions.AddToTable(tempVeh, vehicleData)
 end
 
 function Parking.Functions.SpawnVehicleChecker()
