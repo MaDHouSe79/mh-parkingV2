@@ -129,11 +129,10 @@ function Parking.Functions.Save(src, data)
 					engine = result.engine,
 					fuel = result.fuel,
 					body = result.body,
-					steerangle = result.steerangle,
+					steerangle = data.steerangle,
 					location = data.location,
 					mods = json.decode(result.mods),
 					trailerdata = json.decode(result.trailerdata),
-
 				}, src)
 				return { status = true, message = Lang:t('info.vehicle_parked') }
 			else
@@ -159,9 +158,9 @@ function Parking.Functions.Drive(src, data)
 		local location = json.decode(result.location)
 		local trailerdata = json.decode(result.trailerdata)
 		if Config.Framework == 'esx' then
-			MySQL.Async.execute('UPDATE owned_vehicles SET stored = ?, location = ? WHERE plate = ?', { 0, nil, plate })
+			MySQL.Async.execute('UPDATE owned_vehicles SET stored = ?, location = ?, steerangle = ? WHERE plate = ?', { 0, nil, 0, plate })
 		elseif Config.Framework == 'qb' then
-			MySQL.Async.execute('UPDATE player_vehicles SET state = ?, location = ? WHERE plate = ?', { 0, nil, plate })
+			MySQL.Async.execute('UPDATE player_vehicles SET state = ?, location = ?, steerangle = ? WHERE plate = ?', { 0, nil, 0, plate })
 		end
 		Wait(50)
 		TriggerClientEvent("mh-parkingV2:client:DeleteVehicle", -1, { plate = plate })
