@@ -44,6 +44,10 @@ Config.ParkingButton = 51 -- E
 ----------------------------------------------------------------------------
 Config.OnlyAutoParkWhenEngineIsOff = true
 ----------------------------------------------------------------------------
+-- if true parked vehicles are unlocked for vehicle owners, 
+-- you must own this vehicle before this works.
+Config.VehicleDoorsUnlockedForOwners = true
+----------------------------------------------------------------------------
 -- Stuff below this is to automatic disable the parking system.
 
 -- This is when you close to a gasstation, you can't use the park system.

@@ -47,7 +47,7 @@
 - `/parkmenu` Open the park menu so you can set a waypoint.
 - `/addvip [id] [amount]` Add a player as vip (admin only)
 - `/removevip [id]` Remove a vip player (admin only)
-
+- `/park` or press `F` short 
 
 # Read Files
 [README FILES](https://github.com/MaDHouSe79/mh-parkingV2/tree/main/readme)
@@ -60,6 +60,8 @@
 ![alttext](https://github.com/MaDHouSe79/mh-parkingV2/blob/main/screenshots/trailer3.png)
 ![alttext](https://github.com/MaDHouSe79/mh-parkingV2/blob/main/screenshots/trailer4.png)
 ![alttext](https://github.com/MaDHouSe79/mh-parkingV2/blob/main/screenshots/trailer5.png)
+![alttext](https://github.com/MaDHouSe79/mh-parkingV2/blob/main/screenshots/trailer7.png)
+![alttext](https://github.com/MaDHouSe79/mh-parkingV2/blob/main/screenshots/trailer7.png)
 
 # LICENSE
 [GPL LICENSE](./LICENSE)<br />

@@ -11,7 +11,19 @@ Config.Trailers = {
     [-2058878099] = {model = "trailers3", name = "trailers3", offset = {backwards = -6.1, posX = 0.0, posY = 0.0, rotX = 0.0, rotY = 0.0}},
     [-100548694] = {model = "trailers4", name = "trailers4", offset = {backwards = -6.1, posX = 0.0, posY = 0.0, rotX = 0.0, rotY = 0.0}},
     [-1352468814] = {model = "trflat", name = "trflat", offset = {backwards = -6.1, posX = 0.0, posY = 0.0, rotX = 0.0, rotY = 0.0}},
-    [2078290630] = {model = "tr2", name = "tr2", offset = {backwards = -7.8, posX = 0.0, posY = 0.0, rotX = 0.0, rotY = 0.0}},
+    [2078290630] = {
+        model = "tr2",
+        name = "tr2",
+        offset = {backwards = -7.8, posX = 0.0, posY = 0.0, rotX = 0.0, rotY = 0.0},
+        parklist = {
+            [1] = { id = 1, coords = vector3(0.0, 4.8, 1.0), loaded = false, entity = nil },
+            [2] = { id = 2, coords = vector3(0.0, 0.0, 1.1), loaded = false, entity = nil },
+            [3] = { id = 3, coords = vector3(0.0, -5.1, 1.2), loaded = false, entity = nil },
+            [4] = { id = 4, coords = vector3(0.0, 5.1, 3.0), loaded = false, entity = nil },
+            [5] = { id = 5, coords = vector3(0.0, 0.0, 3.1), loaded = false, entity = nil },
+            [6] = { id = 6, coords = vector3(0.0, -5.1, 3.2), loaded = false, entity = nil },
+        }
+    },
     [2091594960] = {model = "tr4", name = "tr4", offset = {backwards = -7.8, posX = 0.0, posY = 0.0, rotX = 0.0, rotY = 0.0}},
 }
 

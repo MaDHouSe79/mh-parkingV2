@@ -6,7 +6,7 @@ game 'gta5'
 
 author 'MaDHouSe79'
 description 'MH Parking V2.'
-version '1.0.15'
+version '1.0.16'
 repository 'https://github.com/MaDHouSe79/mh-parkingV2'
 
 shared_scripts {
