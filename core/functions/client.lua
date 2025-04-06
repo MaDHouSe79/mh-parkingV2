@@ -10,6 +10,10 @@ trailerLoad = {}
 isInVehicle = false
 currentVehicle = 0
 currentSeat = 0
+currentTruck = -1
+currentTrailer = -1
+isRampDown = false
+isPlatformDown = false
 
 function Parking.Functions.AddToTable(entity, data)
 	LocalVehicles[#LocalVehicles + 1] = {
@@ -458,36 +462,34 @@ function Parking.Functions.SpawnTrailer(vehicle, data)
 			if callback.status then
 				if callback.load ~= nil then
 					if GetEntityModel(tempVeh) == 2078290630 then -- Tr2 trailer
-						if Config.ParkTrailersWithVehicles then
-							if not trailerLoad[data.plate] then trailerLoad[data.plate] = {} end
-							local trailer = Config.Trailers[GetEntityModel(tempVeh)]
-							for l, load in pairs(callback.load) do
-								for k, park in pairs(trailer.parklist) do
-									if load.id == park.id then
-										if not park.loaded and park.entity == nil then
-											park.loaded = true
-											trailerLoad[data.plate][#trailerLoad[data.plate] + 1] = load
-											LoadModel(load.hash)
-											local tempLoad = CreateVehicle(load.hash, park.coords.x, park.coords.y, park.coords.z, heading, true)
-											while not DoesEntityExist(tempLoad) do Wait(1) end
-											park.entity = tempLoad
-											local vehRotation = GetEntityRotation(vehicle)
-											AttachVehicleOnToTrailer(tempLoad, tempVeh, 0.0, 0.0, 0.0, park.coords.x + 0.0, park.coords.y + 0.0, park.coords.z + 0.05, vehRotation.x, vehRotation.y, 0.0, false)
-											Wait(100)
-											DetachEntity(tempLoad, true, true)
-											Wait(1000)
-											local vehRotation = GetEntityRotation(tempLoad)
-											local localcoords = GetOffsetFromEntityGivenWorldCoords(tempVeh, GetEntityCoords(tempLoad))
-											AttachVehicleOnToTrailer(tempLoad, tempVeh, 0.0, 0.0, 0.0, localcoords.x + 0.0, localcoords.y + 0.0, localcoords.z, vehRotation.x, vehRotation.y, 0.0, false)
-											SetVehicleProperties(tempLoad, load.mods)
-											exports[Config.FuelScript]:SetFuel(tempLoad, 100.0)
-											SetEntityInvincible(tempLoad, true)
-											SetVehRadioStation(tempLoad, 'OFF')
-											SetVehicleDirtLevel(tempLoad, 0)
-											TriggerEvent('vehiclekeys:client:SetOwner', GetPlate(tempLoad))
-											Wait(100)
-											break
-										end
+						if not trailerLoad[data.plate] then trailerLoad[data.plate] = {} end
+						local trailer = Config.Trailers[GetEntityModel(tempVeh)]
+						for l, load in pairs(callback.load) do
+							for k, park in pairs(trailer.parklist) do
+								if load.id == park.id then
+									if not park.loaded and park.entity == nil then
+										park.loaded = true
+										trailerLoad[data.plate][#trailerLoad[data.plate] + 1] = load
+										LoadModel(load.hash)
+										local tempLoad = CreateVehicle(load.hash, park.coords.x, park.coords.y, park.coords.z, heading, true)
+										while not DoesEntityExist(tempLoad) do Wait(1) end
+										park.entity = tempLoad
+										local vehRotation = GetEntityRotation(vehicle)
+										AttachVehicleOnToTrailer(tempLoad, tempVeh, 0.0, 0.0, 0.0, park.coords.x + 0.0, park.coords.y + 0.0, park.coords.z + 0.05, vehRotation.x, vehRotation.y, 0.0, false)
+										Wait(100)
+										DetachEntity(tempLoad, true, true)
+										Wait(1000)
+										local vehRotation = GetEntityRotation(tempLoad)
+										local localcoords = GetOffsetFromEntityGivenWorldCoords(tempVeh, GetEntityCoords(tempLoad))
+										AttachVehicleOnToTrailer(tempLoad, tempVeh, 0.0, 0.0, 0.0, localcoords.x + 0.0, localcoords.y + 0.0, localcoords.z, vehRotation.x, vehRotation.y, 0.0, false)
+										SetVehicleProperties(tempLoad, load.mods)
+										exports[Config.FuelScript]:SetFuel(tempLoad, 100.0)
+										SetEntityInvincible(tempLoad, true)
+										SetVehRadioStation(tempLoad, 'OFF')
+										SetVehicleDirtLevel(tempLoad, 0)
+										TriggerEvent('vehiclekeys:client:SetOwner', GetPlate(tempLoad))
+										Wait(100)
+										break
 									end
 								end
 							end
@@ -906,11 +908,6 @@ function Parking.Functions.GetIn(entity)
 	Parking.Functions.RemoveVehicleFromTrailer(plate)
 end
 
-local currentTruck = -1
-local currentTrailer = -1
-local isRampDown = false
-local isPlatformDown = false
-
 function Parking.Functions.AttachedToTrailer()
 	while true do
         local sleep = 1000
@@ -1022,9 +1019,7 @@ function Parking.Functions.AttachedToTrailer()
 							if GetEntityModel(trailer) == 524108981 then -- boat trailer
 								Parking.Functions.AddBoatToTrailer(vehicle, trailer)
 							elseif GetEntityModel(trailer) == 2078290630 then -- tr2 trailer
-								if Config.ParkTrailersWithVehicles then
-									Parking.Functions.AddVehicleOnTrailer(vehicle, trailer)
-								end
+								Parking.Functions.AddVehicleOnTrailer(vehicle, trailer)
 							end
 						end
 					end
@@ -1143,7 +1138,6 @@ function Parking.Functions.LoadTarget()
 					currentTruck = entity
 				end,
 				canInteract = function(entity, distance, data)
-					if currentTrailer ~= -1 then return false end
 					return true
 				end
 			}},
