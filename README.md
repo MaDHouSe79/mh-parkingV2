@@ -48,6 +48,7 @@
 - `/addvip [id] [amount]` Add a player as vip (admin only)
 - `/removevip [id]` Remove a vip player (admin only)
 - `/park` or press `F` short 
+- `E` to lock vehicles on trailers 
 
 # Read Files
 [README FILES](https://github.com/MaDHouSe79/mh-parkingV2/tree/main/readme)
