@@ -965,7 +965,7 @@ function Parking.Functions.AddVehicleOnTrailer(vehicle, trailer)
 				AttachVehicleOnToTrailer(vehicle, trailer, 0.0, 0.0, 0.0, localcoords.x, localcoords.y, localcoords.z, vehRotation.x, vehRotation.y, 0.0, false)
 				if not trailerLoad[plate] then trailerLoad[plate] = {} end
 				local number = GetTrailerLocalPosNumber(trailer, localcoords)
-				print("Park Num: "..number)
+				--print("Park Num: "..number)
 				trailerLoad[plate][#trailerLoad[plate] + 1] = {
 					id = number,
 					entity = vehicle,
