@@ -446,7 +446,7 @@ function Parking.Functions.SpawnTrailer(vehicle, data)
 		end
 		local trailerSpawnPos = GetOffsetFromEntityInWorldCoords(vehicle, posX, offset, 0.0)
 		Parking.Functions.DeleteVehicleAtcoords(trailerSpawnPos)
-		Wait(100)
+		Wait(1000)
 		LoadModel(data.trailerdata.hash)
 		tempVeh = CreateVehicle(data.trailerdata.hash, trailerSpawnPos.x, trailerSpawnPos.y, vehicleCoords.z - 1.5, heading, true, false)
 		while not DoesEntityExist(tempVeh) do Wait(1) end
@@ -485,6 +485,7 @@ function Parking.Functions.SpawnTrailer(vehicle, data)
 										SetVehRadioStation(tempLoad, 'OFF')
 										SetVehicleDirtLevel(tempLoad, 0)
 										TriggerEvent('vehiclekeys:client:SetOwner', GetPlate(tempLoad))
+										Wait(100)
 										break
 									end
 								end
@@ -512,12 +513,12 @@ function Parking.Functions.SpawnTrailer(vehicle, data)
 end
 
 function Parking.Functions.SpawnVehicles(vehicles)
-	while DeletingEntities do Wait(500) end
+	while DeletingEntities do Wait(1000) end
 	for i = 1, #vehicles, 1 do
 		Parking.Functions.DeleteLocalVehicle(vehicles[i].vehicle)
 		Parking.Functions.DeleteNearVehicle(vec3(vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z))
 		Parking.Functions.DeleteVehicleAtcoords(vehicles[i].location)
-		Wait(100)
+		Wait(1000)
 		LoadModel(vehicles[i].mods["model"])
 		local tempVeh = CreateVehicle(vehicles[i].mods["model"], vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z, vehicles[i].location.h, true)
 		while not DoesEntityExist(tempVeh) do Wait(1) end
@@ -556,7 +557,7 @@ function Parking.Functions.SpawnVehicle(vehicleData)
 	Parking.Functions.DeleteLocalVehicle(vehicleData.vehicle)
 	Parking.Functions.DeleteNearVehicle(vec3(vehicleData.location.x, vehicleData.location.y, vehicleData.location.z))
 	Parking.Functions.DeleteVehicleAtcoords(vehicleData.location)
-	Wait(100)
+	Wait(1000)
 	LoadModel(vehicleData.mods["model"])
 	local tempVeh = CreateVehicle(vehicleData.mods["model"], vehicleData.location.x, vehicleData.location.y, vehicleData.location.z, vehicleData.location.h, true)
 	while not DoesEntityExist(tempVeh) do Wait(1) end
