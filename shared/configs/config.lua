@@ -48,6 +48,10 @@ Config.OnlyAutoParkWhenEngineIsOff = true
 -- you must own this vehicle before this works.
 Config.VehicleDoorsUnlockedForOwners = true
 ----------------------------------------------------------------------------
+-- if true you can also park vehicles on the tr2 trailer, don't use this for now it's still a little buggy..
+Config.ParkTrailersWithVehicles = false
+
+----------------------------------------------------------------------------
 -- Stuff below this is to automatic disable the parking system.
 
 -- This is when you close to a gasstation, you can't use the park system.
