@@ -499,7 +499,13 @@ function Parking.Functions.SpawnTrailer(vehicle, data)
 						LoadModel(callback.load.hash)
 						local tempLoad = CreateVehicle(callback.load.hash, trailerSpawnPos.x, trailerSpawnPos.y, trailerSpawnPos.z, heading, true)
 						while not DoesEntityExist(tempLoad) do Wait(1) end
-						AttachEntityToEntity(tempLoad, tempVeh, 20, 0.0, -1.0, 0.25, 0.0, 0.0, 0.0, false, false, true, false, 20, true)
+						local x, y, z = 0.0, -1.0, 0.25
+						if GetEntityModel(tempLoad) == -1030275036 or GetEntityModel(tempLoad) == 3678636260 or GetEntityModel(tempLoad) == 3983945033 then
+							local localcoords = GetOffsetFromEntityGivenWorldCoords(trailer, GetEntityCoords(tempLoad))
+							x, y, z  = localcoords.y - 0.0, localcoords.y - 1.0, localcoords.z - 0.25
+						end
+						vehRotation = GetEntityRotation(tempLoad)
+						AttachEntityToEntity(tempLoad, tempVeh, 20, x, y, z, vehRotation.x, vehRotation.y, vehRotation.z, false, false, true, false, 20, true)
 						SetVehicleProperties(tempLoad, callback.load.mods)
 						exports[Config.FuelScript]:SetFuel(tempLoad, 100.0)
 						SetEntityInvincible(tempLoad, true)
@@ -965,7 +971,6 @@ function Parking.Functions.AddVehicleOnTrailer(vehicle, trailer)
 				AttachVehicleOnToTrailer(vehicle, trailer, 0.0, 0.0, 0.0, localcoords.x, localcoords.y, localcoords.z, vehRotation.x, vehRotation.y, 0.0, false)
 				if not trailerLoad[plate] then trailerLoad[plate] = {} end
 				local number = GetTrailerLocalPosNumber(trailer, localcoords)
-				--print("Park Num: "..number)
 				trailerLoad[plate][#trailerLoad[plate] + 1] = {
 					id = number,
 					entity = vehicle,
@@ -988,9 +993,13 @@ function Parking.Functions.AddBoatToTrailer(boat, trailer)
         if not IsVehicleAttachedToTrailer(boat) then
             if GetEntityModel(trailer) == 524108981 then -- (boattrailer)
 				if Config.TrailerBoats[GetEntityModel(boat)] then
-                	AttachEntityToEntity(boat, trailer, 20, 0.0, -1.0, 0.25, 0.0, 0.0, 0.0, false, false, true, false, 20, true)
-					local vehicle = GetEntityAttachedTo(trailer)
-					local plate = GetPlate(vehicle)
+					local x, y, z = 0.0, -1.0, 0.25
+					if GetEntityModel(tempLoad) == -1030275036 or GetEntityModel(tempLoad) == 3678636260 or GetEntityModel(tempLoad) == 3983945033 then
+						local localcoords = GetOffsetFromEntityGivenWorldCoords(trailer, GetEntityCoords(tempLoad))
+						x, y, z  = localcoords.y - 0.0, localcoords.y - 1.0, localcoords.z - 0.25
+					end
+					vehRotation = GetEntityRotation(tempLoad)
+					AttachEntityToEntity(tempLoad, tempVeh, 20, x, y, z, vehRotation.x, vehRotation.y, vehRotation.z, false, false, true, false, 20, true)
 					trailerLoad[plate] = {hash = GetEntityModel(boat), mods = GetVehicleProperties(boat)}
 				end
 			end

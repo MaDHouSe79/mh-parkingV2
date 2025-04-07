@@ -28,9 +28,16 @@ Config.Trailers = {
 }
 
 Config.TrailerBoats = {
+    -- dinghy
     [1033245328] = {model = "dinghy", name = "Dinghy"},
     [276773164] = {model = "dinghy2", name = "Dinghy"},
     [509498602] = {model = "dinghy3", name = "Dinghy"},
     [867467158] = {model = "dinghy4", name = "Dinghy"},
     [3314393930] = {model = "dinghy5", name = "Dinghy"},
+    -- seashark
+    [-1030275036] = {model = "seashark", name = "Seashark"},
+    [3678636260] = {model = "seashark2", name = "Seashark"},
+    [3983945033] = {model = "seashark3", name = "Seashark"},
+
+
 }
