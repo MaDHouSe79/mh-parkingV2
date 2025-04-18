@@ -1039,6 +1039,26 @@ function Parking.Functions.AttachedToTrailer()
     end
 end
 
+function Parking.Functions.DisableParkedVehiclesCollision()
+	while true do
+		Wait(0)
+		if isLoggedIn then
+			local vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)
+			if (GetPedInVehicleSeat(vehicle, -1) == GetPlayerPed(-1)) then
+				local playerCoords = GetEntityCoords(GetPlayerPed(-1))
+				for k, v in pairs(LocalVehicles) do
+					if GetDistance(playerCoords, v.location) < 5.0 then
+						SetEntityCollision(v.entity, false, false)
+						FreezeEntityPosition(v.entity, true)
+					elseif GetDistance(playerCoords, v.location) > 5.0 then
+						SetEntityCollision(v.entity, true, true)
+					end
+				end
+			end
+		end
+	end
+end
+
 function Parking.Functions.LoadTarget()
 	for k, v in pairs(Config.TrailerBoats) do
         exports['qb-target']:AddTargetModel(v.model, {
