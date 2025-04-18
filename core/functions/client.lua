@@ -1039,20 +1039,29 @@ function Parking.Functions.AttachedToTrailer()
     end
 end
 
+local disableCollisionVehicles = {}
 function Parking.Functions.DisableParkedVehiclesCollision()
 	while true do
 		Wait(0)
 		if isLoggedIn and Config.DisableParkedVehiclesCollision then
 			local vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)
+			local playerCoords = GetEntityCoords(GetPlayerPed(-1))
 			if (GetPedInVehicleSeat(vehicle, -1) == GetPlayerPed(-1)) then
-				local playerCoords = GetEntityCoords(GetPlayerPed(-1))
 				for k, v in pairs(LocalVehicles) do
 					if GetDistance(playerCoords, v.location) < 5.0 then
+						disableCollisionVehicles[#disableCollisionVehicles + 1] = { entity = v.entity }
 						SetEntityCollision(v.entity, false, false)
 						FreezeEntityPosition(v.entity, true)
 					elseif GetDistance(playerCoords, v.location) > 5.0 then
 						SetEntityCollision(v.entity, true, true)
 					end
+				end
+			else
+				if #disableCollisionVehicles > 0 then
+					for	k, v in pairs(disableCollisionVehicles) do
+						SetEntityCollision(v.entity, true, true)
+					end
+					disableCollisionVehicles = {}
 				end
 			end
 		end
