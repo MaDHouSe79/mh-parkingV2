@@ -48,6 +48,9 @@ Config.OnlyAutoParkWhenEngineIsOff = true
 -- you must own this vehicle before this works.
 Config.VehicleDoorsUnlockedForOwners = true
 ----------------------------------------------------------------------------
+-- Disable parked vehicle collision, players can't ram the parked vehicles.
+Config.DisableParkedVehiclesCollision = true
+----------------------------------------------------------------------------
 -- Stuff below this is to automatic disable the parking system.
 
 -- This is when you close to a gasstation, you can't use the park system.
