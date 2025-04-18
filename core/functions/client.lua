@@ -1049,31 +1049,20 @@ function Parking.Functions.DisableParkedVehiclesCollision()
 			if vehicle ~= nil and vehicle ~= 0 then
 				if (GetPedInVehicleSeat(vehicle, -1) == GetPlayerPed(-1)) then
 					for k, v in pairs(LocalVehicles) do
-						if GetDistance(playerCoords, v.location) < 20.0 then
+						if GetDistance(playerCoords, v.location) < 5.0 then
 							SetEntityCollision(v.entity, false, false)
 							FreezeEntityPosition(v.entity, true)
-							if v.trailerEntity ~= nil then
-								SetEntityCollision(v.trailerEntity, false, false)
-								FreezeEntityPosition(v.trailerEntity, true)
-							end
-							disableCollisionVehicles[#disableCollisionVehicles + 1] = { vehicle = v.entity, trailer = v.trailerEntity}
-						elseif GetDistance(playerCoords, v.location) > 20.0 then
+							disableCollisionVehicles[#disableCollisionVehicles + 1] = { vehicle = v.entity}
+						elseif GetDistance(playerCoords, v.location) > 5.0 then
 							SetEntityCollision(v.entity, true, true)
-							if v.trailerEntity ~= nil then
-								SetEntityCollision(v.trailerEntity, true, false)
-								FreezeEntityPosition(v.trailerEntity, true)
-							end
 						end
 					end
 				end
 			else
 				if #disableCollisionVehicles > 0 then
 					for	k, v in pairs(disableCollisionVehicles) do
-						if GetDistance(playerCoords, v.location) > 20.0 then
+						if GetDistance(playerCoords, v.location) > 5.0 then
 							SetEntityCollision(v.vehicle, true, true)
-							if v.trailer ~= nil then
-								SetEntityCollision(v.trailer, true, true)
-							end
 						end
 					end
 					disableCollisionVehicles = {}
