@@ -1042,7 +1042,7 @@ end
 function Parking.Functions.DisableParkedVehiclesCollision()
 	while true do
 		Wait(0)
-		if isLoggedIn then
+		if isLoggedIn and Config.DisableParkedVehiclesCollision then
 			local vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), false)
 			if (GetPedInVehicleSeat(vehicle, -1) == GetPlayerPed(-1)) then
 				local playerCoords = GetEntityCoords(GetPlayerPed(-1))
