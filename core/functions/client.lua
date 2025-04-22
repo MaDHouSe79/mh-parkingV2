@@ -1052,7 +1052,7 @@ function Parking.Functions.DisableParkedVehiclesCollision()
 						if GetDistance(playerCoords, v.location) < 5.0 then
 							SetEntityCollision(v.entity, false, false)
 							FreezeEntityPosition(v.entity, true)
-							disableCollisionVehicles[#disableCollisionVehicles + 1] = { vehicle = v.entity}
+							disableCollisionVehicles[#disableCollisionVehicles + 1] = { vehicle = v.entity, location = v.location}
 						elseif GetDistance(playerCoords, v.location) > 5.0 then
 							SetEntityCollision(v.entity, true, true)
 						end
