@@ -349,6 +349,7 @@ function Parking.Functions.Save(vehicle)
 					end
 				end, {
 					mods = GetVehicleProperties(vehicle),
+					plate = vehPlate,
 					fuel = exports[Config.FuelScript]:GetFuel(vehicle),
 					engine = GetVehicleEngineHealth(vehicle),
 					body = GetVehicleBodyHealth(vehicle),
