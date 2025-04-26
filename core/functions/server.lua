@@ -94,7 +94,7 @@ function Parking.Functions.Save(src, data)
 	if Config.UseAsVip then defaultMax = Parking.Functions.IfPlayerIsVIPGetMaxParking(src) end
 	if type(totalParked) == 'table' and #totalParked < defaultMax then
 		local fullname = GetCitizenFullname(src)
-		local plate = data.mods.plate
+		local plate = data.plate
 		local isParked = nil
 		if Config.Framework == 'esx' then
 			isParked = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE owner = ? AND plate = ? AND stored = ?", { citizenid, plate, 3 })[1]
