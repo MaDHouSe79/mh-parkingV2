@@ -19,7 +19,7 @@ end
 function GetPlate(vehicle)
     if vehicle == nil then return nil end
     if not DoesEntityExist(vehicle) then return nil end
-    return GetVehicleNumberPlateText(vehicle)
+    return Trim(GetVehicleNumberPlateText(vehicle))
 end
 
 function GetVehicleProperties(vehicle)
