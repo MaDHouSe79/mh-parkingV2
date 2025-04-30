@@ -35,10 +35,21 @@ local Translations = {
         ['addvip_info_amount'] = "Max park totaal",
         ['removevip'] = "Parking Vip Verwijderen",
         ['removevip_info'] = "De ID van de player dat je wilt verwijderen",
+    },
+    vehicle = {
+        ['model'] = "Model: %{model}",
+        ['brand'] = "Uitvoering: %{brand}",
+        ['plate'] = "Kenteken: %{plate}",
+        ['fuel']  = "Brandstof: %{fuel}%",
+        ['engine'] = "Motor: %{engine}%",
+        ['body']  = "Body: %{body}%",
     }
 }
 
-Lang = Locale:new({
-    phrases = Translations,
-    warnOnMissing = true
-})
+if GetConvar('qb_locale', 'en') == 'nl' then
+    Lang = Locale:new({
+        phrases = Translations,
+        warnOnMissing = true,
+        fallbackLang = Lang,
+    })
+end

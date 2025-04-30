@@ -75,6 +75,7 @@ function Parking.Functions.BlinkVehiclelights(vehicle, state)
 	AttachEntityToEntity(object, ped, GetPedBoneIndex(ped, 57005), 0.1, 0.0, 0.0, 0.0, 0.0, 0.0, true, true, false, true, 1, true)
 	TaskPlayAnim(ped, 'anim@mp_player_intmenu@key_fob@', 'fob_click', 8.0, -8.0, -1, 52, 0, false, false, false)
 	TriggerServerEvent("InteractSound_SV:PlayWithinDistance", 5, "lock", 0.2)
+
 	SetVehicleLights(vehicle, 2)
 	Wait(150)
 	SetVehicleLights(vehicle, 0)
@@ -280,15 +281,6 @@ function Parking.Functions.LockDoors(entity, data)
 		SetVehicleDoorsLocked(entity, 1)
 	end
 end
-function GetEntity(data)
-	local result = nil
-	if type(data) == 'table' then
-		result = data.entity
-	elseif type(vehicle) == 'number' then
-		result = data
-	end
-	return result
-end
 
 function Parking.Functions.Drive(vehicle)
 	local entity = GetEntity(vehicle)
@@ -349,8 +341,8 @@ function Parking.Functions.Save(vehicle)
 					end
 				end, {
 					mods = GetVehicleProperties(vehicle),
-					plate = vehPlate,
 					fuel = exports[Config.FuelScript]:GetFuel(vehicle),
+					plate = vehPlate,
 					engine = GetVehicleEngineHealth(vehicle),
 					body = GetVehicleBodyHealth(vehicle),
 					street = GetStreetName(vehicle),
@@ -358,10 +350,8 @@ function Parking.Functions.Save(vehicle)
 					location = { x = vehPos.x, y = vehPos.y, z = vehPos.z, h = vehHead },
 					trailerdata = trailerdata,
 				})
-				return
-			else
+			elseif not canSave then
 				SetVehicleEngineOn(vehicle, false, false, true)
-				return
 			end
 		end
 	end
@@ -382,6 +372,7 @@ function Parking.Functions.DriveVehicle(data)
 	TaskWarpPedIntoVehicle(GetPlayerPed(-1), tempVeh, -1)
 	SetEntityVisible(PlayerPedId(), true, 0)
 	FreezeEntityPosition(tempVeh, false)
+	SetEntityCollision(tempVeh, true, true)
 	if Config.ParkVehiclesWithTrailers then
 		if data.trailerdata ~= nil then
 			data.trailerEntity = Parking.Functions.SpawnTrailer(tempVeh, data)
@@ -441,10 +432,10 @@ function Parking.Functions.SpawnTrailer(vehicle, data)
 					offset = Config.Trailers[data.trailerdata.hash].offset.backwards
 				end
 				if Config.Trailers[data.trailerdata.hash].offset.heading ~= nil then
-					heading -= Config.Trailers[data.trailerdata.hash].offset.heading
+					heading = heading - Config.Trailers[data.trailerdata.hash].offset.heading
 				end
 				if Config.Trailers[data.trailerdata.hash].offset.posX ~= nil then
-					posX -= Config.Trailers[data.trailerdata.hash].offset.posX
+					posX = posX - Config.Trailers[data.trailerdata.hash].offset.posX
 				end
 			end
 		end
@@ -686,9 +677,9 @@ function Parking.Functions.CreateOwnerVehicleBlip(data)
 end
 
 function Parking.Functions.OnJoin()
-	Wait(5000)
 	PlayerData = GetPlayerData()
 	isLoggedIn = true
+	Wait(5000)
 	Parking.Functions.LockAllParkedVehicles()
 end
 
@@ -709,30 +700,21 @@ function Parking.Functions.GetVehicleMenu()
 		if #vehicles >= 1 then
 			local options = {}
 			for k, v in pairs(vehicles) do
-				local coords = json.decode(v.location)
-				options[#options + 1] = {
-					title = v.vehicle:upper() .. " " .. v.plate .. " is parked",
-					description = Lang:t('info.steet', {steet = v.steet}) .. '\n'.. Lang:t('info.fuel', {fuel = v.fuel}) .. '\n'.. Lang:t('info.engine', {engine = v.engine}) .. '\n'.. Lang:t('info.body', {body = v.body}) .. '\n'..Lang:t('info.click_to_set_waypoint'),
-					arrow = false,
-					onSelect = function()
-						Parking.Functions.SetVehicleWaypoit(coords)
-					end
-				}
-			end
-			options[#options + 1] = {
-				title = Lang:t('info.close'),
-				icon = "fa-solid fa-stop",
-				description = '',
-				arrow = false,
-				onSelect = function()
+				if v.state == 3 then
+					local coords = json.decode(v.location)
+					options[#options + 1] = {
+						title = FirstToUpper(v.vehicle) .. " " .. v.plate .. " is parked",
+						description = Lang:t('info.steet', {steet = v.steet}) .. '\n'.. Lang:t('info.fuel', {fuel = v.fuel}) .. '\n'.. Lang:t('info.engine', {engine = v.engine}) .. '\n'.. Lang:t('info.body', {body = v.body}) .. '\n'..Lang:t('info.click_to_set_waypoint'),
+						arrow = false,
+						onSelect = function()
+							Parking.Functions.SetVehicleWaypoit(coords)
+						end
+					}
+					num = num + 1
 				end
-			}
-			lib.registerContext({
-				id = 'parkMenu',
-				title = "MH Parking V2",
-				icon = "fa-solid fa-warehouse",
-				options = options
-			})
+			end
+			options[#options + 1] = {title = Lang:t('info.close'), icon = "fa-solid fa-stop", description = '', arrow = false, onSelect = function() end}
+			lib.registerContext({id = 'parkMenu', title = "MH Parking V2", icon = "fa-solid fa-warehouse", options = options})
 			lib.showContext('parkMenu')
 		else
 			Notify(Lang:t('info.no_vehicles_parked'), "error", 5000)
@@ -753,30 +735,11 @@ end
 function Parking.Functions.RadialMenu()
 	if Config.Framework == 'qb' then
 		RegisterNetEvent('qb-radialmenu:client:onRadialmenuOpen', function()
-			if parkMenu ~= nil then
-				exports['qb-radialmenu']:RemoveOption(parkMenu)
-				parkMenu = nil
-			end
-			parkMenu = exports['qb-radialmenu']:AddOption({
-				id = 'park_vehicles_menu',
-				title = Lang:t('info.park_menu'),
-				icon = "square-parking",
-				type = 'client',
-				event = "mh-parkingV2:client:GetVehicleMenu",
-				shouldClose = true
-			}, parkMenu)
+			if parkMenu ~= nil then exports['qb-radialmenu']:RemoveOption(parkMenu) parkMenu = nil end
+			parkMenu = exports['qb-radialmenu']:AddOption({id = 'park_vehicles_menu', title = Lang:t('info.park_menu'), icon = "square-parking", type = 'client', event = "mh-parkingV2:client:GetVehicleMenu", shouldClose = true}, parkMenu)
 		end)
 	elseif Config.Framework == 'esx' then
-		lib.addRadialItem({
-			{
-				id = 'park_vehicles_menu',
-				label = Lang:t('info.park_menu'),
-				icon = 'square-parking',
-				onSelect = function()
-					TriggerEvent("mh-parkingV2:client:GetVehicleMenu")
-				end
-			}
-		})
+		lib.addRadialItem({{id = 'park_vehicles_menu', label = Lang:t('info.park_menu'), icon = 'square-parking', onSelect = function() TriggerEvent("mh-parkingV2:client:GetVehicleMenu") end}})
 	end
 end
 

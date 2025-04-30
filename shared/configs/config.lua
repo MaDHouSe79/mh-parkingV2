@@ -10,16 +10,16 @@ if GetResourceState("es_extended") ~= 'missing' then
     Config.Framework = 'esx'
 elseif GetResourceState("qb-core") ~= 'missing' then
     Config.Framework = 'qb'
-elseif GetResourceState("qbx-core") ~= 'missing' then
-    Config.Framework = 'qbx'
 end
 ----------------------------------------------------------------------------
 -- Fuel Script
-Config.FuelScript = 'LegacyFuel'           -- Default is LegacyFuel, if you use a other fuel script, for example ox_fuel
+Config.FuelScript = 'mh-fuel'           -- Default is LegacyFuel, if you use a other fuel script, for example ox_fuel
 ----------------------------------------------------------------------------
 -- Notify Script
 Config.DisableParkNotify = false           -- Default true, if false you get many notifications when you enter or leave the vehicle, all other notify massages are stil enable.
 Config.NotifyScript = "ox_lib"             -- Default qb, you can use (qb, ox_lib, k5_notify, okokNotify, Roda_Notifications)
+----------------------------------------------------------------------------
+Config.MenuScript = "qb-menu"              -- Default qb-menu, you can also use ox_lib
 ----------------------------------------------------------------------------
 Config.ForceVehicleOnGound = true          -- If true this will force parked vehicles on the ground, sometimes the vehicles are in the air and by enable this is force the vehicle to the ground
 ----------------------------------------------------------------------------
@@ -48,8 +48,27 @@ Config.OnlyAutoParkWhenEngineIsOff = true
 -- you must own this vehicle before this works.
 Config.VehicleDoorsUnlockedForOwners = true
 ----------------------------------------------------------------------------
--- Tru to disable parked vehicle collision, players can't ram the parked vehicles.
-Config.DisableParkedVehiclesCollision = false
+-- Disable parked vehicle collision, players can't ram the parked vehicles.
+Config.DisableParkedVehiclesCollision = true
+----------------------------------------------------------------------------
+Config.Weapons = {"WEAPON_PISTOL", "WEAPON_PISTOL_MK2", "WEAPON_COMBATPISTOL", "WEAPON_APPISTOL", "WEAPON_STUNGUN"}
+----------------------------------------------------------------------------
+-- Garage ped driver outfit
+Config.Outfit = {
+    ['hair'] = {item = 19, texture = 4}, -- Hear
+    ['beard'] = {item = 2, texture = 0}, -- Beard
+    ["pants"] = {item = 10, texture = 0}, -- Pants
+    ["arms"] = {item = 12, texture = 0}, -- Arms
+    ["t-shirt"] = {item = 21, texture = 0}, -- T Shirt
+    ["vest"] = {item = 0, texture = 0}, -- Body Vest
+    ["torso2"] = {item = 32, texture = 0}, -- Jacket
+    ["shoes"] = {item = 10, texture = 0}, -- Shoes
+    ["decals"] = {item = 0, texture = 0}, -- Neck Accessory
+    ["bag"] = {item = 0, texture = 0}, -- Bag
+    ["hat"] = {item = 0, texture = 0}, -- Hat
+    ["glass"] = {item = 23, texture = 11}, -- Glasses
+    ["mask"] = {item = 0, texture = 0} -- Mask
+}
 ----------------------------------------------------------------------------
 -- Stuff below this is to automatic disable the parking system.
 

@@ -35,10 +35,21 @@ local Translations = {
         ['addvip_info_amount'] = "Max park amount",
         ['removevip'] = "Parking Remove Vip",
         ['removevip_info'] = "The id of the player you want to remove",
+    },
+    vehicle = {
+        ['model'] = "Model: %{model}",
+        ['brand'] = "Brand: %{brand}",
+        ['plate'] = "Plate: %{plate}",
+        ['fuel']  = "Fuel: %{fuel}%",
+        ['engine'] = "Engine: %{engine}%",
+        ['body']  = "Body: %{body}%",
     }
 }
---Lang:t('info.parking_lot')
-Lang = Locale:new({
-    phrases = Translations,
-    warnOnMissing = true
-})
+
+if GetConvar('qb_locale', 'en') == 'en' then
+    Lang = Locale:new({
+        phrases = Translations,
+        warnOnMissing = true,
+        fallbackLang = Lang,
+    })
+end

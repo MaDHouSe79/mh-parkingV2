@@ -22,6 +22,24 @@ function GetPlate(vehicle)
     return Trim(GetVehicleNumberPlateText(vehicle))
 end
 
+function FirstToUpper(str)
+    if str ~= nil then
+        return (str:gsub("^%l", string.upper))
+    else
+        return
+    end
+end
+
+function GetEntity(data)
+	local result = nil
+	if type(data) == 'table' then
+		result = data.entity
+	elseif type(vehicle) == 'number' then
+		result = data
+	end
+	return result
+end
+
 function GetVehicleProperties(vehicle)
     if DoesEntityExist(vehicle) then
         local pearlescentColor, wheelColor = GetVehicleExtraColours(vehicle)

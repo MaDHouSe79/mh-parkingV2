@@ -10,9 +10,10 @@ function Parking.Functions.GetVehicles(src)
 	if xPlayer then
 		local result = nil
 		if Config.Framework == 'esx' then
-			result = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE owner = ? AND stored = ?", { citizenid, 3 })
+			result = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE owner = ? ORDER BY vehicle ASC", { citizenid })
+			result.state = result.stored
 		elseif Config.Framework == 'qb' then
-			result = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE citizenid = ? AND state = ?", { citizenid, 3 })
+			result = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE citizenid = ? ORDER BY vehicle ASC", { citizenid })
 		end
 		if result then return result else return nil end
 	end
@@ -23,13 +24,13 @@ function Parking.Functions.RefreshVehicles(src)
 	local vehicles = {}
 	local result = nil
 	if Config.Framework == 'esx' then
-		result = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE stored = ?", { 3 })
+		result = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE stored = 3")
 	elseif Config.Framework == 'qb' then
-		result = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE state = ?", { 3 })
+		result = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE state = 3")
 	end
 	for k, v in pairs(result) do
 		if Config.Framework == 'esx' then
-			local char = MySQL.Sync.fetchAll("SELECT * FROM users WHERE owner = ?", { v.citizenid })[1]
+			local char = MySQL.Sync.fetchAll("SELECT * FROM users WHERE owner = ?", {v.citizenid})[1]
 			if char and v.fullname == nil then v.fullname = char.firstname .. ' ' .. char.lastname end
 		elseif Config.Framework == 'qb' then
 			local target = GetPlayerDataByCitizenId(v.citizenid)
