@@ -51,9 +51,6 @@
 - `F` press it short to park press it lock to ignore park. 
 - `E` to lock vehicles on trailers 
 
-# Read Files
-[README FILES](https://github.com/MH-Scripts/mh-parkingV2/tree/main/readme)
-
 # Screenshots
 ![alttext](https://github.com/MH-Scripts/mh-parkingV2/blob/main/screenshots/parked.png)
 ![alttext](https://github.com/MH-Scripts/mh-parkingV2/blob/main/screenshots/trailer6.png)
