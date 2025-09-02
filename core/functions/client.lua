@@ -373,6 +373,7 @@ function Parking.Functions.DriveVehicle(data)
 	SetEntityVisible(PlayerPedId(), true, 0)
 	FreezeEntityPosition(tempVeh, false)
 	SetEntityCollision(tempVeh, true, true)
+	TriggerEvent('vehiclekeys:client:SetOwner', GetPlate(tempVeh))
 	if Config.ParkVehiclesWithTrailers then
 		if data.trailerdata ~= nil then
 			data.trailerEntity = Parking.Functions.SpawnTrailer(tempVeh, data)
