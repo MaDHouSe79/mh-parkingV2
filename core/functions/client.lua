@@ -15,6 +15,14 @@ currentTrailer = -1
 isRampDown = false
 isPlatformDown = false
 
+local function SetFuel(vehicle, fuel)
+	if Config.FuelScript == "ox_fuel" then
+		TriggerServerEvent('ox_fuel:updateFuelCan', 100.0, NetworkGetNetworkIdFromEntity(vehicle), fuel + 0.0)
+	elseif Config.FuelScript == "mh-fuel" then
+		exports[Config.FuelScript]:SetFuel(vehicle, fuel + 0.0)
+	end
+end
+
 function Parking.Functions.AddToTable(entity, data)
 	LocalVehicles[#LocalVehicles + 1] = {
 		entity = entity,
@@ -307,10 +315,14 @@ function Parking.Functions.Save(vehicle)
 	local allowToPark = Parking.Functions.AllowToPark(GetEntityCoords(PlayerPedId()))
 	if allowToPark then
 		if DoesEntityExist(vehicle) then
+			TaskLeaveVehicle(PlayerPedId(), vehicle, 1)
+			Wait(3500)
 			local canSave = true
 			local vehPos = GetEntityCoords(vehicle)
 			local vehHead = GetEntityHeading(vehicle)
 			local vehPlate = GetPlate(vehicle)
+			local fuelLevel = GetVehicleFuelLevel(vehicle)
+			local engineIsOn = GetIsVehicleEngineRunning(vehicle)
 			local trailerdata = nil
 			if Config.ParkVehiclesWithTrailers then
 				local hasTrailer, trailer = GetVehicleTrailerVehicle(vehicle)
@@ -324,14 +336,12 @@ function Parking.Functions.Save(vehicle)
 					}
 				end
 			end
-			TaskLeaveVehicle(PlayerPedId(), vehicle, 1)
-			Wait(2500)
-			if Config.OnlyAutoParkWhenEngineIsOff and GetIsVehicleEngineRunning(vehicle) then canSave = false end
+			if Config.OnlyAutoParkWhenEngineIsOff and engineIsOn then canSave = false end
+			print(engineIsOn)
 			if canSave then
 				Parking.Functions.BlinkVehiclelights(vehicle, true)
 				TriggerCallback("mh-parkingV2:server:SaveCar", function(callback)
 					if callback.status then
-						TriggerServerEvent('mh-parkingV2:server:CreateOwnerVehicleBlip', vehPlate)
 						DeleteVehicle(vehicle)
 						trailerLoad[vehPlate] = nil
 						DisplayHelpText(callback.message)
@@ -341,7 +351,7 @@ function Parking.Functions.Save(vehicle)
 					end
 				end, {
 					mods = GetVehicleProperties(vehicle),
-					fuel = exports[Config.FuelScript]:GetFuel(vehicle),
+					fuel = fuelLevel,
 					plate = vehPlate,
 					engine = GetVehicleEngineHealth(vehicle),
 					body = GetVehicleBodyHealth(vehicle),
@@ -365,7 +375,7 @@ function Parking.Functions.DriveVehicle(data)
 	while not DoesEntityExist(tempVeh) do Wait(1) end
 	SetVehicleProperties(tempVeh, data.mods)
 	DoVehicleDamage(tempVeh, data.body, data.engine)
-	exports[Config.FuelScript]:SetFuel(tempVeh, data.fuel)
+	SetFuel(tempVeh, data.fuel)
 	SetVehicleOnGroundProperly(tempVeh)
 	SetVehRadioStation(tempVeh, 'OFF')
 	SetVehicleDirtLevel(tempVeh, 0)
@@ -476,7 +486,7 @@ function Parking.Functions.SpawnTrailer(vehicle, data)
 										local localcoords = GetOffsetFromEntityGivenWorldCoords(tempVeh, GetEntityCoords(tempLoad))
 										AttachVehicleOnToTrailer(tempLoad, tempVeh, 0.0, 0.0, 0.0, localcoords.x + 0.0, localcoords.y + 0.0, localcoords.z, vehRotation.x, vehRotation.y, 0.0, false)
 										SetVehicleProperties(tempLoad, load.mods)
-										exports[Config.FuelScript]:SetFuel(tempLoad, 100.0)
+										SetFuel(tempLoad, 100.0)
 										SetEntityInvincible(tempLoad, true)
 										SetVehRadioStation(tempLoad, 'OFF')
 										SetVehicleDirtLevel(tempLoad, 0)
@@ -500,7 +510,7 @@ function Parking.Functions.SpawnTrailer(vehicle, data)
 						vehRotation = GetEntityRotation(tempLoad)
 						AttachEntityToEntity(tempLoad, tempVeh, 20, x, y, z, vehRotation.x, vehRotation.y, vehRotation.z, false, false, true, false, 20, true)
 						SetVehicleProperties(tempLoad, callback.load.mods)
-						exports[Config.FuelScript]:SetFuel(tempLoad, 100.0)
+						SetFuel(tempVeh, 100.0)
 						SetEntityInvincible(tempLoad, true)
 						SetVehRadioStation(tempLoad, 'OFF')
 						SetVehicleDirtLevel(tempLoad, 0)
@@ -534,7 +544,7 @@ function Parking.Functions.SpawnVehicles(vehicles)
 		SetVehicleSteeringAngle(tempVeh, vehicles[i].steerangle + 0.0)
 		SetVehicleLivery(tempVeh, vehicles[i].mods.livery)
 		DoVehicleDamage(tempVeh, vehicles[i].body, vehicles[i].engine)
-		exports[Config.FuelScript]:SetFuel(tempVeh, vehicles[i].fuel)
+		SetFuel(tempVeh, vehicles[i].fuel)
 		SetEntityInvincible(tempVeh, true)
 		SetVehRadioStation(tempVeh, 'OFF')
 		SetVehicleDirtLevel(tempVeh, 0)
@@ -576,7 +586,7 @@ function Parking.Functions.SpawnVehicle(vehicleData)
 	SetVehicleLivery(tempVeh, vehicleData.mods.livery)
 	SetVehRadioStation(tempVeh, 'OFF')
 	SetVehicleDirtLevel(tempVeh, 0)
-	exports[Config.FuelScript]:SetFuel(tempVeh, vehicleData.fuel)
+	SetFuel(tempVeh, vehicleData.fuel)
 	SetModelAsNoLongerNeeded(vehicleData.mods["model"])
 	Parking.Functions.LockDoors(tempVeh, vehicleData)
 	if PlayerData.citizenid == vehicleData.owner then
@@ -1038,117 +1048,119 @@ function Parking.Functions.DisableParkedVehiclesCollision()
 end
 
 function Parking.Functions.LoadTarget()
-	for k, v in pairs(Config.TrailerBoats) do
-        exports['qb-target']:AddTargetModel(v.model, {
-			options = {{
-				type = "client",
-				event = "mh-parkingV2:client:GetInVehicle",
-				icon = "fas fa-car",
-				label = Lang:t('info.get_in_vehicle'),
-				action = function(entity)
-					Parking.Functions.GetIn(entity)
-				end,
-				canInteract = function(entity, distance, data)
-					if currentTrailer == -1 then return false end
-					return true
-				end
-			}},
-			distance = 15.0
-		})
-    end
-	for k, v in pairs(Config.Trailers) do
-		exports['qb-target']:AddTargetModel(v.model, {
-			options = {
-			{
-				type = "client",
-				event = "",
-				icon = "fas fa-car",
-				label = 'Ramp Down',
-				action = function(entity)
-					SetVehicleDoorOpen(entity, 5, false)
-					currentTrailer = entity
-					isRampDown = true
-				end,
-				canInteract = function(entity, distance, data)
-					if isRampDown then return false end
-					return true
-				end
-			}, {
-				type = "client",
-				event = "",
-				icon = "fas fa-car",
-				label = 'Ramp Up',
-				action = function(entity)
-					SetVehicleDoorShut(entity, 5, true)
-					currentTrailer = entity
-					isRampDown = false
-				end,
-				canInteract = function(entity, distance, data)
-					if not isRampDown then return false end
-					return true
-				end
-			},
-			{
-				type = "client",
-				event = "mh-parkingV2:client:togglePlatform",
-				icon = "fas fa-car",
-				label = "Platform Up",
-				action = function(entity)
-					currentTrailer = entity
-					SetVehicleDoorShut(entity, 4, false)
-					isPlatformDown = false
-				end,
-				canInteract = function(entity, distance, data)
-					if isRampDown then return false end
-					if not isPlatformDown then return false end
-					return true
-				end
-			}, {
-				type = "client",
-				event = "mh-parkingV2:client:togglePlatform",
-				icon = "fas fa-car",
-				label = 'Platform Down',
-				action = function(entity)
-					currentTrailer = entity
-					isPlatformDown = true
-					SetVehicleDoorOpen(entity, 4, false)
-				end,
-				canInteract = function(entity, distance, data)
-					if not isRampDown then return false end
-					if isPlatformDown then return false end
-					return true
-				end
-			}},
-			distance = 5.0
-		})
+	if GetResourceState("qb-target") ~= 'missing' then
+		for k, v in pairs(Config.TrailerBoats) do
+			exports['qb-target']:AddTargetModel(v.model, {
+				options = {{
+					type = "client",
+					event = "mh-parkingV2:client:GetInVehicle",
+					icon = "fas fa-car",
+					label = Lang:t('info.get_in_vehicle'),
+					action = function(entity)
+						Parking.Functions.GetIn(entity)
+					end,
+					canInteract = function(entity, distance, data)
+						if currentTrailer == -1 then return false end
+						return true
+					end
+				}},
+				distance = 15.0
+			})
+		end
+		for k, v in pairs(Config.Trailers) do
+			exports['qb-target']:AddTargetModel(v.model, {
+				options = {
+				{
+					type = "client",
+					event = "",
+					icon = "fas fa-car",
+					label = 'Ramp Down',
+					action = function(entity)
+						SetVehicleDoorOpen(entity, 5, false)
+						currentTrailer = entity
+						isRampDown = true
+					end,
+					canInteract = function(entity, distance, data)
+						if isRampDown then return false end
+						return true
+					end
+				}, {
+					type = "client",
+					event = "",
+					icon = "fas fa-car",
+					label = 'Ramp Up',
+					action = function(entity)
+						SetVehicleDoorShut(entity, 5, true)
+						currentTrailer = entity
+						isRampDown = false
+					end,
+					canInteract = function(entity, distance, data)
+						if not isRampDown then return false end
+						return true
+					end
+				},
+				{
+					type = "client",
+					event = "mh-parkingV2:client:togglePlatform",
+					icon = "fas fa-car",
+					label = "Platform Up",
+					action = function(entity)
+						currentTrailer = entity
+						SetVehicleDoorShut(entity, 4, false)
+						isPlatformDown = false
+					end,
+					canInteract = function(entity, distance, data)
+						if isRampDown then return false end
+						if not isPlatformDown then return false end
+						return true
+					end
+				}, {
+					type = "client",
+					event = "mh-parkingV2:client:togglePlatform",
+					icon = "fas fa-car",
+					label = 'Platform Down',
+					action = function(entity)
+						currentTrailer = entity
+						isPlatformDown = true
+						SetVehicleDoorOpen(entity, 4, false)
+					end,
+					canInteract = function(entity, distance, data)
+						if not isRampDown then return false end
+						if isPlatformDown then return false end
+						return true
+					end
+				}},
+				distance = 5.0
+			})
+		end
+		for k, v in pairs(Config.Vehicles) do
+			exports['qb-target']:AddTargetModel(v.model, {
+				options = {{
+					type = "client",
+					event = "",
+					icon = "fas fa-car",
+					label = Lang:t('info.get_in_vehicle'),
+					action = function(entity)
+						Parking.Functions.GetIn(entity)
+					end,
+					canInteract = function(entity, distance, data)
+						if currentTrailer == -1 then return false end
+						return true
+					end
+				},{
+					type = "client",
+					event = "",
+					icon = "fas fa-car",
+					label = Lang:t('info.select_vehicle'),
+					action = function(entity)
+						currentTruck = entity
+					end,
+					canInteract = function(entity, distance, data)
+						return true
+					end
+				}},
+				distance = 15.0
+			})
+		end
 	end
-	for k, v in pairs(Config.Vehicles) do
-        exports['qb-target']:AddTargetModel(v.model, {
-			options = {{
-				type = "client",
-				event = "",
-				icon = "fas fa-car",
-				label = Lang:t('info.get_in_vehicle'),
-				action = function(entity)
-					Parking.Functions.GetIn(entity)
-				end,
-				canInteract = function(entity, distance, data)
-					if currentTrailer == -1 then return false end
-					return true
-				end
-			},{
-				type = "client",
-				event = "",
-				icon = "fas fa-car",
-				label = Lang:t('info.select_vehicle'),
-				action = function(entity)
-					currentTruck = entity
-				end,
-				canInteract = function(entity, distance, data)
-					return true
-				end
-			}},
-			distance = 15.0
-		})
-    end
 end

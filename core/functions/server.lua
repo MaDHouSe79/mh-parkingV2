@@ -135,6 +135,7 @@ function Parking.Functions.Save(src, data)
 					mods = json.decode(result.mods),
 					trailerdata = json.decode(trailerdata),
 				}, src)
+				TriggerClientEvent('mh-parkingV2:client:CreateOwnerVehicleBlip', src, result.plate)
 				return { status = true, message = Lang:t('info.vehicle_parked') }
 			else
 				return {status = false, message = Lang:t('info.not_the_owner')}
@@ -172,9 +173,16 @@ function Parking.Functions.Drive(src, data)
 end
 
 function Parking.Functions.CreateOwnerVehicleBlip(src, plate)
-	local xPlayer = GetPlayer(src)
-	local result = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE citizenid = ? AND plate = ?", { xPlayer.PlayerData.citizenid, plate })[1]
-	if result then TriggerClientEvent("mh-parkingV2:client:CreateOwnerVehicleBlip", src, { vehicle = result.vehicle, location = json.decode(result.location), plate = result.plate }) end
+	local Player = GetPlayer(src)
+	local result = nil
+	if Config.Framework == 'esx' then
+		result = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE owner = ? AND plate = ?", { Player.identifier, plate })[1]
+	elseif Config.Framework == 'qb' then
+		result = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE citizenid = ? AND plate = ?", { Player.PlayerData.citizenid, plate })[1]
+	end
+	if result ~= nil then 
+		TriggerClientEvent("mh-parkingV2:client:CreateOwnerVehicleBlip", src, { vehicle = result.vehicle, location = json.decode(result.location), plate = result.plate })
+	end
 end
 
 function Parking.Functions.OnJoin(src)
