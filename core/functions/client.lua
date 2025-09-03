@@ -337,7 +337,7 @@ function Parking.Functions.Save(vehicle)
 				end
 			end
 			if Config.OnlyAutoParkWhenEngineIsOff and engineIsOn then canSave = false end
-			print(engineIsOn)
+
 			if canSave then
 				Parking.Functions.BlinkVehiclelights(vehicle, true)
 				TriggerCallback("mh-parkingV2:server:SaveCar", function(callback)
@@ -840,7 +840,8 @@ function Parking.Functions.AutoPark(driver)
 				currentSeat = 0
 			end
         elseif player ~= driver then
-            TaskLeaveVehicle(PlayerPedId(), vehicle, 1)
+			local vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), true)
+            TaskLeaveVehicle(GetPlayerPed(-1), vehicle, 1)
         end
     end
 end

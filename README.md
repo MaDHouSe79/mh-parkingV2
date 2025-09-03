@@ -45,8 +45,9 @@
 - Step 1: First stop your server.
 - Step 2: Copy the directory `mh-parkinV2` to `resources/[mh]/`.
 - Stap 3: Add `ensure [mh]` in `server.cfg` below `ensure [defaultmaps]`.
-- Stap 4: For QBX you need to set keepEngineOnWhenAbandoned to false in `qbx_vehiclekeys/config/client.lua` at line 29.
-- Step 5: Start your server.  
+- Stap 4: For QBX you need to set keepEngineOnWhenAbandoned to false in `qbx_vehiclekeys/config/client.lua` at line 29, 
+- Stap 5: For QBX you need to set SetConvarReplicated('game_enableFlyThroughWindscreen', 'true') to false in `qbx_seatbelt/server/main.lua` line 1
+- Step 6: Start your server.
 
 # Commands
 - `/toggleparktext` Disable or Enable the text above the parked vehicles. (for streamers)
