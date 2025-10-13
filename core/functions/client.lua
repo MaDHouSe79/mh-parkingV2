@@ -1215,7 +1215,7 @@ function Parking.Functions.UseParkCommand()
 		            else
 		                if vehicle ~= 0 then
 		                    local speed = GetEntitySpeed(vehicle)
-		                    if speed > Config.MinSpeedToPark then
+		                    if speed > 0.1 then
 		                        Notify(Lang:t("info.stop_car"), "primary", 5000)
 		                    else
 		                        if IsThisModelACar(GetEntityModel(vehicle)) or IsThisModelABike(GetEntityModel(vehicle)) or IsThisModelABicycle(GetEntityModel(vehicle)) then
@@ -1237,5 +1237,6 @@ function Parking.Functions.UseParkCommand()
 	    Wait(0) 
 	end
 end
+
 
 
