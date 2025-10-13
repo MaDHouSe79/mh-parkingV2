@@ -11,8 +11,10 @@ if GetResourceState("es_extended") ~= 'missing' then
 elseif GetResourceState("qb-core") ~= 'missing' then
     Config.Framework = 'qb'
 end
-
+----------------------------------------------------------------------------
 Config.UseParkWithCommand = true
+Config.ParkingButton = 166           -- F5 (vehicle exit and or park)
+Config.KeyParkBindButton = "F5"      -- F5 keybinder 
 ----------------------------------------------------------------------------
 -- Fuel Script
 Config.FuelScript = 'qb-fuel'           -- Default is LegacyFuel, if you use a other fuel script, for example ox_fuel
@@ -141,3 +143,4 @@ Config.AllowedParkingLots = {
     {coords = vector3(131.8025, -712.3470, 32.4903), radius = 50.0, color = 2, sprite = 237},   -- parkinglot 17
 
 }
+
