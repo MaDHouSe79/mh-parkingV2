@@ -73,7 +73,7 @@ function Parking.Functions.CheckDistanceToForceGrounded()
 	end
 end
 
-local Parking.Functions.AllPlayersLeaveVehicle(vehicle)
+function Parking.Functions.AllPlayersLeaveVehicle(vehicle)
     if DoesEntityExist(vehicle) then
         for i = -1, GetVehicleModelNumberOfSeats(GetEntityModel(vehicle)), 1 do
             if not IsVehicleSeatFree(vehicle, i) then
@@ -1180,3 +1180,4 @@ function Parking.Functions.LoadTarget()
 	end
 
 end
+
