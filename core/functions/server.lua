@@ -290,30 +290,34 @@ end
 
 function Parking.Functions.EnteringVehicle(src, currentVehicle, currentSeat, vehicleName, netId)
 	local Player = GetPlayer(src)
-	local vehicle = NetworkGetEntityFromNetworkId(netId)
-	if DoesEntityExist(vehicle) and currentSeat == -1 then
-		local plate = GetVehicleNumberPlateText(vehicle)
-		local result = nil
-		if Config.Framework == 'esx' then
-			result = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE owner = ? AND plate = ? AND stored = ?", { Player.identifier, plate, 3 })[1]
-		elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
-			result = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE citizenid = ? AND plate = ? AND state = ?", { Player.PlayerData.citizenid, plate, 3 })[1]
+	if Config.UseParkWithCommand == false then
+		local vehicle = NetworkGetEntityFromNetworkId(netId)
+		if DoesEntityExist(vehicle) and currentSeat == -1 then
+			local plate = GetVehicleNumberPlateText(vehicle)
+			local result = nil
+			if Config.Framework == 'esx' then
+				result = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE owner = ? AND plate = ? AND stored = ?", { Player.identifier, plate, 3 })[1]
+			elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
+				result = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE citizenid = ? AND plate = ? AND state = ?", { Player.PlayerData.citizenid, plate, 3 })[1]
+			end
+			if result then TriggerClientEvent('mh-parkingV2:client:AutoDrive', -1, src) end
 		end
-		if result then TriggerClientEvent('mh-parkingV2:client:AutoDrive', -1, src) end
 	end
 end
 
 function Parking.Functions.LeftVehicle(src, currentVehicle, currentSeat, vehicleName, netId)
 	local Player = GetPlayer(src)
-	local vehicle = NetworkGetEntityFromNetworkId(netId)
-	if DoesEntityExist(vehicle) then
-		local plate = GetVehicleNumberPlateText(vehicle)
-		local result = nil
-		if Config.Framework == 'esx' then
-			result = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE owner = ? AND plate = ? AND stored = ?", { Player.identifier, plate, 0 })[1]
-		elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
-			result = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE citizenid = ? AND plate = ? AND state = ?", { Player.PlayerData.citizenid, plate, 0 })[1]
+	if Config.UseParkWithCommand == false then
+		local vehicle = NetworkGetEntityFromNetworkId(netId)
+		if DoesEntityExist(vehicle) then
+			local plate = GetVehicleNumberPlateText(vehicle)
+			local result = nil
+			if Config.Framework == 'esx' then
+				result = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE owner = ? AND plate = ? AND stored = ?", { Player.identifier, plate, 0 })[1]
+			elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
+				result = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE citizenid = ? AND plate = ? AND state = ?", { Player.PlayerData.citizenid, plate, 0 })[1]
+			end
+			if result then TriggerClientEvent('mh-parkingV2:client:AutoPark', -1, src) end
 		end
-		if result then TriggerClientEvent('mh-parkingV2:client:AutoPark', -1, src) end
 	end
 end
