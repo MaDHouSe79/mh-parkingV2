@@ -1181,3 +1181,49 @@ function Parking.Functions.LoadTarget()
 
 end
 
+Parking,functions.UseParkCommand()
+	CreateThread(function()
+		while true do
+			if Config.UseParkWithCommand then
+		        local player = PlayerPedId()
+		        if IsPedInAnyVehicle(player) then
+		            local storedVehicle = GetPlayerInStoredCar(player)
+		            local vehicle = GetVehiclePedIsIn(player)
+		            if storedVehicle ~= false then
+		                DisplayHelpText(Lang:t("info.press_drive_car"))
+		                if IsControlJustReleased(0, 166) then
+		                    IsUsingParkCommand = true
+		                end
+		            end
+		            if IsUsingParkCommand then
+		                IsUsingParkCommand = false
+		                if storedVehicle ~= false then
+		                    Drive(player, storedVehicle)
+		                    storedVehicle = nil
+		                else
+		                    if vehicle ~= 0 then
+		                        local speed = GetEntitySpeed(vehicle)
+		                        if speed > Config.MinSpeedToPark then
+		                            Notify(Lang:t("info.stop_car"), "primary", 5000)
+		                        else
+		                            if IsThisModelACar(GetEntityModel(vehicle)) or IsThisModelABike(GetEntityModel(vehicle)) or IsThisModelABicycle(GetEntityModel(vehicle)) then
+		                                local wheelangle = GetVehicleSteeringAngle(vehicle)
+										Parking.Functions.Save(vehicle)
+		                                --Save(wheelangle, vehicle)
+		                            else
+		                                Notify(Lang:t("info.only_cars_allowd"), "primary", 5000)
+		                            end
+		                            player = nil
+		                        end
+		                    end
+		                    vehicle = nil
+		                end
+		            end
+				end
+	        else
+	            IsUsingParkCommand = false
+	        end
+	        Wait(0) 
+	    end
+	end)
+end
