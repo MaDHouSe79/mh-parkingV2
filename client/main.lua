@@ -1,7 +1,7 @@
 --[[ ===================================================== ]] --
 --[[               MH Parking V2 by MaDHouSe79             ]] --
 --[[ ===================================================== ]] --
-LocalVehicles, GlobalVehicles, isLoggedIn, SpawnedVehicles, DeletingEntities, displayOwnerText = {}, {}, false, false, false, Config.UseVehicleOwnerText
+LocalVehicles, GlobalVehicles, IsUsingParkCommand, isLoggedIn, SpawnedVehicles, DeletingEntities, displayOwnerText = {}, {}, false, false, false, false, Config.UseVehicleOwnerText
 AddEventHandler('onResourceStop', function(resource) if resource == GetCurrentResourceName() then Parking.Functions.DeleteAllVehicles() PlayerData = {} isLoggedIn = false end end)
 AddEventHandler('onResourceStart', function(resource) if resource == GetCurrentResourceName() then TriggerServerEvent('mh-parkingV2:server:OnJoin') PlayerData = GetPlayerData() isLoggedIn = true end end)
 RegisterNetEvent(OnPlayerLoaded, function() TriggerServerEvent('mh-parkingV2:server:OnJoin') end)
@@ -29,3 +29,5 @@ CreateThread(function() Parking.Functions.RadialMenu() end)
 CreateThread(function() Parking.Functions.CreateBlips() end)
 CreateThread(function() Parking.Functions.AttachedToTrailer() end)
 CreateThread(function() Parking.Functions.LoadTarget() end)
+RegisterKeyMapping('park', Lang:t('system.park_or_drive'), 'keyboard', "F5")
+RegisterCommand(Config.Command.park, function() IsUsingParkCommand = true end, false)
