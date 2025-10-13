@@ -73,6 +73,19 @@ function Parking.Functions.CheckDistanceToForceGrounded()
 	end
 end
 
+local Parking.Functions.AllPlayersLeaveVehicle(vehicle)
+    if DoesEntityExist(vehicle) then
+        for i = -1, GetVehicleModelNumberOfSeats(GetEntityModel(vehicle)), 1 do
+            if not IsVehicleSeatFree(vehicle, i) then
+                local ped = GetPedInVehicleSeat(vehicle, i)
+                if IsPedAPlayer(ped) then
+                    TaskLeaveVehicle(ped, vehicle, 1)
+                end
+            end
+        end
+    end
+end
+
 function Parking.Functions.BlinkVehiclelights(vehicle, state)
 	local ped = PlayerPedId()
 	local model = 'prop_cuff_keys_01'
@@ -315,7 +328,8 @@ function Parking.Functions.Save(vehicle)
 	local allowToPark = Parking.Functions.AllowToPark(GetEntityCoords(PlayerPedId()))
 	if allowToPark then
 		if DoesEntityExist(vehicle) then
-			TaskLeaveVehicle(PlayerPedId(), vehicle, 1)
+			--TaskLeaveVehicle(PlayerPedId(), vehicle, 1)
+			Parking.Functions.AllPlayersLeaveVehicle(vehicle)
 			Wait(3500)
 			local canSave = true
 			local vehPos = GetEntityCoords(vehicle)
@@ -1164,4 +1178,5 @@ function Parking.Functions.LoadTarget()
 			})
 		end
 	end
+
 end
