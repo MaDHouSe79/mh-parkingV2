@@ -11,9 +11,11 @@ if GetResourceState("es_extended") ~= 'missing' then
 elseif GetResourceState("qb-core") ~= 'missing' then
     Config.Framework = 'qb'
 end
+
+Config.UseParkWithCommand = true
 ----------------------------------------------------------------------------
 -- Fuel Script
-Config.FuelScript = 'ox_fuel'           -- Default is LegacyFuel, if you use a other fuel script, for example ox_fuel
+Config.FuelScript = 'qb-fuel'           -- Default is LegacyFuel, if you use a other fuel script, for example ox_fuel
 ----------------------------------------------------------------------------
 -- Notify Script
 Config.DisableParkNotify = false           -- Default true, if false you get many notifications when you enter or leave the vehicle, all other notify massages are stil enable.
@@ -137,4 +139,5 @@ Config.AllowedParkingLots = {
     {coords = vector3(253.9985, -1156.1332, 28.6003), radius = 15.0, color = 2, sprite = 237},  -- parkinglot 15
     {coords = vector3(1183.6377, -1550.7142, 34.1825), radius = 20.0, color = 2, sprite = 237}, -- parkinglot 16
     {coords = vector3(131.8025, -712.3470, 32.4903), radius = 50.0, color = 2, sprite = 237},   -- parkinglot 17
+
 }
