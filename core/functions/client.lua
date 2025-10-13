@@ -23,6 +23,18 @@ local function SetFuel(vehicle, fuel)
 	end
 end
 
+local function GetPlayerInStoredCar(player)
+    local entity = GetVehiclePedIsIn(player)
+    local findVehicle = false
+    for i = 1, #LocalVehicles do
+		if LocalVehicles[i].entity == entity then
+			findVehicle = LocalVehicles[i]
+			break
+		end
+    end
+    return findVehicle
+end
+
 function Parking.Functions.AddToTable(entity, data)
 	LocalVehicles[#LocalVehicles + 1] = {
 		entity = entity,
@@ -1225,4 +1237,5 @@ function Parking.Functions.UseParkCommand()
 	    Wait(0) 
 	end
 end
+
 
