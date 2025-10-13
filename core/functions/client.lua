@@ -1198,7 +1198,7 @@ function Parking.Functions.UseParkCommand()
 		        if IsUsingParkCommand then
 		            IsUsingParkCommand = false
 		            if storedVehicle ~= false then
-		                Drive(player, storedVehicle)
+		                Parking.Functions.Drive(player, storedVehicle)
 		                storedVehicle = nil
 		            else
 		                if vehicle ~= 0 then
@@ -1209,7 +1209,6 @@ function Parking.Functions.UseParkCommand()
 		                        if IsThisModelACar(GetEntityModel(vehicle)) or IsThisModelABike(GetEntityModel(vehicle)) or IsThisModelABicycle(GetEntityModel(vehicle)) then
 		                            local wheelangle = GetVehicleSteeringAngle(vehicle)
 									Parking.Functions.Save(vehicle)
-		                            --Save(wheelangle, vehicle)
 		                        else
 		                            Notify(Lang:t("info.only_cars_allowd"), "primary", 5000)
 		                        end
@@ -1226,3 +1225,4 @@ function Parking.Functions.UseParkCommand()
 	    Wait(0) 
 	end
 end
+
