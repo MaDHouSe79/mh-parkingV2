@@ -1178,7 +1178,6 @@ function Parking.Functions.LoadTarget()
 			})
 		end
 	end
-
 end
 
 Parking,functions.UseParkCommand()
@@ -1191,7 +1190,7 @@ Parking,functions.UseParkCommand()
 		            local vehicle = GetVehiclePedIsIn(player)
 		            if storedVehicle ~= false then
 		                DisplayHelpText(Lang:t("info.press_drive_car"))
-		                if IsControlJustReleased(0, 166) then
+		                if IsControlJustReleased(0, Config.ParkingButton) then
 		                    IsUsingParkCommand = true
 		                end
 		            end
@@ -1227,3 +1226,4 @@ Parking,functions.UseParkCommand()
 	    end
 	end)
 end
+
