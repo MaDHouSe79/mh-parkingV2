@@ -812,38 +812,40 @@ end
 
 function Parking.Functions.GetInAndOutVehicle()
     local ped = PlayerPedId()
-    if not isInVehicle and not IsPlayerDead(PlayerId()) then
-        if DoesEntityExist(GetVehiclePedIsTryingToEnter(ped)) and not isEnteringVehicle then
-            local vehicle = GetVehiclePedIsTryingToEnter(ped)
-            local seat = GetSeatPedIsTryingToEnter(ped)
-            local name = GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))
-            local netId = VehToNet(vehicle)
-            isEnteringVehicle = true
-            TriggerServerEvent('mh-parkingV2:server:EnteringVehicle', vehicle, seat, name, netId)
-        elseif not DoesEntityExist(GetVehiclePedIsTryingToEnter(ped)) and not IsPedInAnyVehicle(ped, true) and isEnteringVehicle then
-            isEnteringVehicle = false
-        elseif IsPedInAnyVehicle(ped, false) then
-            isEnteringVehicle = false
-            isInVehicle = true
-            currentVehicle = GetVehiclePedIsUsing(ped)
-			currentSeat = GetPedVehicleSeat(ped)
-            TriggerServerEvent('mh-parkingV2:server:EnteredVehicle', currentVehicle, currentSeat, name, netId)
-        end
-    elseif isInVehicle then
-        if not IsPedInAnyVehicle(ped, false) or IsPlayerDead(PlayerId()) then
-            local name = GetDisplayNameFromVehicleModel(GetEntityModel(currentVehicle))
-            local netId = VehToNet(currentVehicle)
-			currentSeat = GetPedVehicleSeat(ped)
-            TriggerServerEvent('mh-parkingV2:server:LeftVehicle', currentVehicle, currentSeat, name, netId)
-            isInVehicle = false
-            currentVehicle = 0
-            currentSeat = 0
-        end
-    end
+	if not Config.UseParkWithCommand then
+	    if not isInVehicle and not IsPlayerDead(PlayerId()) then
+	        if DoesEntityExist(GetVehiclePedIsTryingToEnter(ped)) and not isEnteringVehicle then
+	            local vehicle = GetVehiclePedIsTryingToEnter(ped)
+	            local seat = GetSeatPedIsTryingToEnter(ped)
+	            local name = GetDisplayNameFromVehicleModel(GetEntityModel(vehicle))
+	            local netId = VehToNet(vehicle)
+	            isEnteringVehicle = true
+	            TriggerServerEvent('mh-parkingV2:server:EnteringVehicle', vehicle, seat, name, netId)
+	        elseif not DoesEntityExist(GetVehiclePedIsTryingToEnter(ped)) and not IsPedInAnyVehicle(ped, true) and isEnteringVehicle then
+	            isEnteringVehicle = false
+	        elseif IsPedInAnyVehicle(ped, false) then
+	            isEnteringVehicle = false
+	            isInVehicle = true
+	            currentVehicle = GetVehiclePedIsUsing(ped)
+				currentSeat = GetPedVehicleSeat(ped)
+	            TriggerServerEvent('mh-parkingV2:server:EnteredVehicle', currentVehicle, currentSeat, name, netId)
+	        end
+	    elseif isInVehicle then
+	        if not IsPedInAnyVehicle(ped, false) or IsPlayerDead(PlayerId()) then
+	            local name = GetDisplayNameFromVehicleModel(GetEntityModel(currentVehicle))
+	            local netId = VehToNet(currentVehicle)
+				currentSeat = GetPedVehicleSeat(ped)
+	            TriggerServerEvent('mh-parkingV2:server:LeftVehicle', currentVehicle, currentSeat, name, netId)
+	            isInVehicle = false
+	            currentVehicle = 0
+	            currentSeat = 0
+	        end
+	    end
+	end
 end
 
 function Parking.Functions.AutoPark(driver)
-    if isLoggedIn then
+    if isLoggedIn and Config.UseParkWithCommand == false then
         local player = GetPlayerServerId(PlayerId())
 		if player == driver then
 			local vehicle = GetVehiclePedIsIn(GetPlayerPed(-1), true)
@@ -861,7 +863,7 @@ function Parking.Functions.AutoPark(driver)
 end
 
 function Parking.Functions.AutoDrive(driver)
-    if isLoggedIn then
+    if isLoggedIn and Config.UseParkWithCommand == false then
         local player = GetPlayerServerId(PlayerId())
         if player == driver then
 			while not IsPedInAnyVehicle(PlayerPedId(), false) do Wait(5) end
@@ -1226,4 +1228,5 @@ Parking,functions.UseParkCommand()
 	    end
 	end)
 end
+
 
