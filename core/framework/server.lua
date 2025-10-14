@@ -12,7 +12,6 @@ if GetResourceState("es_extended") ~= 'missing' then
     function GetJob(source) return Framework.GetPlayerFromId(source).job end
     function GetCitizenId(src) local xPlayer = GetPlayer(src) return xPlayer.identifier end
     function GetCitizenFullname(src) local xPlayer = GetPlayer(src) return xPlayer.name end
-    function Notify(src, message, type, length) TriggerClientEvent("mh-parkingV2:client:Notify", src, message, type, length) end
 elseif GetResourceState("qb-core") ~= 'missing' then
     Config.Framework = 'qb'
     Framework = exports['qb-core']:GetCoreObject()
@@ -24,5 +23,23 @@ elseif GetResourceState("qb-core") ~= 'missing' then
     function GetPlayerDataByCitizenId(citizenid) return Framework.Functions.GetPlayerByCitizenId(citizenid) or Framework.Functions.GetOfflinePlayerByCitizenId(citizenid) end
     function GetCitizenId(src) local xPlayer = GetPlayer(src) return xPlayer.PlayerData.citizenid end
     function GetCitizenFullname(src) local xPlayer = GetPlayer(src) return xPlayer.PlayerData.charinfo.firstname .. ' ' .. xPlayer.PlayerData.charinfo.lastname end
-    function Notify(src, message, type, length) TriggerClientEvent("mh-parkingV2:client:Notify", src, message, type, length) end
+elseif GetResourceState("qbx_core") ~= 'missing' then
+    Config.Framework = 'qb'
+    Framework = exports['qb-core']:GetCoreObject()
+    CreateCallback = Framework.Functions.CreateCallback
+    AddCommand = Framework.Commands.Add
+    function GetPlayers() return Framework.Players end
+    function GetPlayer(source) return Framework.Functions.GetPlayer(source) end
+    function GetJob(source) return Framework.Functions.GetPlayer(source).PlayerData.job end
+    function GetPlayerDataByCitizenId(citizenid) return Framework.Functions.GetPlayerByCitizenId(citizenid) or Framework.Functions.GetOfflinePlayerByCitizenId(citizenid) end
+    function GetCitizenId(src) local xPlayer = GetPlayer(src) return xPlayer.PlayerData.citizenid end
+    function GetCitizenFullname(src) local xPlayer = GetPlayer(src) return xPlayer.PlayerData.charinfo.firstname .. ' ' .. xPlayer.PlayerData.charinfo.lastname end
+end
+
+function Notify(src, message, type, length)
+    if GetResourceState("ox_lib") ~= 'missing' then
+        lib.notify(src, {title = "MH Parking V2", description = message, type = type})
+    else
+        Framework.Functions.Notify(src, {text = "MH Parking V2", caption = message}, type, length)
+    end
 end

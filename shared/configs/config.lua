@@ -3,14 +3,7 @@
 --[[ ===================================================== ]] --
 Config = {}                                -- Placeholder don't edit or change or remove this.
 Config.Debug = false                       -- Default false, if true this will show prints in the server console.
-----------------------------------------------------------------------------
--- Framework (Do not change this)
-Config.Framework = nil
-if GetResourceState("es_extended") ~= 'missing' then
-    Config.Framework = 'esx'
-elseif GetResourceState("qb-core") ~= 'missing' then
-    Config.Framework = 'qb'
-end
+Config.DebugBlipForRadius = true           -- If true you see a circle aera on the map, use this for debug only.
 ----------------------------------------------------------------------------
 Config.UseParkWithCommand = false          -- When true auto park is diabled.
 Config.ParkingButton = 166                 -- F5 (vehicle exit and or park)
@@ -69,8 +62,12 @@ Config.Outfit = {
     ["glass"] = {item = 23, texture = 11}, -- Glasses
     ["mask"] = {item = 0, texture = 0} -- Mask
 }
+
+
 ----------------------------------------------------------------------------
 -- Stuff below this is to automatic disable the parking system.
+
+
 
 -- This is when you close to a gasstation, you can't use the park system.
 -- This goes automatic so leave it as it is.
@@ -84,13 +81,11 @@ Config.DisableNeedByPumpModels = {
     ['prop_gas_pump_old3'] = true
 }
 ----------------------------------------------------------------------------
-Config.DebugBlipForRadius = true -- If true you see a circle aera on the map, use this for debug only.
-
 -- This are locations where you can't use the park system.
 -- the reason for this is it can be that you need to use the vehicle on that point.
 -- So if you want that, you can't use the park system cause you can't use the vehicle when parked.
 -- If you want to see the radius on the map you need to set Config.DebugBlipForRadius to true
-Config.UseUnableParkingBlips = true -- If this you see blip for radius in the map.
+Config.UseUnableParkingBlips = true -- If this is true, you see blip for radius in the map.
 Config.NoParkingLocations = {
     -- Default locations
     {coords = vector3(-333.0179, -135.5331, 38.3735), radius = 15.0, color = 1, sprite = 163, job = 'mechanic'},   -- ls costum 1

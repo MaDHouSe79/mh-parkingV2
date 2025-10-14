@@ -9,6 +9,15 @@ description 'MH Parking V2.'
 version '1.0.18'
 repository 'https://github.com/MaDHouSe79/mh-parkingV2'
 
+files {'images/*.png'}
+
+ui_page 'images/index.html'
+
+files {
+	'images/index.html',
+    'images/*.png',
+}
+
 shared_scripts {
 	'@ox_lib/init.lua',
 	'shared/locale.lua',

@@ -64,9 +64,8 @@ end
 local function SpawnVeh(model, plate, coords, heading)
 	LoadModel(model)
 	ClearAreaOfVehicles(coords.x, coords.y, coords.z, 10000, false, false, false, false, false)
-    local entity = CreateVehicle(model, coords.x, coords.y, coords.z, heading, true, true)
+    local entity = CreateVehicle(model, coords.x, coords.y, coords.z, heading, true)
 	while not DoesEntityExist(entity) do Wait(1) end
-    SetModelAsNoLongerNeeded(model)
 	SetEntityAsMissionEntity(entity, true, true)
 	SetVehicleNumberPlateText(entity, plate)
 	RequestCollisionAtCoord(coords.x, coords.y, coords.z)
@@ -76,6 +75,7 @@ local function SpawnVeh(model, plate, coords, heading)
     SetVehicleFuelLevel(entity, 100.0)
 	SetVehRadioStation(entity, 'OFF')
 	SetVehicleDirtLevel(entity, 0)
+	SetModelAsNoLongerNeeded(model)
 	return entity
 end
 
@@ -135,29 +135,77 @@ local function GetVehicleMenu()
 				local options = {}
 				local num = 1
 				for k, v in pairs(vehicles) do
+					local name = Config.Vehicles[GetHashKey(v.vehicle)].name
+					local model = Config.Vehicles[GetHashKey(v.vehicle)].model
+					local brand = Config.Vehicles[GetHashKey(v.vehicle)].brand
+					local image = GetVehicleImageLinkFromModelName(model)
 					local description = Lang:t('vehicle.plate', {plate = v.plate}) .. '\n' .. Lang:t('vehicle.fuel', {fuel = v.fuel}) .. '\n' .. Lang:t('vehicle.engine', {engine = Round(v.engine / 10, 0)}) .. '\n' .. Lang:t('vehicle.body', {body = Round(v.body / 10, 0)})
-					options[#options + 1] = {
-						id = num,
-						title = Config.Vehicles[GetHashKey(v.vehicle:lower())].name.." "..Config.Vehicles[GetHashKey(v.vehicle:lower())].brand,
-						description = description,
-						arrow = false,
-						onSelect = function()
-							TriggerEvent('mh-parkingV2:client:CallVehicleDelivery', {model = v.vehicle:lower(), plate = v.plate})
-						end
-					}
-					num = num + 1
+					if v.state == 1 then
+						options[#options + 1] = {
+							id = num,
+							title = name.." "..brand,
+							description = description,
+							arrow = false,
+							onSelect = function()
+								TriggerEvent('mh-parkingV2:client:CallVehicleDelivery', {model = v.vehicle, plate = v.plate})
+							end
+						}
+					end
 				end
-				options[#options + 1] = {id = num,title = Lang:t('info.close'), icon = "fa-solid fa-stop", description = '', arrow = false, onSelect = function() end}
+				num = num + 1
+				options[#options + 1] = {
+					id = num, 
+					title = Lang:t('info.close'), 
+					icon = "fa-solid fa-stop", 
+					description = '', 
+					arrow = false, 
+					onSelect = function() end
+				}
 				table.sort(options, function(a, b) return a.id < b.id end)
-				lib.registerContext({id = 'menu', title = "MH Uber", icon = "fa-solid fa-car", options = options})
+				lib.registerContext({id = 'menu', title = "Call Vehicle Delivery", icon = "fa-solid fa-car", options = options})
 				lib.showContext('menu')
+			
 			elseif Config.MenuScript == "qb-menu" then
-				local options = {{header = "Call Vehicle Delivery", isMenuHeader = true}}
+				local num = 1
+				local options = {
+					{
+						id = num,
+						header = "Call Vehicle Delivery",
+						isMenuHeader = true
+					}
+				}
 				for k, v in pairs(vehicles) do
-					local description = Lang:t('vehicle.model', {model = Config.Vehicles[GetHashKey(v.vehicle:lower())].name}) .. "<br />" .. Lang:t('vehicle.brand', {brand = Config.Vehicles[GetHashKey(v.vehicle:lower())].brand}) .. "<br />" .. Lang:t('vehicle.plate', {plate = v.plate}) .. '<br />' .. Lang:t('vehicle.fuel', {fuel = v.fuel}) .. '<br />' .. Lang:t('vehicle.engine', {engine = Round(v.engine / 10, 0)}) .. '<br />' .. Lang:t('vehicle.body', {body = Round(v.body / 10, 0)})
-					if v.state == 1 then options[#options + 1] = {header = "", txt = '<table><td style="text-align:left; height: 50px; padding: 5px;"><img src='.."nui://mh-vehicleimages/images/" .. v.vehicle:lower() .. ".png"..' style="width:80px;"></td><td style="text-align:top; height: 50px; padding: 15px;">'..description..'</td></table>', params = {event = 'mh-parkingV2:client:CallVehicleDelivery', args = {model = v.vehicle:lower(), plate = v.plate}}} end
+					local name = Config.Vehicles[GetHashKey(v.vehicle)].name
+					local model = Config.Vehicles[GetHashKey(v.vehicle)].model
+					local brand = Config.Vehicles[GetHashKey(v.vehicle)].brand
+					local image = GetVehicleImageLinkFromModelName(model)
+					print(image)
+					local description = Lang:t('vehicle.model', {model = model}) .. "<br />" .. Lang:t('vehicle.brand', {brand = brand}) .. "<br />" .. Lang:t('vehicle.plate', {plate = v.plate}) .. '<br />' .. Lang:t('vehicle.fuel', {fuel = v.fuel}) .. '<br />' .. Lang:t('vehicle.engine', {engine = Round(v.engine / 10, 0)}) .. '<br />' .. Lang:t('vehicle.body', {body = Round(v.body / 10, 0)})
+					if v.state == 1 then
+						options[#options + 1] = {
+							id = num,
+							header = "", 
+							txt = '<table><td style="text-align:left; height: 50px; padding: 5px;"><img src="' .. image .. '" style="width:80px;"></td><td style="text-align:top; height: 50px; padding: 15px;">'..description..'</td></table>', 
+							params = {
+								event = 'mh-parkingV2:client:CallVehicleDelivery', 
+								args = {
+									model = v.vehicle:lower(), 
+									plate = v.plate
+								}
+							}
+						}
+					end
 				end
-				options[#options + 1] = {header = Lang:t('info.close'), txt = '', params = {event = 'qb-menu:client:closeMenu'}}
+				num = num + 1
+				options[#options + 1] = {
+					id = num,
+					header = Lang:t('info.close'), 
+					txt = '', 
+					params = {
+						event = 'qb-menu:client:closeMenu'
+					}
+				}
+				table.sort(options, function(a, b) return a.id < b.id end)
 				exports['qb-menu']:openMenu(options)
 			end
         end

@@ -24,6 +24,21 @@ elseif GetResourceState("qb-core") ~= 'missing' then
     function IsDead() return Framework.Functions.GetPlayerData().metadata['isdead'] end
     function SetJob(job) PlayerData.job = job end
     RegisterNetEvent('QBCore:Player:SetPlayerData', function(data) PlayerData = data end)
+elseif GetResourceState("qbx_core") ~= 'missing' then
+    Config.Framework = 'qb'
+    Framework = exports['qb-core']:GetCoreObject()
+    TriggerCallback = Framework.Functions.TriggerCallback
+    OnPlayerLoaded = 'QBCore:Client:OnPlayerLoaded'
+    OnPlayerUnload = 'QBCore:Client:OnPlayerUnload'
+    OnJobUpdate = 'QBCore:Client:OnJobUpdate'
+    function GetPlayerData() return Framework.Functions.GetPlayerData() end
+    function IsDead() return Framework.Functions.GetPlayerData().metadata['isdead'] end
+    function SetJob(job) PlayerData.job = job end
+    RegisterNetEvent('QBCore:Player:SetPlayerData', function(data) PlayerData = data end)
+end
+
+function GetVehicleImageLinkFromModelName(model) 
+    return 'nui://mh-parkingV2/images/'..model..'.png'
 end
 
 function GetPedVehicleSeat(ped)
@@ -38,7 +53,7 @@ function Notify(message, type, length)
     if GetResourceState("ox_lib") ~= 'missing' then
         lib.notify({title = "MH Parking V2", description = message, type = type})
     else
-        QBCore.Functions.Notify({text = "MH Parking V2", caption = message}, type, length)
+        Framework.Functions.Notify({text = "MH Parking V2", caption = message}, type, length)
     end
 end
 
