@@ -34,7 +34,7 @@ function GetEntity(data)
 	local result = nil
 	if type(data) == 'table' then
 		result = data.entity
-	elseif type(vehicle) == 'number' then
+	elseif type(data) == 'number' then
 		result = data
 	end
 	return result

@@ -12,12 +12,13 @@ elseif GetResourceState("qb-core") ~= 'missing' then
     Config.Framework = 'qb'
 end
 ----------------------------------------------------------------------------
-Config.UseParkWithCommand = true
-Config.ParkingButton = 166           -- F5 (vehicle exit and or park)
-Config.KeyParkBindButton = "F5"      -- F5 keybinder 
+Config.UseParkWithCommand = false          -- When true auto park is diabled.
+Config.ParkingButton = 166                 -- F5 (vehicle exit and or park)
+Config.KeyParkBindButton = "F5"            -- F5 keybinder 
+Config.OnlyAutoParkWhenEngineIsOff = true  -- When true and Config.UseParkWithCommand = true this wil be automatic false.
 ----------------------------------------------------------------------------
 -- Fuel Script
-Config.FuelScript = 'qb-fuel'           -- Default is LegacyFuel, if you use a other fuel script, for example ox_fuel
+Config.FuelScript = 'mh-fuel'              -- Default is LegacyFuel, if you use a other fuel script, for example ox_fuel
 ----------------------------------------------------------------------------
 -- Notify Script
 Config.DisableParkNotify = false           -- Default true, if false you get many notifications when you enter or leave the vehicle, all other notify massages are stil enable.
@@ -43,17 +44,12 @@ Config.InteractDistance = 5.0
 ----------------------------------------------------------------------------
 Config.ParkVehiclesWithTrailers = true     -- Keep it false, don't use this for now.....
 ----------------------------------------------------------------------------
-Config.KeyParkBindButton = "E"
-Config.ParkingButton = 51 -- E
-----------------------------------------------------------------------------
-Config.OnlyAutoParkWhenEngineIsOff = true
-----------------------------------------------------------------------------
 -- if true parked vehicles are unlocked for vehicle owners, 
 -- you must own this vehicle before this works.
 Config.VehicleDoorsUnlockedForOwners = true
 ----------------------------------------------------------------------------
 -- Disable parked vehicle collision, players can't ram the parked vehicles.
-Config.DisableParkedVehiclesCollision = true
+Config.DisableParkedVehiclesCollision = false
 ----------------------------------------------------------------------------
 Config.Weapons = {"WEAPON_PISTOL", "WEAPON_PISTOL_MK2", "WEAPON_COMBATPISTOL", "WEAPON_APPISTOL", "WEAPON_STUNGUN"}
 ----------------------------------------------------------------------------
@@ -144,3 +140,26 @@ Config.AllowedParkingLots = {
 
 }
 
+
+---------------------------------------Key Script---------------------------------------
+-- Client side
+function SetClientVehicleOwnerKey(plate, vehicle)
+    if GetResourceState("qb-vehiclekeys") ~= 'missing' then
+        if not exports['qb-vehiclekeys']:HasKeys(plate) then
+            TriggerServerEvent('qb-vehiclekeys:server:AcquireVehicleKeys', plate)
+        end
+    elseif GetResourceState("<your script>") ~= 'missing' then
+        -- your client export or trigger here
+    end
+end
+
+-- Server Ssde
+function SetServerVehicleOwnerKey(src, plate, vehicle)
+    if GetResourceState("qb-vehiclekeys") ~= 'missing' then
+        if not exports['qb-vehiclekeys']:HasKeys(src, plate) then
+            exports['qb-vehiclekeys']:GiveKeys(src, plate)
+        end
+    elseif GetResourceState("<your script>") ~= 'missing' then
+        -- your server side export or trigger here             
+    end
+end

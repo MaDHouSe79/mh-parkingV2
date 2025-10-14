@@ -7,16 +7,16 @@ Parking.Functions = {}
 function Parking.Functions.GetVehicles(src)
 	local xPlayer = GetPlayer(src)
 	local citizenid = GetCitizenId(src)
+	local result = nil
 	if xPlayer then
-		local result = nil
 		if Config.Framework == 'esx' then
 			result = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE owner = ? ORDER BY vehicle ASC", { citizenid })
 			result.state = result.stored
 		elseif Config.Framework == 'qb' then
 			result = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE citizenid = ? ORDER BY vehicle ASC", { citizenid })
 		end
-		if result then return result else return nil end
 	end
+	return result
 end
 
 function Parking.Functions.RefreshVehicles(src)
@@ -54,9 +54,7 @@ function Parking.Functions.RefreshVehicles(src)
 			local target = GetPlayerDataByCitizenId(v.citizenid)
 			if target.PlayerData.citizenid == v.citizenid and target.PlayerData.source ~= nil then
 				if DoesEntityExist(GetPlayerPed(target.PlayerData.source)) then
-					if GetResourceState("qb-vehiclekeys") ~= 'missing' then
-						exports['qb-vehiclekeys']:GiveKeys(target.PlayerData.source, v.plate)
-					end
+					SetServerVehicleOwnerKey(target.PlayerData.source, v.plate)
 				end
 			end
 		end
@@ -136,13 +134,13 @@ function Parking.Functions.Save(src, data)
 					trailerdata = json.decode(trailerdata),
 				}, src)
 				TriggerClientEvent('mh-parkingV2:client:CreateOwnerVehicleBlip', src, result.plate)
-				return { status = true, message = Lang:t('info.vehicle_parked') }
+				return {status = true, message = Lang:t('info.vehicle_parked') }
 			else
 				return {status = false, message = Lang:t('info.not_the_owner')}
 			end
 		end
 	else
-		return { status = false, message = Lang:t('info.limit_parking', {limit=defaultMax}) }
+		return {status = false, message = Lang:t('info.limit_parking', {limit=defaultMax}) }
 	end
 end
 
@@ -288,36 +286,28 @@ function Parking.Functions.Impound(src, plate)
     end
 end
 
-function Parking.Functions.EnteringVehicle(src, currentVehicle, currentSeat, vehicleName, netId)
+function Parking.Functions.EnteringVehicle(src, currentSeat, plate)
 	local Player = GetPlayer(src)
-	if Config.UseParkWithCommand == false then
-		local vehicle = NetworkGetEntityFromNetworkId(netId)
-		if DoesEntityExist(vehicle) and currentSeat == -1 then
-			local plate = GetVehicleNumberPlateText(vehicle)
-			local result = nil
-			if Config.Framework == 'esx' then
-				result = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE owner = ? AND plate = ? AND stored = ?", { Player.identifier, plate, 3 })[1]
-			elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
-				result = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE citizenid = ? AND plate = ? AND state = ?", { Player.PlayerData.citizenid, plate, 3 })[1]
-			end
-			if result then TriggerClientEvent('mh-parkingV2:client:AutoDrive', -1, src) end
+	if currentSeat == -1 and Config.UseParkWithCommand == false then
+		local result = nil
+		if Config.Framework == 'esx' then
+			result = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE owner = ? AND plate = ? AND stored = ?", { Player.identifier, plate, 3})[1]
+		elseif Config.Framework == 'qb' then
+			result = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE citizenid = ? AND plate = ? AND state = ?", { Player.PlayerData.citizenid, plate, 3})[1]
 		end
+		if result ~= nil then TriggerClientEvent('mh-parkingV2:client:AutoDrive', -1, src) end
 	end
 end
 
-function Parking.Functions.LeftVehicle(src, currentVehicle, currentSeat, vehicleName, netId)
+function Parking.Functions.LeftVehicle(src, currentSeat, plate)
 	local Player = GetPlayer(src)
-	if Config.UseParkWithCommand == false then
-		local vehicle = NetworkGetEntityFromNetworkId(netId)
-		if DoesEntityExist(vehicle) then
-			local plate = GetVehicleNumberPlateText(vehicle)
-			local result = nil
-			if Config.Framework == 'esx' then
-				result = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE owner = ? AND plate = ? AND stored = ?", { Player.identifier, plate, 0 })[1]
-			elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
-				result = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE citizenid = ? AND plate = ? AND state = ?", { Player.PlayerData.citizenid, plate, 0 })[1]
-			end
-			if result then TriggerClientEvent('mh-parkingV2:client:AutoPark', -1, src) end
+	if currentSeat == -1 and Config.UseParkWithCommand == false then
+		local result = nil
+		if Config.Framework == 'esx' then
+			result = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE owner = ? AND plate = ? AND stored = ?", {Player.identifier, plate, 0})[1]
+		elseif Config.Framework == 'qb' then
+			result = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE citizenid = ? AND plate = ? AND state = ?", { Player.PlayerData.citizenid, plate, 0})[1]
 		end
+		if result ~= nil then TriggerClientEvent('mh-parkingV2:client:AutoPark', -1, src) end
 	end
 end

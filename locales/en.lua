@@ -28,6 +28,9 @@ local Translations = {
         ['press_to_attach'] = "Press E to attach the boat to trailer",
         ['unable_to_park'] = "Unable to park",
         ['parking_lot'] = "Parking Lot",
+        ["press_drive_car"] = "Press F5 to start driving",
+        ["stop_car"] = "Stop your vehicle before you park",
+        ["only_cars_allowd"] = "You can only park cars here",
     },
     commands = {
         ['addvip'] = "Parking Add VIP",

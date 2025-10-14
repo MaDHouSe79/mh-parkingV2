@@ -28,6 +28,9 @@ local Translations = {
         ['press_to_attach'] = "Druk E om the boot op de trailer te plaatsen",
         ['unable_to_park'] = "Kan niet parkeren",
         ['parking_lot'] = "Parkeerplaats",
+        ["press_drive_car"] = "Druk op F5 om te gaan rijden",
+        ["stop_car"] = "Stop het voertuig voor dat je het wilt parkeren...",
+        ["only_cars_allowd"]    = "Je kunt hier alleen auto's parkeren",
     },
     commands = {
         ['addvip'] = "Parking VIP Toevoegen",
