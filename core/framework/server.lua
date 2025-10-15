@@ -36,6 +36,16 @@ elseif GetResourceState("qbx_core") ~= 'missing' then
     function GetCitizenFullname(src) local xPlayer = GetPlayer(src) return xPlayer.PlayerData.charinfo.firstname .. ' ' .. xPlayer.PlayerData.charinfo.lastname end
 end
 
+function SetServerVehicleOwnerKey(src, plate, vehicle)
+    if GetResourceState("qb-vehiclekeys") ~= 'missing' then
+        if not exports['qb-vehiclekeys']:HasKeys(src, plate) then
+            exports['qb-vehiclekeys']:GiveKeys(src, plate)
+        end
+    -- elseif GetResourceState("<your script>") ~= 'missing' then
+    --     -- your server side export or trigger here             
+    end
+end
+
 function Notify(src, message, type, length)
     if GetResourceState("ox_lib") ~= 'missing' then
         lib.notify(src, {title = "MH Parking V2", description = message, type = type})

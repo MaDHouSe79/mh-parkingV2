@@ -233,7 +233,9 @@ function Parking.Functions.Init()
 	end
 end
 
-AddCommand("addvip", Lang:t('commands.addvip'), { { name = 'ID', help = Lang:t('commands.addvip_info') }, { name = 'Amount', help = Lang:t('commands.addvip_info_amount') } }, true, function(source, args)
+------------------------------------------------------------------------------
+
+AddCommand("addparkvip", Lang:t('commands.addvip'), { { name = 'ID', help = Lang:t('commands.addvip_info') }, { name = 'Amount', help = Lang:t('commands.addvip_info_amount') } }, true, function(source, args)
 	local src, amount, targetID = source, Config.Maxparking, -1
 	if args[1] and tonumber(args[1]) > 0 then targetID = tonumber(args[1]) end
 	if args[2] and tonumber(args[2]) > 0 then amount = tonumber(args[2]) end
@@ -253,7 +255,7 @@ AddCommand("addvip", Lang:t('commands.addvip'), { { name = 'ID', help = Lang:t('
 	end
 end, 'admin')
 
-AddCommand("removevip", Lang:t('commands.removevip'), { { name = 'ID', help = Lang:t('commands.removevip_info') } }, true, function(source, args)
+AddCommand("removeparkvip", Lang:t('commands.removevip'), { { name = 'ID', help = Lang:t('commands.removevip_info') } }, true, function(source, args)
 	local src, targetID = source, -1
 	if args[1] and tonumber(args[1]) > 0 then targetID = tonumber(args[1]) end
 	if targetID ~= -1 then
@@ -271,6 +273,7 @@ AddCommand("removevip", Lang:t('commands.removevip'), { { name = 'ID', help = La
 end, 'admin')
 
 ------------------------------------------------------------------------------
+
 function Parking.Functions.Impound(src, plate)
     local Player = GetPlayer(src)
     if Player then
@@ -310,4 +313,15 @@ function Parking.Functions.LeftVehicle(src, currentSeat, plate)
 		end
 		if result ~= nil then TriggerClientEvent('mh-parkingV2:client:AutoPark', -1, src) end
 	end
+end
+
+function Parking.Functions.AllPlayersLeaveVehicle(vehicleNetID, players)
+    if players ~= nil and #players >= 1 then
+        local vehicle = NetworkGetEntityFromNetworkId(vehicleNetID)
+        if DoesEntityExist(vehicle) then
+            for i = 1, #players, 1 do
+                TriggerClientEvent('mh-parkingV2:client:leaveVehicle', players[i].playerId, {vehicleNetID = vehicleNetID, playerId = players[i].playerId} )
+            end
+        end
+    end
 end

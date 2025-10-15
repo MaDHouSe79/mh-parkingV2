@@ -14,6 +14,7 @@ RegisterNetEvent('mh-parkingV2:client:GetVehicleMenu', function() Parking.Functi
 RegisterNetEvent('mh-parkingV2:client:OnJoin', function() Parking.Functions.OnJoin() end)
 RegisterNetEvent("mh-parkingV2:client:AutoPark", function(driver) Parking.Functions.AutoPark(driver) end)
 RegisterNetEvent("mh-parkingV2:client:AutoDrive", function(driver) Parking.Functions.AutoDrive(driver) end)
+RegisterNetEvent('mh-parkingV2:client:leaveVehicle', function(data) Parking.Functions.LeaveVehicle(data) end)
 RegisterKeyMapping('park', 'Park or Drive', 'keyboard', Config.KeyParkBindButton)
 RegisterCommand('toggleparktext', function() displayOwnerText = not displayOwnerText end, false)
 RegisterCommand('parkmenu', function() TriggerEvent('mh-parkingV2:client:GetVehicleMenu') end, false)
