@@ -417,7 +417,7 @@ function Parking.Functions.DriveVehicle(data)
 	while not DoesEntityExist(tempVeh) do Wait(1) end
 	SetEntityAsMissionEntity(tempVeh, true, true)
 	SetVehicleNumberPlateText(tempVeh, data.plate)	
-	print(PlayerData.citizenid, data.owner)
+	
 	if PlayerData.citizenid == data.owner then
 		Entity(tempVeh).state.owner = data.owner
 		SetClientVehicleOwnerKey(GetPlate(tempVeh), tempVeh)
