@@ -1,6 +1,6 @@
---[[ ===================================================== ]] --
---[[               MH Parking V2 by MaDHouSe79             ]] --
---[[ ===================================================== ]] --
+-- [[ ===================================================== ]] --
+-- [[               MH Parking V2 by MaDHouSe79             ]] --
+-- [[ ===================================================== ]] --
 Framework, TriggerCallback, OnPlayerLoaded, OnPlayerUnload = nil, nil, nil, nil
 OnJobUpdate, isLoggedIn, PlayerData = nil, false, {}
 if GetResourceState("es_extended") ~= 'missing' then
@@ -27,12 +27,10 @@ elseif GetResourceState("qb-core") ~= 'missing' then
 end
 
 function SetClientVehicleOwnerKey(plate, vehicle)
-    if GetResourceState("qb-vehiclekeys") ~= 'missing' then
-        if not exports['qb-vehiclekeys']:HasKeys(plate) then
-            TriggerServerEvent('qb-vehiclekeys:server:AcquireVehicleKeys', plate)
-        end
-    -- elseif GetResourceState("<your script>") ~= 'missing' then
-    --     -- your client export or trigger here
+    if Config.KeyScript == "qb-vehiclekeys" then
+        TriggerServerEvent('qb-vehiclekeys:server:AcquireVehicleKeys', plate)
+    elseif Config.KeyScript == "qbx_vehiclekeys" then
+        TriggerServerEvent('mh-parkingV2:server:GiveKeys', plate, VehToNet(vehicle))
     end
 end
 

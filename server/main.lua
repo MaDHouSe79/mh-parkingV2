@@ -1,6 +1,6 @@
---[[ ===================================================== ]] --
---[[               MH Parking V2 by MaDHouSe79             ]] --
---[[ ===================================================== ]] --
+-- [[ ===================================================== ]] --
+-- [[               MH Parking V2 by MaDHouSe79             ]] --
+-- [[ ===================================================== ]] --
 CreateCallback("mh-parkingV2:server:SaveCar", function(source, cb, data) cb(Parking.Functions.Save(source, data)) end)
 CreateCallback("mh-parkingV2:server:DriveCar", function(source, cb, data)  cb(Parking.Functions.Drive(source, data)) end)
 CreateCallback("mh-parkingV2:server:GetVehicles", function(source, cb) cb(Parking.Functions.GetVehicles(source)) end)
@@ -11,5 +11,6 @@ RegisterNetEvent("mh-parkingV2:server:EnteringVehicle", function(currentVehicle,
 RegisterNetEvent('mh-parkingV2:server:LeftVehicle', function(currentVehicle, currentSeat, vehicleName, netId) Parking.Functions.LeftVehicle(source, currentVehicle, currentSeat, vehicleName, netId) end)
 RegisterNetEvent('mh-parkingV2:server:AllPlayersLeaveVehicle', function(vehicleNetID, players) Parking.Functions.AllPlayersLeaveVehicle(vehicleNetID, players) end)
 RegisterNetEvent('police:server:Impound', function(plate, fullImpound, price, body, engine, fuel) Parking.Functions.Impound(source, plate) end)
+RegisterNetEvent('mh-parkingV2:server:GiveKeys', function(plate, netId) SetServerVehicleOwnerKey(source, plate, netId) end)
 RegisterNetEvent('mh-parkingV2:server:OnJoin', function() Parking.Functions.OnJoin(source) end)
 CreateThread(function() Parking.Functions.Init() end)

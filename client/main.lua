@@ -1,9 +1,11 @@
---[[ ===================================================== ]] --
---[[               MH Parking V2 by MaDHouSe79             ]] --
---[[ ===================================================== ]] --
-LocalVehicles, GlobalVehicles, IsUsingParkCommand, isLoggedIn, SpawnedVehicles, DeletingEntities, displayOwnerText = {}, {}, false, false, false, false, Config.UseVehicleOwnerText
+-- [[ ===================================================== ]] --
+-- [[               MH Parking V2 by MaDHouSe79             ]] --
+-- [[ ===================================================== ]] --
+isLoggedIn, IsUsingParkCommand, displayOwnerText = false, false, Config.UseVehicleOwnerText
+--
 AddEventHandler('onResourceStop', function(resource) if resource == GetCurrentResourceName() then Parking.Functions.DeleteAllVehicles() PlayerData = {} isLoggedIn = false end end)
 AddEventHandler('onResourceStart', function(resource) if resource == GetCurrentResourceName() then TriggerServerEvent('mh-parkingV2:server:OnJoin') PlayerData = GetPlayerData() isLoggedIn = true end end)
+--
 RegisterNetEvent(OnPlayerLoaded, function() TriggerServerEvent('mh-parkingV2:server:OnJoin') end)
 RegisterNetEvent(OnPlayerUnload, function() Parking.Functions.DeleteAllVehicles() PlayerData = {} isLoggedIn = false end)
 RegisterNetEvent("mh-parkingV2:client:RefreshVehicles", function(vehicles) Parking.Functions.RefreshVehicles(vehicles) end)
@@ -15,16 +17,12 @@ RegisterNetEvent('mh-parkingV2:client:OnJoin', function() Parking.Functions.OnJo
 RegisterNetEvent("mh-parkingV2:client:AutoPark", function(driver) Parking.Functions.AutoPark(driver) end)
 RegisterNetEvent("mh-parkingV2:client:AutoDrive", function(driver) Parking.Functions.AutoDrive(driver) end)
 RegisterNetEvent('mh-parkingV2:client:leaveVehicle', function(data) Parking.Functions.LeaveVehicle(data) end)
-RegisterKeyMapping('park', 'Park or Drive', 'keyboard', Config.KeyParkBindButton)
-RegisterCommand('toggleparktext', function() displayOwnerText = not displayOwnerText end, false)
-RegisterCommand('parkmenu', function() TriggerEvent('mh-parkingV2:client:GetVehicleMenu') end, false)
-RegisterCommand('park', function() IsUsingParkCommand = true end, false)
-CreateThread(function() while true do Wait(0) if isLoggedIn and displayOwnerText then Parking.Functions.DisplayVehicleOwnerText() end end end)
-CreateThread(function() while true do Wait(2000) if isLoggedIn then if #LocalVehicles ~= 0 then Parking.Functions.MakeVehiclesVisable() end end end end)
-CreateThread(function() while true do Wait(3000) if isLoggedIn then if #LocalVehicles ~= 0 then Parking.Functions.CheckDistanceToForceGrounded() end end end end)
-CreateThread(function() while true do Wait(1000) if isLoggedIn then if #LocalVehicles ~= 0 then Parking.Functions.UpdateVehicleStatus() end collectgarbage("collect") end end end)
-CreateThread(function() while true do Wait(0) if isLoggedIn then Parking.Functions.GetInAndOutVehicle() Wait(50) end end end)
-CreateThread(function() while true do Wait(0) if isLoggedIn then Parking.Functions.KeepEngineRunning() end end end)
+--
+CreateThread(function() Parking.Functions.KeepEngineRunning() end)
+CreateThread(function() Parking.Functions.DisplayVehicleOwnerText() end)
+CreateThread(function() Parking.Functions.GetInAndOutVehicle() end)
+CreateThread(function() Parking.Functions.CheckDistanceToForceGrounded() end)
+CreateThread(function() Parking.Functions.MakeVehiclesVisable() end)
 CreateThread(function() Parking.Functions.DisableParkedVehiclesCollision() end)
 CreateThread(function() Parking.Functions.SpawnVehicleChecker() end)
 CreateThread(function() Parking.Functions.CheckSteeringAngle() end)
@@ -33,3 +31,8 @@ CreateThread(function() Parking.Functions.CreateBlips() end)
 CreateThread(function() Parking.Functions.AttachedToTrailer() end)
 CreateThread(function() Parking.Functions.LoadTarget() end)
 CreateThread(function() Parking.Functions.UseParkCommand() end)
+--
+RegisterKeyMapping('park', 'Park or Drive', 'keyboard', Config.KeyParkBindButton)
+RegisterCommand('toggleparktext', function() displayOwnerText = not displayOwnerText end, false)
+RegisterCommand('parkmenu', function() TriggerEvent('mh-parkingV2:client:GetVehicleMenu') end, false)
+RegisterCommand('park', function() IsUsingParkCommand = true end, false)

@@ -1,6 +1,6 @@
---[[ ===================================================== ]] --
---[[               MH Parking V2 by MaDHouSe79             ]] --
---[[ ===================================================== ]] --
+-- [[ ===================================================== ]] --
+-- [[               MH Parking V2 by MaDHouSe79             ]] --
+-- [[ ===================================================== ]] --
 Framework, CreateCallback, AddCommand = nil, nil, nil
 if GetResourceState("es_extended") ~= 'missing' then
     Config.Framework = 'esx'
@@ -36,13 +36,15 @@ elseif GetResourceState("qbx_core") ~= 'missing' then
     function GetCitizenFullname(src) local xPlayer = GetPlayer(src) return xPlayer.PlayerData.charinfo.firstname .. ' ' .. xPlayer.PlayerData.charinfo.lastname end
 end
 
-function SetServerVehicleOwnerKey(src, plate, vehicle)
-    if GetResourceState("qb-vehiclekeys") ~= 'missing' then
-        if not exports['qb-vehiclekeys']:HasKeys(src, plate) then
-            exports['qb-vehiclekeys']:GiveKeys(src, plate)
+function SetServerVehicleOwnerKey(src, plate, vehicleNetId)
+    if Config.KeyScript == "qb-vehiclekeys" then
+        exports['qb-vehiclekeys']:GiveKeys(src, plate)
+    elseif Config.KeyScript == "qbx_vehiclekeys" then
+        local vehicle = NetworkGetEntityFromNetworkId(vehicleNetId)
+        local haskey = exports['qbx_vehiclekeys']:HasKeys(src, vehicle, true)
+        if not haskey then
+            exports['qbx_vehiclekeys']:GiveKeys(src, vehicle, true)
         end
-    -- elseif GetResourceState("<your script>") ~= 'missing' then
-    --     -- your server side export or trigger here             
     end
 end
 

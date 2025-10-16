@@ -1,6 +1,6 @@
---[[ ===================================================== ]] --
---[[               MH Parking V2 by MaDHouSe79             ]] --
---[[ ===================================================== ]] --
+-- [[ ===================================================== ]] --
+-- [[               MH Parking V2 by MaDHouSe79             ]] --
+-- [[ ===================================================== ]] --
 -- Trailer list, you can add more if the trailer does not exist in this list.
 Config.Trailers = {
     [712162987] = {model = "trailersmall", name = "trailersmall", offset = {backwards = -5.80, posX = -0.85, posY = 1.0, heading = 70.20} },
@@ -38,6 +38,4 @@ Config.TrailerBoats = {
     [-1030275036] = {model = "seashark", name = "Seashark"},
     [3678636260] = {model = "seashark2", name = "Seashark"},
     [3983945033] = {model = "seashark3", name = "Seashark"},
-
-
 }

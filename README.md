@@ -29,12 +29,12 @@
 # My Youtube Channel
 - [Subscribe](https://www.youtube.com/@MaDHouSe79) 
 
-# MH Parking V2 (QB/ESX) by MaDHouSe79
+# MH Parking V2 (QB/QBX/ESX) by MaDHouSe79
 - With auto park and unpark vehicles when you press `F` stort or press `F` long to iqnore the parking.
 - Before you press `F` press the keys `A` or `D` to turn your wheels this will save the wheel angle on your parked vehicle.
 - VIP included and tou can also use the old waw with F5 see config file.
 
-# Dependencies (QB/ESX)
+# Dependencies (QB/QBX/ESX)
 - [oxmysql](https://github.com/overextended/oxmysql/releases/tag/v1.9.3)
 - [ox_lib](https://github.com/overextended/ox_lib/releases)
 - [qb-core](https://github.com/qbcore-framework/qb-core) or [esx](https://github.com/esx-framework)

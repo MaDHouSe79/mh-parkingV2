@@ -1,6 +1,6 @@
---[[ ===================================================== ]] --
---[[               MH Parking V2 by MaDHouSe79             ]] --
---[[ ===================================================== ]] --
+-- [[ ===================================================== ]] --
+-- [[               MH Parking V2 by MaDHouSe79             ]] --
+-- [[ ===================================================== ]] --
 Parking = {}
 Parking.Functions = {}
 
@@ -50,12 +50,10 @@ function Parking.Functions.RefreshVehicles(src)
 			location = json.decode(v.location),
 			trailerdata = json.decode(v.trailerdata),
 		}
-		if Config.Framework == 'qb' then
-			local target = GetPlayerDataByCitizenId(v.citizenid)
-			if target.PlayerData.citizenid == v.citizenid and target.PlayerData.source ~= nil then
-				if DoesEntityExist(GetPlayerPed(target.PlayerData.source)) then
-					SetServerVehicleOwnerKey(target.PlayerData.source, v.plate)
-				end
+		local target = GetPlayerDataByCitizenId(v.citizenid)
+		if target.PlayerData.citizenid == v.citizenid and target.PlayerData.source ~= nil then
+			if DoesEntityExist(GetPlayerPed(target.PlayerData.source)) then
+				SetServerVehicleOwnerKey(target.PlayerData.source, v.plate)
 			end
 		end
 	end
@@ -148,10 +146,13 @@ function Parking.Functions.Drive(src, data)
 	local xPlayer = GetPlayer(src)
 	local plate = data.plate
 	local result = nil
+	local owner = nil
 	if Config.Framework == 'esx' then
 		result = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE owner = ? AND plate = ? AND stored = ?", { xPlayer.identifier, plate, 3 })[1]
+		if result ~= nil then owner = xPlayer.identifier end
 	elseif Config.Framework == 'qb' then
 		result = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE citizenid = ? AND plate = ? AND state = ?", { xPlayer.PlayerData.citizenid, plate, 3 })[1]
+		if result ~= nil then owner = xPlayer.PlayerData.citizenid end
 	end
 	if result ~= nil then
 		local mods = json.decode(result.mods)
@@ -164,7 +165,7 @@ function Parking.Functions.Drive(src, data)
 		end
 		Wait(50)
 		TriggerClientEvent("mh-parkingV2:client:DeleteVehicle", -1, { plate = plate })
-		return { status = true, message = Lang:t('info.remove_vehicle_zone'), vehicle = result.vehicle, mods = mods, plate = result.plate, location = location, fuel = result.fuel, body = result.body, engine = result.engine, trailerdata = trailerdata }
+		return { status = true, message = Lang:t('info.remove_vehicle_zone'), owner = owner, vehicle = result.vehicle, mods = mods, plate = result.plate, location = location, fuel = result.fuel, body = result.body, engine = result.engine, trailerdata = trailerdata }
 	else
 		return { status = false, message = Lang:t('info.no_vehicles_parked') }
 	end
@@ -246,7 +247,7 @@ AddCommand("addparkvip", Lang:t('commands.addvip'), { { name = 'ID', help = Lang
 				MySQL.Async.execute("UPDATE users SET parkvip = ?, parkmax = ? WHERE owner = ?", { 1, amount, Player.identifier })
 				if targetID ~= src then Notify(targetID, Lang:t('info.playeraddasvip'), "success", 10000) end
 				Notify(src, Lang:t('info.isaddedasvip'), "success", 10000)
-			elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
+			elseif Config.Framework == 'qb' then
 				MySQL.Async.execute("UPDATE players SET parkvip = ?, parkmax = ? WHERE citizenid = ?", { 1, amount, Player.PlayerData.citizenid })
 				if targetID ~= src then Notify(targetID, Lang:t('info.playeraddasvip'), "success", 10000) end
 				Notify(src, Lang:t('info.isaddedasvip'), "success", 10000)
@@ -264,7 +265,7 @@ AddCommand("removeparkvip", Lang:t('commands.removevip'), { { name = 'ID', help 
 			if Config.Framework == 'esx' then
 				MySQL.Async.execute("UPDATE users SET parkvip = ?, parkmax = ? WHERE owner = ?", { 0, 0, Player.identifier })
 				Notify(src, Lang:t('info.playerremovedasvip'), "success", 10000)
-			elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
+			elseif Config.Framework == 'qb' then
 				MySQL.Async.execute("UPDATE players SET parkvip = ?, parkmax = ? WHERE citizenid = ?", { 0, 0, Player.PlayerData.citizenid })
 				Notify(src, Lang:t('info.playerremovedasvip'), "success", 10000)
 			end
@@ -281,7 +282,7 @@ function Parking.Functions.Impound(src, plate)
             local parked = nil
             if Config.Framework == 'esx' then
                 parked = MySQL.Sync.fetchAll("SELECT * FROM owned_vehicles WHERE plate = ? AND stored = ?", { plate, 3 })[1]
-            elseif Config.Framework == 'qb' or Config.Framework == 'qbx' then
+            elseif Config.Framework == 'qb' then
                 parked = MySQL.Sync.fetchAll("SELECT * FROM player_vehicles WHERE plate = ? AND state = ?", { plate, 3 })[1]
             end
             if parked then TriggerClientEvent('mh-parkingV2:client:DeletePlate', -1, plate) end

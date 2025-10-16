@@ -1,10 +1,12 @@
---[[ ===================================================== ]] --
---[[               MH Parking V2 by MaDHouSe79             ]] --
---[[ ===================================================== ]] --
+-- [[ ===================================================== ]] --
+-- [[               MH Parking V2 by MaDHouSe79             ]] --
+-- [[ ===================================================== ]] --
 Parking = {}
 Parking.Functions = {}
 Parking.TrailerData = {}
 
+local LocalVehicles = {}
+local GlobalVehicles = {}
 local parkedBlips = {}
 local trailerLoad = {}
 local parkMenu = nil
@@ -16,15 +18,22 @@ local currentTrailer = -1
 local isInVehicle = false
 local isRampDown = false
 local isPlatformDown = false
+local isEnteringVehicle = false
+local SpawnedVehicles = false
+local DeletingEntities = false
 
 local function SetFuel(vehicle, fuel)
-	if Config.FuelScript == "ox_fuel" then
-		TriggerServerEvent('ox_fuel:updateFuelCan', 100.0, NetworkGetNetworkIdFromEntity(vehicle), fuel + 0.0)
-	elseif Config.FuelScript == "mh-fuel" then
-		exports["mh-fuel"]:SetFuel(vehicle, fuel + 0.0)
-	elseif Config.FuelScript == "qb-fuel" then
-		exports["qb-fuel"]:SetFuel(vehicle, fuel + 0.0)
-	end
+    if not DoesEntityExist(vehicle) then return end
+    if fuel < 0 then fuel = 0 end
+    if fuel > 100 then fuel = 100 end
+    NetworkRequestControlOfEntity(vehicle)
+    Entity(vehicle).state:set('fuel', fuel + 0.0, true)
+    SetVehicleFuelLevel(vehicle, fuel + 0.0)
+end
+
+local function GetFuel(vehicle)
+    if not DoesEntityExist(vehicle) then return end
+    return Entity(vehicle).state.fuel or -1.0
 end
 
 local function GetPlayerInStoredCar(player)
@@ -41,7 +50,19 @@ local function GetPlayerInStoredCar(player)
 	return findVehicle
 end
 
-function Parking.Functions.AddToTable(entity, data)
+local function LockDoors(entity, data)
+	TriggerServerEvent('mh-parkingV2:server:SetVehLockState', VehToNet(entity), 2)
+	SetVehicleDoorsLocked(entity, 2)
+	if Config.VehicleDoorsUnlockedForOwners and PlayerData.citizenid == data.owner then
+		TriggerServerEvent('mh-parkingV2:server:SetVehLockState', VehToNet(entity), 1)
+		SetVehicleDoorsLocked(entity, 1)
+	end
+end
+
+local function AddToTable(entity, data)
+	if PlayerData.citizenid == data.owner then
+		SetClientVehicleOwnerKey(data.plate, entity)
+	end
 	LocalVehicles[#LocalVehicles + 1] = {
 		entity = entity,
 		model = data.vehicle,
@@ -59,40 +80,7 @@ function Parking.Functions.AddToTable(entity, data)
 	}
 end
 
-function Parking.Functions.MakeVehiclesVisable()
-	if isLoggedIn and Config.ViewDistance and #LocalVehicles > 0 then
-		local playerCoords = GetEntityCoords(PlayerPedId())
-		for k, v in pairs(LocalVehicles) do
-			if GetDistance(playerCoords, v.location) < Config.ParkedViewDistance and not IsEntityVisible(v.entity) then
-				SetEntityVisible(v.entity, true)
-				if v.trailerEntity ~= nil then SetEntityVisible(v.trailerEntity, true) end
-			elseif GetDistance(playerCoords, v.location) > Config.ParkedViewDistance and IsEntityVisible(v.entity) then
-				SetEntityVisible(v.entity, false)
-				if v.trailerEntity ~= nil then SetEntityVisible(v.trailerEntity, false) end
-			end
-		end
-	end
-end
-
-function Parking.Functions.CheckDistanceToForceGrounded()
-	if isLoggedIn and Config.ForceVehicleOnGound and #LocalVehicles > 0 then
-		for i = 1, #LocalVehicles do
-			if type(LocalVehicles[i]) == 'table' then
-				local playerCoords = GetEntityCoords(PlayerPedId())
-				if LocalVehicles[i].entity ~= nil and DoesEntityExist(LocalVehicles[i].entity) and not LocalVehicles[i].isGrounded then
-					if GetVehicleWheelSuspensionCompression(LocalVehicles[i].entity) == 0 or GetDistance(playerCoords, LocalVehicles[i].location) < 150 then
-						SetEntityCoords(LocalVehicles[i].entity, LocalVehicles[i].location.x, LocalVehicles[i].location.y, LocalVehicles[i].location.z)
-						SetVehicleOnGroundProperly(LocalVehicles[i].entity)
-						LocalVehicles[i].isGrounded = true
-					end
-				end
-				Wait(100)
-			end
-		end
-	end
-end
-
-function Parking.Functions.BlinkVehiclelights(vehicle, state)
+local function BlinkVehiclelights(vehicle, state)
 	local ped = PlayerPedId()
 	local model = 'prop_cuff_keys_01'
 	LoadAnimDict('anim@mp_player_intmenu@key_fob@')
@@ -123,6 +111,45 @@ function Parking.Functions.BlinkVehiclelights(vehicle, state)
 	end
 end
 
+function Parking.Functions.MakeVehiclesVisable()
+	while true do 
+		Wait(2000) 
+		if isLoggedIn and Config.ViewDistance and #LocalVehicles > 0 then
+			local playerCoords = GetEntityCoords(PlayerPedId())
+			for k, v in pairs(LocalVehicles) do
+				if GetDistance(playerCoords, v.location) < Config.ParkedViewDistance and not IsEntityVisible(v.entity) then
+					SetEntityVisible(v.entity, true)
+					if v.trailerEntity ~= nil then SetEntityVisible(v.trailerEntity, true) end
+				elseif GetDistance(playerCoords, v.location) > Config.ParkedViewDistance and IsEntityVisible(v.entity) then
+					SetEntityVisible(v.entity, false)
+					if v.trailerEntity ~= nil then SetEntityVisible(v.trailerEntity, false) end
+				end
+			end
+		end
+	end
+end
+
+function Parking.Functions.CheckDistanceToForceGrounded()
+	while true do 
+		Wait(3000) 
+		if isLoggedIn and Config.ForceVehicleOnGound and #LocalVehicles > 0 then
+			for i = 1, #LocalVehicles do
+				if type(LocalVehicles[i]) == 'table' then
+					local playerCoords = GetEntityCoords(PlayerPedId())
+					if LocalVehicles[i].entity ~= nil and DoesEntityExist(LocalVehicles[i].entity) and not LocalVehicles[i].isGrounded then
+						if GetVehicleWheelSuspensionCompression(LocalVehicles[i].entity) == 0 or GetDistance(playerCoords, LocalVehicles[i].location) < 150 then
+							SetEntityCoords(LocalVehicles[i].entity, LocalVehicles[i].location.x, LocalVehicles[i].location.y, LocalVehicles[i].location.z)
+							SetVehicleOnGroundProperly(LocalVehicles[i].entity)
+							LocalVehicles[i].isGrounded = true
+						end
+						Wait(100)
+					end
+				end
+			end
+		end
+	end
+end
+
 function Parking.Functions.GetPedInStoredCar(ped)
 	local findVeh = false
 	local entity = GetVehiclePedIsIn(ped, false)
@@ -148,6 +175,7 @@ function Parking.Functions.DeleteNearVehicle(location)
 			NetworkRequestControlOfEntity(veh)
 			local tmpModel = GetEntityModel(veh)
 			SetModelAsNoLongerNeeded(tmpModel)
+			SetEntityAsMissionEntity(veh, true, true)
 			Parking.Functions.DeteteParkedBlip(veh)
 			DeleteEntity(veh)
 		end
@@ -164,6 +192,7 @@ function Parking.Functions.RemoveVehicles(vehicles)
 				Parking.Functions.DeteteParkedBlip(veh)
 				local tmpModel = GetEntityModel(veh)
 				SetModelAsNoLongerNeeded(tmpModel)
+				SetEntityAsMissionEntity(veh, true, true)
 				DeleteEntity(veh)
 				Wait(300)
 			end
@@ -206,6 +235,7 @@ function Parking.Functions.DeleteLocalVehicle(vehicle)
 				local tmpModel = GetEntityModel(LocalVehicles[i].entity)
 				Parking.Functions.DeteteParkedBlip(LocalVehicles[i].entity)
 				SetModelAsNoLongerNeeded(tmpModel)
+				SetEntityAsMissionEntity(LocalVehicles[i].entity, true, true)
 				DeleteEntity(LocalVehicles[i].entity)
 				LocalVehicles[i] = nil
 				tmpModel = nil
@@ -220,12 +250,14 @@ function Parking.Functions.DeleteAllVehicles()
 			if LocalVehicles[i] then
 				if LocalVehicles[i].entity ~= nil then
 					if DoesEntityExist(LocalVehicles[i].entity) then
+						SetEntityAsMissionEntity(LocalVehicles[i].entity, true, true)
 						DeleteEntity(LocalVehicles[i].entity)
 						LocalVehicles[i].entity = nil
 					end
 				end
 				if LocalVehicles[i].trailerEntity ~= nil then
 					if DoesEntityExist(LocalVehicles[i].trailerEntity) then
+						SetEntityAsMissionEntity(LocalVehicles[i].entity, true, true)
 						DeleteEntity(LocalVehicles[i].trailerEntity)
 						LocalVehicles[i].trailerEntity = nil
 					end
@@ -292,20 +324,12 @@ end
 function Parking.Functions.DeleteVehicleAtcoords(coords)
 	local closestVehicle, closestDistance = GetClosestVehicle(coords)
 	if closestVehicle ~= -1 and closestDistance <= 2.0 then
+		SetEntityAsMissionEntity(closestVehicle, true, true)
 		DeleteEntity(closestVehicle)
 		while DoesEntityExist(closestVehicle) do
 			DeleteEntity(closestVehicle)
 			Wait(50)
 		end
-	end
-end
-
-function Parking.Functions.LockDoors(entity, data)
-	TriggerServerEvent('mh-parkingV2:server:SetVehLockState', VehToNet(entity), 2)
-	SetVehicleDoorsLocked(entity, 2)
-	if Config.VehicleDoorsUnlockedForOwners and PlayerData.citizenid == data.owner then
-		TriggerServerEvent('mh-parkingV2:server:SetVehLockState', VehToNet(entity), 1)
-		SetVehicleDoorsLocked(entity, 1)
 	end
 end
 
@@ -336,7 +360,7 @@ function Parking.Functions.Save(vehicle)
 			local vehPos = GetEntityCoords(vehicle)
 			local vehHead = GetEntityHeading(vehicle)
 			local vehPlate = GetPlate(vehicle)
-			local fuelLevel = GetVehicleFuelLevel(vehicle)
+			local fuelLevel = GetFuel(vehicle)
 			local trailerdata = nil
 
 			if Config.ParkVehiclesWithTrailers then
@@ -351,12 +375,13 @@ function Parking.Functions.Save(vehicle)
 					}
 				end
 			end
-			
+			if Config.UseParkWithCommand then Config.OnlyAutoParkWhenEngineIsOff = false end
+			Wait(500)
 			local engineIsOn = GetIsVehicleEngineRunning(vehicle)
 			if Config.OnlyAutoParkWhenEngineIsOff and engineIsOn then canSave = false end
 
 			if canSave then
-				Parking.Functions.BlinkVehiclelights(vehicle, true)
+				BlinkVehiclelights(vehicle, true)
 				TriggerCallback("mh-parkingV2:server:SaveCar", function(callback)
 					if callback.status then
 						DeleteVehicle(vehicle)
@@ -390,19 +415,26 @@ function Parking.Functions.DriveVehicle(data)
 	LoadModel(data.mods.model)
 	local tempVeh = CreateVehicle(data.mods.model, data.location.x, data.location.y, data.location.z, data.location.h, true)
 	while not DoesEntityExist(tempVeh) do Wait(1) end
+	SetEntityAsMissionEntity(tempVeh, true, true)
+	SetVehicleNumberPlateText(tempVeh, data.plate)	
+	print(PlayerData.citizenid, data.owner)
+	if PlayerData.citizenid == data.owner then
+		Entity(tempVeh).state.owner = data.owner
+		SetClientVehicleOwnerKey(GetPlate(tempVeh), tempVeh)
+	end
+
 	TaskWarpPedIntoVehicle(PlayerPedId(), tempVeh, -1)
-	SetVehicleProperties(tempVeh, data.mods)
+	SetEntityVisible(PlayerPedId(), true, 0)
 	SetVehicleOnGroundProperly(tempVeh)
+	SetVehicleProperties(tempVeh, data.mods)
+	SetEntityCollision(tempVeh, true, true)
 	SetVehRadioStation(tempVeh, 'OFF')
 	SetVehicleDirtLevel(tempVeh, 0)
 	FreezeEntityPosition(tempVeh, false)
-	SetEntityCollision(tempVeh, true, true)
 	DoVehicleDamage(tempVeh, data.body, data.engine)
+	
 	SetFuel(tempVeh, data.fuel)
-	SetEntityVisible(PlayerPedId(), true, 0)
-	if PlayerData.citizenid == data.owner then
-		SetClientVehicleOwnerKey(GetPlate(tempVeh), tempVeh)
-	end
+
 	if Config.ParkVehiclesWithTrailers then
 		if data.trailerdata ~= nil then
 			data.trailerEntity = Parking.Functions.SpawnTrailer(tempVeh, data)
@@ -475,6 +507,9 @@ function Parking.Functions.SpawnTrailer(vehicle, data)
 		LoadModel(data.trailerdata.hash)
 		tempVeh = CreateVehicle(data.trailerdata.hash, trailerSpawnPos.x, trailerSpawnPos.y, vehicleCoords.z - 1.5, heading, false, false)
 		while not DoesEntityExist(tempVeh) do Wait(1) end
+
+		Entity(tempVeh).state.owner = data.owner
+
 		SetEntityAsMissionEntity(tempVeh, true, true)
 		RequestCollisionAtCoord(trailerSpawnPos.x, trailerSpawnPos.y, trailerSpawnPos.z)
 		SetVehicleOnGroundProperly(tempVeh)
@@ -521,6 +556,7 @@ function Parking.Functions.SpawnTrailer(vehicle, data)
 						LoadModel(callback.load.hash)
 						local tempLoad = CreateVehicle(callback.load.hash, trailerSpawnPos.x, trailerSpawnPos.y, trailerSpawnPos.z, heading, false)
 						while not DoesEntityExist(tempLoad) do Wait(1) end
+						Entity(tempLoad).state.owner = data.owner
 						local x, y, z = 0.0, -1.0, 0.25
 						if GetEntityModel(tempLoad) == -1030275036 or GetEntityModel(tempLoad) == 3678636260 or GetEntityModel(tempLoad) == 3983945033 then
 							local localcoords = GetOffsetFromEntityGivenWorldCoords(trailer, GetEntityCoords(tempLoad))
@@ -543,6 +579,29 @@ function Parking.Functions.SpawnTrailer(vehicle, data)
 	return tempVeh
 end
 
+local function SpawnVoertuig(data)
+	LoadModel(data.mods.model)
+	local entity = CreateVehicle(data.mods.model, data.location.x, data.location.y, data.location.z, data.location.h, false)
+	while not DoesEntityExist(entity) do Wait(1) end
+	if PlayerData.citizenid == data.owner then
+		Entity(entity).state.owner = data.owner
+	end
+	SetEntityAsMissionEntity(entity, true, true)
+	SetVehicleNumberPlateText(entity, data.plate)
+	SetVehicleProperties(entity, data.mods)
+	SetVehicleEngineOn(entity, false, false, true)
+	RequestCollisionAtCoord(data.location.x, data.location.y, data.location.z)
+	SetVehicleOnGroundProperly(entity)
+	SetVehicleSteeringAngle(entity, data.steerangle + 0.0)
+	SetVehicleLivery(entity, data.mods.livery)
+	DoVehicleDamage(entity, data.body, data.engine)
+	SetEntityInvincible(entity, true)
+	SetVehRadioStation(entity, 'OFF')
+	SetVehicleDirtLevel(entity, 0)
+	SetModelAsNoLongerNeeded(data.mods.model)
+	return entity
+end
+
 function Parking.Functions.SpawnVehicles(vehicles)
 	while DeletingEntities do Wait(1000) end
 	for i = 1, #vehicles, 1 do
@@ -550,36 +609,19 @@ function Parking.Functions.SpawnVehicles(vehicles)
 		Parking.Functions.DeleteNearVehicle(vec3(vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z))
 		Parking.Functions.DeleteVehicleAtcoords(vehicles[i].location)
 		Wait(1000)
-		LoadModel(vehicles[i].mods.model)
-		local tempVeh = CreateVehicle(vehicles[i].mods.model, vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z, vehicles[i].location.h, false)
-		while not DoesEntityExist(tempVeh) do Wait(1) end
-		vehicles[i].entity = tempVeh
-		SetEntityAsMissionEntity(tempVeh, true, true)
-		SetVehicleNumberPlateText(tempVeh, vehicles[i].plate)
-		SetVehicleProperties(tempVeh, vehicles[i].mods)
-		SetVehicleEngineOn(tempVeh, false, false, true)
-		RequestCollisionAtCoord(vehicles[i].location.x, vehicles[i].location.y, vehicles[i].location.z)
-		SetVehicleOnGroundProperly(tempVeh)
-		SetVehicleSteeringAngle(tempVeh, vehicles[i].steerangle + 0.0)
-		SetVehicleLivery(tempVeh, vehicles[i].mods.livery)
-		DoVehicleDamage(tempVeh, vehicles[i].body, vehicles[i].engine)
-		SetFuel(tempVeh, vehicles[i].fuel)
-		SetEntityInvincible(tempVeh, true)
-		SetVehRadioStation(tempVeh, 'OFF')
-		SetVehicleDirtLevel(tempVeh, 0)
-		SetModelAsNoLongerNeeded(vehicles[i].mods["model"])
-		Parking.Functions.LockDoors(tempVeh, vehicles[i])
+		vehicles[i].entity = SpawnVoertuig(vehicles[i])
+		SetFuel(vehicles[i].entity, vehicles[i].fuel)
+		LockDoors(vehicles[i].entity, vehicles[i])
 		if PlayerData.citizenid == vehicles[i].owner then
 			TriggerServerEvent('mh-parkingV2:server:CreateOwnerVehicleBlip', vehicles[i].plate)
 		end
 		if Config.ParkVehiclesWithTrailers then
 			if vehicles[i].trailerdata ~= nil then
-				vehicles[i].trailerEntity = Parking.Functions.SpawnTrailer(tempVeh, vehicles[i])
+				vehicles[i].trailerEntity = Parking.Functions.SpawnTrailer(vehicles[i].entity, vehicles[i])
 			end
 		end
 		Wait(50)
-		Parking.Functions.AddToTable(tempVeh, vehicles[i])
-		tempVeh = nil
+		AddToTable(vehicles[i].entity, vehicles[i])
 	end
 end
 
@@ -589,36 +631,19 @@ function Parking.Functions.SpawnVehicle(vehicleData)
 	Parking.Functions.DeleteNearVehicle(vec3(vehicleData.location.x, vehicleData.location.y, vehicleData.location.z))
 	Parking.Functions.DeleteVehicleAtcoords(vehicleData.location)
 	Wait(1000)
-	LoadModel(vehicleData.mods.model)
-	local tempVeh = CreateVehicle(vehicleData.mods.model, vehicleData.location.x, vehicleData.location.y, vehicleData.location.z, vehicleData.location.h, false)
-	while not DoesEntityExist(tempVeh) do Wait(1) end
-	vehicleData.entity = tempVeh
-	SetEntityAsMissionEntity(tempVeh, true, true)
-	SetVehicleNumberPlateText(tempVeh, vehicleData.plate)
-	SetVehicleProperties(tempVeh, vehicleData.mods)
-	SetVehicleEngineOn(tempVeh, false, false, true)
-	RequestCollisionAtCoord(vehicleData.location.x, vehicleData.location.y, vehicleData.location.z)
-	SetVehicleOnGroundProperly(tempVeh)
-	SetVehicleSteeringAngle(tempVeh, vehicleData.steerangle + 0.0)
-	SetEntityInvincible(tempVeh, true)
-	DoVehicleDamage(tempVeh, vehicleData.body, vehicleData.engine)
-	SetVehicleLivery(tempVeh, vehicleData.mods.livery)
-	SetVehRadioStation(tempVeh, 'OFF')
-	SetVehicleDirtLevel(tempVeh, 0)
-	SetFuel(tempVeh, vehicleData.fuel)
-	SetModelAsNoLongerNeeded(vehicleData.mods.model)
-	Parking.Functions.LockDoors(tempVeh, vehicleData)
+	vehicleData.entity = SpawnVoertuig(vehicleData)
+	SetFuel(vehicleData.entity, vehicleData.fuel)
+	LockDoors(vehicleData.entity, vehicleData)
 	if PlayerData.citizenid == vehicleData.owner then
 		TriggerServerEvent('mh-parkingV2:server:CreateOwnerVehicleBlip', vehicleData.plate)
 	end
 	if Config.ParkVehiclesWithTrailers then
 		if vehicleData.trailerdata ~= nil then
-			vehicleData.trailerEntity = Parking.Functions.SpawnTrailer(tempVeh, vehicleData)
+			vehicleData.trailerEntity = Parking.Functions.SpawnTrailer(vehicleData.entity, vehicleData)
 		end
 	end
-	Wait(10)
-	Parking.Functions.AddToTable(tempVeh, vehicleData)
-	tempVeh = nil
+	Wait(50)
+	AddToTable(vehicleData.entity, vehicleData)
 end
 
 function Parking.Functions.SpawnVehicleChecker()
@@ -640,6 +665,7 @@ function Parking.Functions.SpawnVehicleChecker()
 					SpawnedVehicles = false
 				end
 			end
+			collectgarbage("collect")
 		end
 		Wait(1000)
 	end
@@ -830,6 +856,37 @@ local function GetAllPlayersInVehicle(vehicle)
     return pedsincar
 end
 
+function Parking.Functions.AllPlayersLeaveVehicle(vehicle)
+    if DoesEntityExist(vehicle) then
+		local players = GetAllPlayersInVehicle(vehicle)
+		if Config.OnlyAutoParkWhenEngineIsOff then
+			local engineIsOn = GetIsVehicleEngineRunning(vehicle)
+			if not engineIsOn then
+				TriggerServerEvent('mh-parkingV2:server:AllPlayersLeaveVehicle', VehToNet(vehicle), players)
+			end
+		else
+			TriggerServerEvent('mh-parkingV2:server:AllPlayersLeaveVehicle', VehToNet(vehicle), players)
+		end
+	end
+end
+
+function Parking.Functions.AutoPark(driver)
+    if isLoggedIn and Config.UseParkWithCommand == false then
+        local player = GetPlayerServerId(PlayerId())
+		if player == driver then
+			local vehicle = GetVehiclePedIsIn(PlayerPedId(), true)
+			if vehicle ~= 0 and DoesEntityExist(vehicle) then
+				local engineIsOn = GetIsVehicleEngineRunning(vehicle)
+				if not engineIsOn then
+					Parking.Functions.AllPlayersLeaveVehicle(vehicle)
+					Wait(3000)
+					Parking.Functions.Save(vehicle)
+				end
+			end
+        end
+    end
+end
+
 -- This is for the player thet is in a vehicle and has to leave.
 function Parking.Functions.LeaveVehicle(data)
     local player = GetPlayerServerId(PlayerId())
@@ -839,27 +896,6 @@ function Parking.Functions.LeaveVehicle(data)
             TaskLeaveVehicle(PlayerPedId(), vehicle, 0)
         end
     end    
-end
-
-function Parking.Functions.AllPlayersLeaveVehicle(vehicle)
-    if DoesEntityExist(vehicle) then
-		local players = GetAllPlayersInVehicle(vehicle)
-		TriggerServerEvent('mh-parkingV2:server:AllPlayersLeaveVehicle', VehToNet(vehicle), players)
-    end
-end
-
-function Parking.Functions.AutoPark(driver)
-    if isLoggedIn and Config.UseParkWithCommand == false then
-        local player = GetPlayerServerId(PlayerId())
-		if player == driver then
-			local vehicle = GetVehiclePedIsIn(PlayerPedId(), true)
-			if vehicle ~= 0 and DoesEntityExist(vehicle) then
-				Parking.Functions.AllPlayersLeaveVehicle(vehicle)
-				Wait(3000)
-				Parking.Functions.Save(vehicle)
-			end
-        end
-    end
 end
 
 function Parking.Functions.AutoDrive(driver)
@@ -878,13 +914,8 @@ function Parking.Functions.AutoDrive(driver)
     end
 end
 
-function Parking.Functions.KeepEngineRunning()
-    if IsPedInAnyVehicle(PlayerPedId(), false) and IsControlPressed(2, 75) and not IsEntityDead(PlayerPedId()) then
-        SetVehicleEngineOn(GetVehiclePedIsIn(PlayerPedId(), false), true, true, true)
-    end
-end
 
-function LockVehiclesOnTrailer(plate, state)
+local function LockVehiclesOnTrailer(plate, state)
 	for i = 1, #trailerLoad[plate] do
 		if trailerLoad[plate][i] then
 			if trailerLoad[plate][i].entity then
@@ -945,7 +976,7 @@ function Parking.Functions.RemoveVehicleFromTrailer(vehiclePlate)
 	end
 end
 
-function GetTrailerLocalPosNumber(trailer, coords)
+local function GetTrailerLocalPosNumber(trailer, coords)
 	local number = -1
 	for k, v in pairs(Config.Trailers[GetEntityModel(trailer)].parklist) do
 		if #(v.coords - coords) < 1 then
@@ -1188,33 +1219,50 @@ function Parking.Functions.LoadTarget()
 end
 
 function Parking.Functions.GetInAndOutVehicle()
-    local ped = PlayerPedId()
-	if Config.UseParkWithCommand == false then
-		if not isInVehicle and not IsPlayerDead(PlayerId()) then
-			if DoesEntityExist(GetVehiclePedIsTryingToEnter(ped)) and not isEnteringVehicle then
-				currentVehicle = GetVehiclePedIsTryingToEnter(ped)
-				currentSeat = GetSeatPedIsTryingToEnter(ped)
-				isEnteringVehicle = true
-				local plate = GetPlate(currentVehicle)
-				TriggerServerEvent('mh-parkingV2:server:EnteringVehicle', currentSeat, plate)
-			elseif not DoesEntityExist(GetVehiclePedIsTryingToEnter(ped)) and not IsPedInAnyVehicle(ped, true) and isEnteringVehicle then
-				isEnteringVehicle = false
-			elseif IsPedInAnyVehicle(ped, false) then
-				isEnteringVehicle = false
-				isInVehicle = true
-				currentVehicle = GetVehiclePedIsUsing(ped)
-				currentSeat = GetPedVehicleSeat(ped)
-				local plate = GetPlate(currentVehicle)
-				TriggerServerEvent('mh-parkingV2:server:EnteredVehicle', currentSeat, plate)
+	while true do 
+		Wait(0) 
+		if isLoggedIn then 
+			local ped = PlayerPedId()
+			if Config.UseParkWithCommand == false then
+				if not isInVehicle and not IsPlayerDead(PlayerId()) then
+					if DoesEntityExist(GetVehiclePedIsTryingToEnter(ped)) and not isEnteringVehicle then
+						currentVehicle = GetVehiclePedIsTryingToEnter(ped)
+						currentSeat = GetSeatPedIsTryingToEnter(ped)
+						isEnteringVehicle = true
+						local plate = GetPlate(currentVehicle)
+						TriggerServerEvent('mh-parkingV2:server:EnteringVehicle', currentSeat, plate)
+					elseif not DoesEntityExist(GetVehiclePedIsTryingToEnter(ped)) and not IsPedInAnyVehicle(ped, true) and isEnteringVehicle then
+						isEnteringVehicle = false
+					elseif IsPedInAnyVehicle(ped, false) then
+						isEnteringVehicle = false
+						isInVehicle = true
+						currentVehicle = GetVehiclePedIsUsing(ped)
+						currentSeat = GetPedVehicleSeat(ped)
+						local plate = GetPlate(currentVehicle)
+						TriggerServerEvent('mh-parkingV2:server:EnteredVehicle', currentSeat, plate)
+					end
+				elseif isInVehicle then
+					if not IsPedInAnyVehicle(ped, false) or IsPlayerDead(PlayerId()) then
+						local plate = GetPlate(GetVehiclePedIsIn(ped, true))
+						TriggerServerEvent('mh-parkingV2:server:LeftVehicle', currentSeat, plate)
+						isEnteringVehicle = false
+						isInVehicle = false
+						currentVehicle = 0
+						currentSeat = 0
+					end
+				end
+				Wait(50)
 			end
-		elseif isInVehicle then
-			if not IsPedInAnyVehicle(ped, false) or IsPlayerDead(PlayerId()) then
-				local plate = GetPlate(GetVehiclePedIsIn(ped, true))
-				TriggerServerEvent('mh-parkingV2:server:LeftVehicle', currentSeat, plate)
-				isEnteringVehicle = false
-				isInVehicle = false
-				currentVehicle = 0
-				currentSeat = 0
+		end
+	end
+end
+
+function Parking.Functions.KeepEngineRunning()
+	while true do 
+		Wait(0) 
+		if isLoggedIn then
+			if IsPedInAnyVehicle(PlayerPedId(), false) and IsControlPressed(2, 75) and not IsEntityDead(PlayerPedId()) then
+				SetVehicleEngineOn(GetVehiclePedIsIn(PlayerPedId(), false), true, true, true)
 			end
 		end
 	end
@@ -1222,7 +1270,7 @@ end
 
 function Parking.Functions.UseParkCommand()
 	while true do
-		if Config.UseParkWithCommand then
+		if Config.UseParkWithCommand == true then
 		    local player = PlayerPedId()
 		    if IsPedInAnyVehicle(player) then
 				local vehicle = GetVehiclePedIsIn(player, false)
@@ -1248,11 +1296,12 @@ function Parking.Functions.UseParkCommand()
 								else
 									if IsThisModelACar(GetEntityModel(vehicle)) or IsThisModelABike(GetEntityModel(vehicle)) or IsThisModelABicycle(GetEntityModel(vehicle)) or IsThisModelAPlane(GetEntityModel(vehicle)) or IsThisModelABoat(GetEntityModel(vehicle)) or IsThisModelAHeli(GetEntityModel(vehicle)) then
 										Parking.Functions.AllPlayersLeaveVehicle(vehicle)
-										Wait(3000)
+										TaskLeaveVehicle(PlayerPedId(), vehicle, 0)
+										Wait(2000)
 										Parking.Functions.Save(vehicle)
 										isInVehicle = false
 										currentVehicle = 0
-										currentSeat = 0	
+										currentSeat = 0
 									else
 										Notify(Lang:t("info.only_cars_allowd"), "primary", 5000)
 									end

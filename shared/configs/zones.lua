@@ -1,3 +1,7 @@
+-- [[ ===================================================== ]] --
+-- [[               MH Parking V2 by MaDHouSe79             ]] --
+-- [[ ===================================================== ]] --
+
 ---------------------------------------No Parking--------------------------------------
 -- This are locations where you can't use the park system.
 -- the reason for this is it can be that you need to use the vehicle on that point.
@@ -23,7 +27,7 @@ Config.NoParkingLocations = {
     {coords = vector3(2358.866, 3139.057, 47.37369), radius = 10.0, color = 1, sprite = 163, job = 'scraptard'},   -- scraptard pos 2 (in de hal) (right)
     {coords = vector3(2333.153, 3042.031, 47.31144), radius = 10.0, color = 1, sprite = 163, job = 'scraptard'},   -- scraptard pos 3 (outside) (left)
     {coords = vector3(2339.808, 3042.183, 47.3141), radius = 10.0, color = 1, sprite = 163, job = 'scraptard'},    -- scraptard pos 4 (outside) (right)
-    -- you can add more locations here.
+    -- you can add more here.
 }
 ---------------------------------------Parking lots-------------------------------------
 -- Parking lots
@@ -50,5 +54,5 @@ Config.AllowedParkingLots = {
     {coords = vector3(253.9985, -1156.1332, 28.6003), radius = 15.0, color = 2, sprite = 237},  -- parkinglot 15
     {coords = vector3(1183.6377, -1550.7142, 34.1825), radius = 20.0, color = 2, sprite = 237}, -- parkinglot 16
     {coords = vector3(131.8025, -712.3470, 32.4903), radius = 50.0, color = 2, sprite = 237},   -- parkinglot 17
-
+    -- you can add here.
 }

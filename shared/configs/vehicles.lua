@@ -1,6 +1,6 @@
---[[ ===================================================== ]] --
---[[               MH Parking V2 by MaDHouSe79             ]] --
---[[ ===================================================== ]] --
+-- [[ ===================================================== ]] --
+-- [[               MH Parking V2 by MaDHouSe79             ]] --
+-- [[ ===================================================== ]] --
 -- Vehicle list, you can add more if the vehicle does not exist in this list.
 Config.Vehicles = {
     [437538602] = { model = "speeder2", name = "Speeder Yacht", brand = "Pegassi", category = "boats" },
